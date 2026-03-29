@@ -3,19 +3,92 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f6f8fb;
+  --foreground: #08111f;
+  --panel: rgba(255, 255, 255, 0.78);
+  --panel-strong: rgba(255, 255, 255, 0.9);
+  --panel-border: rgba(15, 23, 42, 0.08);
+  --muted: #516076;
+  --grid-line: rgba(58, 76, 103, 0.06);
+  --glow-a: rgba(41, 121, 255, 0.08);
+  --glow-b: rgba(0, 229, 255, 0.07);
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  --background: #06111f;
+  --foreground: #eff6ff;
+  --panel: rgba(7, 19, 34, 0.76);
+  --panel-strong: rgba(8, 24, 42, 0.88);
+  --panel-border: rgba(148, 163, 184, 0.16);
+  --muted: #93a6bf;
+  --grid-line: rgba(129, 160, 201, 0.08);
+  --glow-a: rgba(34, 211, 238, 0.1);
+  --glow-b: rgba(37, 99, 235, 0.12);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Geist", "Segoe UI", sans-serif;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(circle at 18% 18%, var(--glow-a), transparent 24%),
+    radial-gradient(circle at 82% 12%, var(--glow-b), transparent 22%),
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size:
+    auto,
+    auto,
+    72px 72px,
+    72px 72px;
+  background-attachment: fixed;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.015), transparent 35%),
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.04), transparent 42%);
+  mix-blend-mode: screen;
+  opacity: 0.45;
+}
+
+::selection {
+  background: rgba(56, 189, 248, 0.3);
+  color: var(--foreground);
+}
+
+@layer components {
+  .glass-panel {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    box-shadow:
+      0 16px 40px rgba(2, 8, 23, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(18px);
+  }
+
+  .glass-panel-strong {
+    background: var(--panel-strong);
+    border: 1px solid var(--panel-border);
+    box-shadow:
+      0 18px 48px rgba(2, 8, 23, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    background-size: auto, auto, 42px 42px, 42px 42px;
+  }
 }
 
 @layer utilities {

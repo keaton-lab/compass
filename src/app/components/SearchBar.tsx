@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Search, X } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface SearchBarProps {
@@ -43,11 +43,6 @@ export default function SearchBar({
     debouncedSearch(value);
   };
 
-  const handleClear = () => {
-    setQuery('');
-    handleSearch('');
-  };
-
   const handleFocus = () => setIsFocused(true);
   const handleBlur = () => setIsFocused(false);
 
@@ -61,16 +56,16 @@ export default function SearchBar({
 
   return (
     <motion.div
-      className="relative w-full max-w-md"
+      className="relative w-full max-w-xl"
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="relative">
-        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10" aria-hidden="true">
+      <div className="glass-panel relative rounded-[24px] p-1.5">
+        <div className="absolute left-5 top-1/2 z-10 -translate-y-1/2" aria-hidden="true">
           <Search 
-            size={16} 
-            className={`transition-colors ${isFocused ? 'text-blue-400' : 'text-gray-400'}`}
+            size={16}
+            className={`transition-colors ${isFocused ? 'text-cyan-400' : 'text-[var(--muted)]'}`}
           />
         </div>
 
@@ -82,26 +77,11 @@ export default function SearchBar({
           onBlur={handleBlur}
           placeholder={placeholder}
           disabled={disabled}
-          className="w-full pl-9 pr-9 py-2.5 md:py-3 bg-white/5 border border-white/10 rounded-lg md:rounded-xl text-sm md:text-base text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full rounded-[20px] border border-transparent bg-transparent py-3 pl-11 pr-4 text-sm text-slate-900 outline-none transition-colors placeholder:text-[var(--muted)] focus:border-cyan-400/30 dark:text-white md:py-3.5 md:text-base disabled:cursor-not-allowed disabled:opacity-50"
         />
 
-        {query && (
-          <motion.button
-            type="button"
-            onClick={handleClear}
-            className="absolute right-2.5 md:right-3 top-1/2 transform -translate-y-1/2 z-10"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            aria-label="Clear search"
-          >
-            <X size={16} className="text-gray-400 hover:text-white transition-colors" />
-          </motion.button>
-        )}
-
         {showResultCount && query && (
-          <div className="absolute -bottom-6 left-0 text-sm text-gray-400">
+          <div className="absolute -bottom-7 left-1 text-xs tracking-[0.18em] text-[var(--muted)] uppercase">
             {resultCount} {resultCount === 1 ? 'result' : 'results'}
           </div>
         )}

@@ -39,38 +39,51 @@ const itemVariants = {
 export default function CategorySection({ category, index }: CategorySectionProps) {
   const { layout } = useSettings();
   const { animations } = useSettings();
-  void index;
+  const categoryNumber = String(index + 1).padStart(2, '0');
 
   // Determine grid layout classes based on current settings
   const gridColumnsClass = layout === 'grid'
-    ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+    ? 'grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
     : 'grid-cols-1';
-  const gapClass = layout === 'list' ? 'gap-6' : 'gap-4';
+  const gapClass = layout === 'list' ? 'gap-5' : 'gap-3 md:gap-4';
 
   // If animations are disabled, render static markup (no motion components)
   if (!animations) {
     return (
-      <section className="mb-12">
-        {/* Category Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <div
-            className="flex items-center justify-center w-10 h-10 rounded-lg"
-            style={{ backgroundColor: `${category.color}20` }}
-          >
-            <Icon name={category.icon} size={20} />
+      <section className="mb-12 md:mb-14">
+        <div className="mb-5 flex flex-col gap-3 md:mb-7 md:flex-row md:items-end md:justify-between md:gap-4">
+          <div className="flex items-center gap-4">
+            <div
+              className="flex h-12 w-12 items-center justify-center rounded-2xl border"
+              style={{
+                backgroundColor: `${category.color}18`,
+                borderColor: `${category.color}38`
+              }}
+            >
+              <Icon name={category.icon} size={20} color={category.color} />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.32em] text-[var(--muted)]">
+                Sector {categoryNumber}
+              </p>
+              <h2 className="mt-1 text-xl font-semibold text-slate-950 dark:text-white md:text-2xl">
+                {category.name}
+              </h2>
+            </div>
           </div>
           <div className="flex items-center gap-3">
-            <h2 className="text-xl font-bold text-white">{category.name}</h2>
-            <div 
-              className="h-px flex-1 min-w-[60px]"
-              style={{ 
-                background: `linear-gradient(to right, ${category.color}40, transparent)` 
+            <div
+              className="h-px w-16 md:w-28"
+              style={{
+                background: `linear-gradient(to right, transparent, ${category.color}80, transparent)`
               }}
             />
+            <p className="text-xs uppercase tracking-[0.28em] text-[var(--muted)]">
+              {category.links.length} links
+            </p>
           </div>
         </div>
 
-        {/* Links Grid */}
         <div className={`grid ${gridColumnsClass} ${gapClass}`}>
           {category.links.map((link) => (
             <div key={link.id}>
@@ -85,31 +98,44 @@ export default function CategorySection({ category, index }: CategorySectionProp
   // Animations enabled: use AnimationController to apply animated container
   return (
     <AnimationController className="mb-12" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-      <section className="mb-12">
-        {/* Category Header (animated) */}
-        <motion.div 
-          className="flex items-center gap-3 mb-6"
+      <section className="mb-12 md:mb-14">
+        <motion.div
+          className="mb-5 flex flex-col gap-3 md:mb-7 md:flex-row md:items-end md:justify-between md:gap-4"
           variants={containerVariants}
         >
-          <div 
-            className="flex items-center justify-center w-10 h-10 rounded-lg"
-            style={{ backgroundColor: `${category.color}20` }}
-          >
-            <Icon name={category.icon} size={20} />
+          <div className="flex items-center gap-4">
+            <div
+              className="flex h-12 w-12 items-center justify-center rounded-2xl border"
+              style={{
+                backgroundColor: `${category.color}18`,
+                borderColor: `${category.color}38`
+              }}
+            >
+              <Icon name={category.icon} size={20} color={category.color} />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.32em] text-[var(--muted)]">
+                Sector {categoryNumber}
+              </p>
+              <h2 className="mt-1 text-xl font-semibold text-slate-950 dark:text-white md:text-2xl">
+                {category.name}
+              </h2>
+            </div>
           </div>
           <div className="flex items-center gap-3">
-            <h2 className="text-xl font-bold text-white">{category.name}</h2>
-            <div 
-              className="h-px flex-1 min-w-[60px]"
-              style={{ 
-                background: `linear-gradient(to right, ${category.color}40, transparent)` 
+            <div
+              className="h-px w-16 md:w-28"
+              style={{
+                background: `linear-gradient(to right, transparent, ${category.color}80, transparent)`
               }}
             />
+            <p className="text-xs uppercase tracking-[0.28em] text-[var(--muted)]">
+              {category.links.length} links
+            </p>
           </div>
         </motion.div>
 
-        {/* Links Grid */}
-        <motion.div 
+        <motion.div
           className={`grid ${gridColumnsClass} ${gapClass}`}
           variants={containerVariants}
         >

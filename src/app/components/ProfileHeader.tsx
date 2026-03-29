@@ -64,47 +64,46 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
   return (
     <>
       <motion.div
-        className="md:hidden flex flex-row items-center justify-between w-full px-4 py-3 bg-white/5 dark:bg-white/5 backdrop-blur-md border border-black/5 dark:border-white/10 rounded-xl"
+        className="glass-panel md:hidden w-full rounded-[24px] p-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-      > 
+      >
         <div className="flex items-center gap-3">
-          {renderAvatar('w-10 h-10', 24, 'text-base')}
-          <h1 className="text-base font-bold text-gray-900 dark:text-white">
-            {name}
-          </h1>
-        </div>
-
-        <div className="text-right">
-          <p className="text-xs text-gray-600 dark:text-gray-400">
-            {description}
-          </p>
-          {bio && (
-            <p className="text-xs text-gray-500 dark:text-gray-500 leading-relaxed mt-0.5">
-              {bio}
+          {renderAvatar('w-11 h-11', 24, 'text-base')}
+          <div className="min-w-0">
+            <h1 className="truncate text-lg font-semibold text-slate-950 dark:text-white">
+              {name}
+            </h1>
+            <p className="truncate text-sm text-[var(--muted)]">
+              {description}
             </p>
-          )}
+          </div>
         </div>
       </motion.div>
 
       <motion.div
-        className="hidden md:flex flex-row items-center gap-4 p-4 rounded-xl bg-white/5 dark:bg-white/5 backdrop-blur-md border border-black/5 dark:border-white/10"
+        className="glass-panel hidden md:flex items-center gap-4 rounded-[28px] px-6 py-5"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-      > 
+      >
         <div className="flex-shrink-0">
-          {renderAvatar('w-12 h-12', 28, 'text-xl')}
+          {renderAvatar('w-14 h-14', 30, 'text-xl')}
         </div>
 
         <div className="flex-1 min-w-0">
-          <h1 className="text-lg font-bold text-gray-900 dark:text-white truncate">
+          <h1 className="text-2xl font-semibold text-slate-950 dark:text-white truncate">
             {name}
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+          <p className="mt-1 text-sm text-slate-700 dark:text-slate-300 truncate">
             {description}
           </p>
+          {bio && (
+            <p className="mt-1 text-sm text-[var(--muted)] truncate">
+              {bio}
+            </p>
+          )}
         </div>
       </motion.div>
     </>

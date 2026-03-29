@@ -1,54 +1,207 @@
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
+const lucideReact = require('lucide-react');
+const simpleIcons = require('simple-icons');
 
 const configPath = path.join(__dirname, '../src/data/config.yaml');
 const configContent = fs.readFileSync(configPath, 'utf8');
 const config = yaml.load(configContent);
 
-const lucideIcons = new Set();
+function toKebabCase(value) {
+  return String(value)
+    .trim()
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .replace(/[_\s]+/g, '-')
+    .replace(/-+/g, '-')
+    .toLowerCase();
+}
+
+function createLucideResolver() {
+  const exportNames = Object.keys(lucideReact).filter(
+    (name) => /^[A-Z]/.test(name) && !name.endsWith('Icon')
+  );
+
+  const kebabToPascal = new Map();
+  const collapsedToPascal = new Map();
+  const exact = new Set(exportNames);
+
+  exportNames.forEach((name) => {
+    const kebab = toKebabCase(name);
+    if (!kebabToPascal.has(kebab)) {
+      kebabToPascal.set(kebab, name);
+    }
+    const collapsed = kebab.replace(/-/g, '');
+    if (!collapsedToPascal.has(collapsed)) {
+      collapsedToPascal.set(collapsed, name);
+    }
+  });
+
+  return function resolveIconName(rawName) {
+    const trimmed = String(rawName).trim();
+    if (!trimmed) {
+      return null;
+    }
+
+    if (exact.has(trimmed)) {
+      return trimmed;
+    }
+
+    const kebab = toKebabCase(trimmed);
+    if (kebabToPascal.has(kebab)) {
+      return kebabToPascal.get(kebab);
+    }
+
+    const collapsed = kebab.replace(/-/g, '');
+    if (collapsedToPascal.has(collapsed)) {
+      return collapsedToPascal.get(collapsed);
+    }
+
+    return null;
+  };
+}
+
+function createBrandResolver() {
+  const exportNames = Object.keys(simpleIcons).filter((name) => /^si[A-Z]/.test(name));
+  const kebabToExport = new Map();
+  const collapsedToExport = new Map();
+  const exact = new Set(exportNames);
+
+  exportNames.forEach((name) => {
+    const shortName = name.slice(2);
+    const kebab = toKebabCase(shortName);
+    if (!kebabToExport.has(kebab)) {
+      kebabToExport.set(kebab, name);
+    }
+    const collapsed = kebab.replace(/-/g, '');
+    if (!collapsedToExport.has(collapsed)) {
+      collapsedToExport.set(collapsed, name);
+    }
+  });
+
+  return function resolveBrandName(rawName) {
+    const trimmed = String(rawName).trim();
+    if (!trimmed) {
+      return null;
+    }
+
+    if (exact.has(trimmed)) {
+      return trimmed;
+    }
+
+    const kebab = toKebabCase(trimmed);
+    if (kebabToExport.has(kebab)) {
+      return kebabToExport.get(kebab);
+    }
+
+    const collapsed = kebab.replace(/-/g, '');
+    if (collapsedToExport.has(collapsed)) {
+      return collapsedToExport.get(collapsed);
+    }
+
+    return null;
+  };
+}
+
+const resolveLucideName = createLucideResolver();
+const resolveBrandName = createBrandResolver();
+const requestedRawIcons = new Set();
+const resolvedLucideIcons = new Set();
 const brandIcons = new Set();
+const resolvedBrandIcons = new Map();
 
 if (config.profile?.avatar) {
-  const avatar = config.profile.avatar;
+  const avatar = String(config.profile.avatar);
   if (avatar.startsWith('icon:')) {
-    lucideIcons.add(avatar.slice(5));
+    requestedRawIcons.add(avatar.slice(5));
   }
 }
 
 if (config.categories) {
   config.categories.forEach(category => {
     if (category.icon) {
-      lucideIcons.add(category.icon);
+      requestedRawIcons.add(category.icon);
     }
     if (category.links) {
       category.links.forEach(link => {
         if (link.icon) {
-          const icon = link.icon;
-          if (icon.toLowerCase() === icon && !icon.includes('-') && !icon.includes(' ')) {
-            brandIcons.add(icon);
-          } else {
-            lucideIcons.add(icon);
-          }
+          requestedRawIcons.add(link.icon);
         }
       });
     }
   });
 }
 
-const fixedLucideIcons = ['Sun', 'Moon', 'Grid', 'List', 'Play', 'Pause', 'Search', 'X', 'Settings', 'Check', 'ChevronDown', 'ChevronUp', 'ChevronLeft', 'ChevronRight', 'Menu', 'Home', 'User', 'LogOut', 'LogIn', 'UserPlus', 'UserMinus', 'UserCheck', 'UserX', 'Users', 'UserCircle', 'UserCog', 'UserSearch', 'UserEdit', 'UserPlus', 'UserMinus', 'UserCheck', 'UserX', 'Users', 'UserCircle', 'UserCog', 'UserSearch', 'UserEdit'];
-fixedLucideIcons.forEach(icon => lucideIcons.add(icon));
+requestedRawIcons.forEach((rawIcon) => {
+  const resolved = resolveLucideName(rawIcon);
+  if (resolved) {
+    resolvedLucideIcons.add(resolved);
+  } else {
+    const normalizedName = toKebabCase(rawIcon);
+    brandIcons.add(normalizedName);
+    const resolvedBrand = resolveBrandName(normalizedName);
+    if (resolvedBrand) {
+      resolvedBrandIcons.set(normalizedName, resolvedBrand);
+    }
+  }
+});
 
 const fixedBrandIcons = ['github'];
-fixedBrandIcons.forEach(icon => brandIcons.add(icon));
+fixedBrandIcons.forEach((icon) => {
+  brandIcons.add(icon);
+  const resolvedBrand = resolveBrandName(icon);
+  if (resolvedBrand) {
+    resolvedBrandIcons.set(icon, resolvedBrand);
+  }
+});
 
-const uniqueLucideIcons = [...lucideIcons];
-const uniqueBrandIcons = [...brandIcons];
+const uniqueLucideIcons = [...resolvedLucideIcons].sort((a, b) => a.localeCompare(b));
+const uniqueBrandIcons = [...brandIcons].sort((a, b) => a.localeCompare(b));
 
-const output = `// This file is auto-generated by scripts/generate-icons-manifest.js
+const lucideImportLine = uniqueLucideIcons.length > 0
+  ? `import { ${uniqueLucideIcons.join(', ')} } from 'lucide-react';\n`
+  : '';
+
+const lucideRecordEntries = uniqueLucideIcons
+  .map((icon) => `  ${icon},`)
+  .join('\n');
+
+const lucideNames = uniqueLucideIcons.map((icon) => toKebabCase(icon));
+
+const brandImportNames = [...new Set([...resolvedBrandIcons.values()])].sort((a, b) => a.localeCompare(b));
+const brandImportLine = brandImportNames.length > 0
+  ? `import { ${brandImportNames.join(', ')} } from 'simple-icons';\n`
+  : '';
+
+const brandRecordEntries = uniqueBrandIcons
+  .map((name) => {
+    const exportName = resolvedBrandIcons.get(name);
+    if (!exportName) {
+      return '';
+    }
+    return `  "${name}": { path: ${exportName}.path, hex: ${exportName}.hex },`;
+  })
+  .filter(Boolean)
+  .join('\n');
+
+const output = `// This file is auto-generated by scripts/generate-icons-manifest.js.
 // Do not edit manually
 
-export const lucideIconNames: string[] = ${JSON.stringify(uniqueLucideIcons, null, 2)};
+${lucideImportLine}import type { LucideIcon } from 'lucide-react';
+${brandImportLine}export interface BrandIconData {
+  path: string;
+  hex: string;
+}
+
+export const lucideIcons: Record<string, LucideIcon> = {
+${lucideRecordEntries}
+};
+
+export const brandIconsMap: Record<string, BrandIconData> = {
+${brandRecordEntries}
+};
+
+export const lucideIconNames: string[] = ${JSON.stringify(lucideNames, null, 2)};
 
 export const brandIconNames: string[] = ${JSON.stringify(uniqueBrandIcons, null, 2)};
 
@@ -61,6 +214,6 @@ fs.writeFileSync(outputPath, output);
 console.log('Generated icons-manifest.ts with:');
 console.log('- Lucide icons:', uniqueLucideIcons.length);
 console.log('- Brand icons:', uniqueBrandIcons.length);
-console.log('- Total icons:', lucideIcons.size + brandIcons.size);
-console.log('\nLucide icons:', uniqueLucideIcons);
+console.log('- Total icons:', uniqueLucideIcons.length + uniqueBrandIcons.length);
+console.log('\nLucide icons (PascalCase):', uniqueLucideIcons);
 console.log('Brand icons:', uniqueBrandIcons);

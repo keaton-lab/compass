@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { load as yamlLoad } from 'js-yaml';
+import { unstable_noStore as noStore } from 'next/cache';
 import ClientLayout from './components/ClientLayout';
 import type { Config } from './types';
 
@@ -10,9 +11,10 @@ function loadConfig(): Config {
   return yamlLoad(fileContents) as Config;
 }
 
-const config: Config = loadConfig();
-
 export default function HomePage() {
+  noStore();
+
+  const config = loadConfig();
   const { profile, settings, categories } = config;
 
   return (

@@ -20,7 +20,7 @@ categories:
   - id: github
     name: GitHub
     url: https://github.com
-    icon: map
+    icon: github
     description: 代码托管平台
   - id: gmail
     name: Gmail
@@ -30,7 +30,7 @@ categories:
   - id: youtube
     name: YouTube
     url: https://youtube.com
-    icon: Play
+    icon: youtube
     description: 视频平台
 - id: tools
   name: Tools
@@ -40,7 +40,7 @@ categories:
   - id: vercel
     name: Vercel
     url: https://vercel.com
-    icon: Rocket
+    icon: vercel
     description: 前端部署平台
   - id: figma
     name: Figma

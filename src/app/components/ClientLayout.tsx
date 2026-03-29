@@ -45,78 +45,63 @@ export default function ClientLayout({
     (acc, cat) => acc + cat.links.length,
     0,
   );
-
   const shouldShowSearch = settings.showSearch;
 
   return (
     <>
       <ThemeToggle />
-      <div className="min-h-screen bg-background text-foreground">
-        <header className="px-4 md:container md:mx-auto md:px-4 py-4 md:py-8">
-          <div className="hidden md:flex flex-row justify-between items-center gap-6">
+      <div className="min-h-screen text-foreground">
+        <div className="mx-auto max-w-[1440px] px-4 pb-24 pt-4 md:px-6 md:pb-16 md:pt-6">
+          <header className="space-y-5">
             <ProfileHeader profile={profile} />
 
             {shouldShowSearch && (
-              <SearchBar
-                onSearch={setSearchQuery}
-                placeholder="搜索链接..."
-                showResultCount={true}
-                resultCount={totalResults}
-              />
+              <div className="max-w-2xl">
+                <SearchBar
+                  onSearch={setSearchQuery}
+                  placeholder="搜索链接、描述或工作入口..."
+                  showResultCount={true}
+                  resultCount={totalResults}
+                />
+              </div>
             )}
-          </div>
-          <div className="md:hidden">
-            <ProfileHeader profile={profile} />
-          </div>
-        </header>
+          </header>
 
-        <main className="container mx-auto px-4 pb-24 md:pb-16">
-          {filteredCategories.map((category, index) => (
-            <CategorySection
-              key={category.id}
-              category={category}
-              index={index}
-            />
-          ))}
+          <main className="mt-8 md:mt-10">
+            {filteredCategories.map((category, index) => (
+              <CategorySection
+                key={category.id}
+                category={category}
+                index={index}
+              />
+            ))}
 
-          {query && filteredCategories.length === 0 && (
-            <div className="text-center py-16">
-              <h2 className="text-2xl font-bold text-white mb-4">未找到结果</h2>
-              <p className="text-gray-400">尝试其他关键词</p>
-            </div>
-          )}
-        </main>
+            {query && filteredCategories.length === 0 && (
+              <div className="glass-panel-strong py-20 text-center rounded-[32px]">
+                <h2 className="text-2xl font-semibold text-slate-950 dark:text-white">未找到结果</h2>
+                <p className="mt-3 text-[var(--muted)]">尝试其他关键词，或者检查链接描述中的命名方式。</p>
+              </div>
+            )}
+          </main>
 
-        <footer className="hidden md:block container mx-auto px-4 py-8 border-t border-white/10">
-          <div className="flex flex-col items-center gap-2">
-            {
+          <footer className="mt-10 hidden border-t border-white/10 px-2 py-8 md:block">
+            <div className="flex flex-col items-center gap-2">
               <a
                 href={profile.repo || ""}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+                className="flex items-center gap-2 text-[var(--muted)] transition-colors hover:text-slate-900 dark:hover:text-white"
               >
                 <Icon name="github" size={16} />
                 <span className="text-sm">{profile.name}</span>
               </a>
-            }
-            <p className="text-gray-400 text-sm">
-              {categories.length} categories •{" "}
-              {categories.reduce((acc, cat) => acc + cat.links.length, 0)} links
-            </p>
-          </div>
-        </footer>
-
-        {shouldShowSearch && (
-          <div className="md:hidden fixed bottom-0 left-0 right-0 p-3 bg-background/80 backdrop-blur-md border-t border-white/10">
-            <SearchBar
-              onSearch={setSearchQuery}
-              placeholder="搜索链接..."
-              showResultCount={true}
-              resultCount={totalResults}
-            />
-          </div>
-        )}
+              <p className="text-sm text-[var(--muted)]">
+                {categories.length} categories •{" "}
+                {categories.reduce((acc, cat) => acc + cat.links.length, 0)} links
+              </p>
+            </div>
+          </footer>
+        </div>
       </div>
     </>
   );

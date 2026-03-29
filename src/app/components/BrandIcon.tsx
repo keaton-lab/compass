@@ -1,10 +1,6 @@
 'use client';
 
-import { siGithub } from 'simple-icons';
-
-const brandIconsMap: Record<string, { path: string; hex: string }> = {
-  github: { path: siGithub.path, hex: siGithub.hex },
-};
+import { brandIconsMap } from '../../data/icons-manifest';
 
 interface BrandIconProps {
   name: string;
