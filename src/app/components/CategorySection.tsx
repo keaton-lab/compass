@@ -3,24 +3,9 @@
 import { motion } from 'framer-motion';
 import AnimationController from './AnimationController';
 import { useSettings } from '../contexts/SettingsContext';
-import { 
-  Calendar, 
-  Wrench, 
-  Code2, 
-  Users, 
-  Cloud,
-  LucideIcon
-} from 'lucide-react';
+import Icon from './Icon';
 import type { Category as CategoryType } from '../types';
 import NavigationCard from './NavigationCard';
-
-const iconMap: Record<string, LucideIcon> = {
-  Calendar,
-  Wrench,
-  Code2,
-  Users,
-  Cloud,
-};
 
 interface CategorySectionProps {
   category: CategoryType;
@@ -55,7 +40,6 @@ export default function CategorySection({ category, index }: CategorySectionProp
   const { layout } = useSettings();
   const { animations } = useSettings();
   void index;
-  const IconComponent = iconMap[category.icon] || Cloud;
 
   // Determine grid layout classes based on current settings
   const gridColumnsClass = layout === 'grid'
@@ -73,7 +57,7 @@ export default function CategorySection({ category, index }: CategorySectionProp
             className="flex items-center justify-center w-10 h-10 rounded-lg"
             style={{ backgroundColor: `${category.color}20` }}
           >
-            <IconComponent size={20} style={{ color: category.color }} />
+            <Icon name={category.icon} size={20} />
           </div>
           <div className="flex items-center gap-3">
             <h2 className="text-xl font-bold text-white">{category.name}</h2>
@@ -111,7 +95,7 @@ export default function CategorySection({ category, index }: CategorySectionProp
             className="flex items-center justify-center w-10 h-10 rounded-lg"
             style={{ backgroundColor: `${category.color}20` }}
           >
-            <IconComponent size={20} style={{ color: category.color }} />
+            <Icon name={category.icon} size={20} />
           </div>
           <div className="flex items-center gap-3">
             <h2 className="text-xl font-bold text-white">{category.name}</h2>

@@ -19,7 +19,7 @@ categories:
   - id: github
     name: GitHub
     url: https://github.com
-    icon: GitBranch
+    icon: github
     description: 代码托管平台
   - id: gmail
     name: Gmail
@@ -61,7 +61,7 @@ categories:
   icon: Code2
   color: "#8b5cf6"
   links:
-  - id:stackoverflow
+  - id: stackoverflow
     name: Stack Overflow
     url: https://stackoverflow.com
     icon: HelpCircle

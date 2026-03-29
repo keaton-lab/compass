@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import type { Settings } from '../types';
-import config from '../../data/config';
 
 interface SettingsContextType extends Settings {
   setTheme: (theme: 'dark' | 'light') => void;
@@ -16,15 +15,17 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 
 const STORAGE_KEY = 'compass-settings';
 
+// Default settings - matching config.yaml defaults
+const DEFAULT_SETTINGS: Settings = {
+  theme: 'dark',
+  layout: 'grid',
+  animations: true,
+  showSearch: true,
+  searchQuery: '',
+};
+
 function getDefaultSettings(): Settings {
-  const defaultFromConfig = (config as { settings?: Settings }).settings;
-  return {
-    theme: defaultFromConfig?.theme ?? 'dark',
-    layout: defaultFromConfig?.layout ?? 'grid',
-    animations: defaultFromConfig?.animations ?? true,
-    showSearch: defaultFromConfig?.showSearch ?? true,
-    searchQuery: '',
-  };
+  return { ...DEFAULT_SETTINGS };
 }
 
 function getInitialSettings(): Settings {
