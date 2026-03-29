@@ -34,7 +34,7 @@ export default function SearchBar({
 
     debounceTimerRef.current = setTimeout(() => {
       handleSearch(searchQuery);
-    }, 300);
+    }, 100);
   }, [handleSearch]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

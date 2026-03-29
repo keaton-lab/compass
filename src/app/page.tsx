@@ -2,7 +2,7 @@
 "use client";
 
 import { useMemo } from 'react';
-import config from '../data/config.json';
+import config from '../data/config';
 import CategorySection from './components/CategorySection';
 import ProfileHeader from './components/ProfileHeader';
 import SearchBar from './components/SearchBar';

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import type { Settings } from '../types';
-import config from '../../data/config.json';
+import config from '../../data/config';
 
 interface SettingsContextType extends Settings {
   setTheme: (theme: 'dark' | 'light') => void;
