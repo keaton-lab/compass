@@ -20,7 +20,7 @@ categories:
   - id: github
     name: GitHub
     url: https://github.com
-    icon: github
+    icon: map
     description: 代码托管平台
   - id: gmail
     name: Gmail

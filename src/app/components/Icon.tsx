@@ -1,29 +1,72 @@
 'use client';
 
-import * as LucideIcons from 'lucide-react';
-import * as simpleIcons from 'simple-icons';
+import { Navigation, Calendar, Mail, Play, Wrench, Rocket, Palette, FileText, MessageSquare, Code2, HelpCircle, BookOpen, Package, Container, Users, AtSign, MessageCircle, Headphones, Cloud, CloudLightning, Shield, Globe, Sun, Moon, Grid, List, Pause, Search, X, Settings, Check, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Menu, Home, User, LogOut, LogIn, UserPlus, UserMinus, UserCheck, UserX, UserCircle, UserCog, UserSearch } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { lucideIconNames, brandIconNames } from '../../data/icons-manifest';
 import BrandIcon from './BrandIcon';
 
-const LUCIDE_ICON_NAMES: string[] = Object.keys(LucideIcons).filter(
-  (name) => name !== 'createLucideIcon' && name !== 'LucideIcon' && name !== 'LucideProps' && name !== 'IconProps'
-);
+const lucideIcons: Record<string, LucideIcon> = {
+  Navigation,
+  Calendar,
+  Mail,
+  Play,
+  Wrench,
+  Rocket,
+  Palette,
+  FileText,
+  MessageSquare,
+  Code2,
+  HelpCircle,
+  BookOpen,
+  Package,
+  Container,
+  Users,
+  AtSign,
+  MessageCircle,
+  Headphones,
+  Cloud,
+  CloudLightning,
+  Shield,
+  Globe,
+  Sun,
+  Moon,
+  Grid,
+  List,
+  Pause,
+  Search,
+  X,
+  Settings,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight,
+  Menu,
+  Home,
+  User,
+  LogOut,
+  LogIn,
+  UserPlus,
+  UserMinus,
+  UserCheck,
+  UserX,
+  UserCircle,
+  UserCog,
+  UserSearch,
+};
 
-const lucideIconMap: Record<string, LucideIcon> = LUCIDE_ICON_NAMES.reduce((acc, name) => {
+const lucideIconMap: Record<string, LucideIcon> = {};
+
+for (const name of lucideIconNames) {
   const key = name.toLowerCase().replace(/([a-z])([A-Z])/g, '$1-$2');
-  const icon = (LucideIcons as Record<string, unknown>)[name];
-  if (typeof icon === 'function' || typeof icon === 'object') {
-    acc[key] = icon as LucideIcon;
-    acc[name] = icon as LucideIcon;
+  const icon = lucideIcons[name];
+  if (icon) {
+    lucideIconMap[key] = icon;
+    lucideIconMap[name] = icon;
   }
-  return acc;
-}, {} as Record<string, LucideIcon>);
+}
 
-const BRAND_ICON_NAMES: string[] = Object.keys(simpleIcons).map(
-  (name) => name.replace(/^si/, '').toLowerCase()
-);
-
-const brandIcons = new Set(BRAND_ICON_NAMES);
+const brandIcons = new Set(brandIconNames);
 
 interface IconProps {
   name: string;
@@ -63,6 +106,6 @@ export default function Icon({ name, size = 24, className = '', color }: IconPro
 }
 
 export const AVAILABLE_ICONS = {
-  lucide: LUCIDE_ICON_NAMES,
-  brands: BRAND_ICON_NAMES
+  lucide: lucideIconNames,
+  brands: brandIconNames,
 };
