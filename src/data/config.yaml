@@ -1,8 +1,9 @@
 profile:
   name: Compass
-  avatar: ""
+  avatar: "icon:navigation"
   description: Your personal navigation hub
   bio: 快速访问常用网站和工具
+  repo: "https://github.com/imzhoukunqiang/compass"
 
 settings:
   theme: dark

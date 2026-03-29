@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Icon from './Icon';
 import type { Profile } from '../types';
 
 interface ProfileHeaderProps {
@@ -22,18 +23,30 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
 
   const initials = getInitials(name);
 
+  const avatarValue = avatar ?? '';
+  const isIconAvatar = avatarValue.startsWith('icon:');
+  const isImageAvatar = !isIconAvatar && avatarValue.trim() !== '';
+
   return (
     <motion.div
       className="flex flex-col md:flex-row items-center md:items-start gap-6 p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-    >
+    > 
       <div className="flex-shrink-0">
-        {avatar && avatar.trim() !== '' ? (
+        {isIconAvatar ? (
+          <div className="flex items-center justify-center w-24 h-24 md:w-28 md:h-28 rounded-full bg-white/10 border border-white/10">
+            <Icon 
+              name={avatarValue.slice(5)} 
+              size={48} 
+              className="text-white"
+            />
+          </div>
+        ) : isImageAvatar ? (
           <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border border-white/10">
             <Image
-              src={avatar}
+              src={avatarValue}
               alt={name}
               fill
               className="object-cover"

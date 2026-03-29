@@ -19,6 +19,7 @@ export interface Profile {
   avatar?: string;
   description: string;
   bio?: string;
+  repo?: string;
 }
 
 export interface Settings {
