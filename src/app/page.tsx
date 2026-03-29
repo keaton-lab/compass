@@ -1,30 +1,83 @@
 
-import LikeButton from "./like-button";
+"use client";
 
-interface HeaderProps {
-  title?: string;
-}
-function Header({ title }: HeaderProps) {
-  return <h1>{title ? title : "Default title"}</h1>;
-}
+import { useMemo } from 'react';
+import config from '../data/config.json';
+import CategorySection from './components/CategorySection';
+import ProfileHeader from './components/ProfileHeader';
+import SearchBar from './components/SearchBar';
+import ThemeToggle from './components/ThemeToggle';
+import type { Config } from './types';
+import { useSettings } from './contexts/SettingsContext';
 
-function HomePage() {
-  const names = ["Ada Lovelace", "Grace Hopper", "Margaret Hamilton"];
+export default function HomePage() {
+  const { profile, settings, categories } = config as Config;
+  const { searchQuery, setSearchQuery } = useSettings();
+  const query = searchQuery ?? '';
+
+  const filteredCategories = useMemo(() => {
+    if (!query.trim()) {
+      return categories;
+    }
+
+    const lowerQuery = query.toLowerCase();
+    return categories
+      .map(category => ({
+        ...category,
+        links: category.links.filter(link =>
+          link.name.toLowerCase().includes(lowerQuery) ||
+          (link.description ?? '').toLowerCase().includes(lowerQuery)
+        ),
+      }))
+      .filter(category => category.links.length > 0);
+  }, [categories, query]);
+
+  const totalResults = filteredCategories.reduce((acc, cat) => acc + cat.links.length, 0);
 
   return (
-    <div>
-      <Header title="Develop. Preview. Ship." />
-      <ul>
-        {names.map((name) => (
-          <li key={name}>{name}</li>
-        ))}
-      </ul>
+    <>
+      <ThemeToggle />
+      <div className="min-h-screen bg-background text-foreground">
+        <header className="container mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <ProfileHeader profile={profile} />
+            
+            <div className="flex items-center gap-4">
+              {settings.showSearch && (
+                <SearchBar
+                  onSearch={setSearchQuery}
+                  placeholder="搜索链接..."
+                  showResultCount={true}
+                  resultCount={totalResults}
+                />
+              )}
+            </div>
+          </div>
+        </header>
 
-      <LikeButton />
+        <main className="container mx-auto px-4 pb-16">
+          {filteredCategories.map((category, index) => (
+            <CategorySection
+              key={category.id}
+              category={category}
+              index={index}
+            />
+          ))}
+          
+          {query && filteredCategories.length === 0 && (
+            <div className="text-center py-16">
+              <h2 className="text-2xl font-bold text-white mb-4">未找到结果</h2>
+              <p className="text-gray-400">尝试其他关键词</p>
+            </div>
+          )}
+        </main>
 
-      <hr />
-    </div>
+        <footer className="container mx-auto px-4 py-8 border-t border-white/10">
+          <div className="text-center text-gray-500 text-sm">
+            <p>Compass Navigation Hub • {categories.length} categories • {categories.reduce((acc, cat) => acc + cat.links.length, 0)} links</p>
+          </div>
+        </footer>
+      </div>
+    </>
   );
 }
-
-export default HomePage;
