@@ -8,6 +8,7 @@ interface SettingsContextType extends Settings {
   setLayout: (layout: 'grid' | 'list') => void;
   setAnimations: (animations: boolean) => void;
   setSearchQuery: (query: string) => void;
+  setShowSearch: (show: boolean) => void;
   updateSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
 }
 
@@ -103,6 +104,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setSettings(prev => ({ ...prev, searchQuery }));
   }, []);
 
+  const setShowSearch = useCallback((showSearch: boolean) => {
+    setSettings(prev => ({ ...prev, showSearch }));
+  }, []);
+
   const updateSetting = useCallback(<K extends keyof Settings>(key: K, value: Settings[K]) => {
     setSettings(prev => ({ ...prev, [key]: value }));
   }, []);
@@ -113,6 +118,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setLayout,
     setAnimations,
     setSearchQuery,
+    setShowSearch,
     updateSetting,
   };
 

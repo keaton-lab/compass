@@ -29,11 +29,12 @@ export default function NavigationCard({ link, color }: NavigationCardProps) {
           background: `radial-gradient(circle at center, ${color}20 0%, transparent 70%)`
         }}
       />
-
       <motion.div 
         className="relative z-10 flex items-center justify-center w-12 h-12 rounded-lg"
         style={{ backgroundColor: `${color}20` }}
-        whileHover={{ rotate: 5 }}
+         animate={{ rotate: 0 }}
+        whileHover={{ rotate: [0, -8, 8, -4, 4, 0] }}
+        transition={{ duration: 0.4 }}
       >
         <Icon 
           name={link.icon}

@@ -23,7 +23,7 @@ export default function BrandIcon({ name, size = 24, className = '', color }: Br
     return <span className={`${className}`} style={{ fontSize: size * 0.5 }}>{name.slice(0, 2)}</span>;
   }
   
-  const fillColor = color || `#${iconData.hex}`;
+  const fillColor = color ? color : 'currentColor';
   
   return (
     <svg
