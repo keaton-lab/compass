@@ -1,57 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { 
-  Mail, 
-  Palette, 
-  FileText, 
-  MessageSquare, 
-  HelpCircle, 
-  BookOpen, 
-  Package, 
-  Container,
-  MessageCircle,
-  Headphones,
-  CloudLightning,
-  Shield,
-  Globe,
-  Calendar,
-  Wrench,
-  Code2,
-  Users,
-  Cloud,
-  Rocket,
-  Play,
-  AtSign,
-  GitBranch,
-  LucideIcon
-} from 'lucide-react';
+import Icon from './Icon';
 import type { Link as LinkType } from '../types';
-
-const iconMap: Record<string, LucideIcon> = {
-  Mail,
-  Palette,
-  FileText,
-  MessageSquare,
-  HelpCircle,
-  BookOpen,
-  Package,
-  Container,
-  MessageCircle,
-  Headphones,
-  CloudLightning,
-  Shield,
-  Globe,
-  Calendar,
-  Wrench,
-  Code2,
-  Users,
-  Cloud,
-  Rocket,
-  Play,
-  AtSign,
-  GitBranch,
-};
 
 interface NavigationCardProps {
   link: LinkType;
@@ -59,8 +10,6 @@ interface NavigationCardProps {
 }
 
 export default function NavigationCard({ link, color }: NavigationCardProps) {
-  const IconComponent = iconMap[link.icon] || Globe;
-
   return (
     <motion.a
       href={link.url}
@@ -86,9 +35,10 @@ export default function NavigationCard({ link, color }: NavigationCardProps) {
         style={{ backgroundColor: `${color}20` }}
         whileHover={{ rotate: 5 }}
       >
-        <IconComponent 
+        <Icon 
+          name={link.icon}
           size={24} 
-          style={{ color }} 
+          color={color}
           className="transition-transform group-hover:scale-110"
         />
       </motion.div>
