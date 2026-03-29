@@ -2,6 +2,7 @@
 "use client";
 
 import { useMemo } from 'react';
+import { Github } from 'lucide-react';
 import config from '../data/config';
 import CategorySection from './components/CategorySection';
 import ProfileHeader from './components/ProfileHeader';
@@ -74,7 +75,7 @@ export default function HomePage() {
 
         <footer className="container mx-auto px-4 py-8 border-t border-white/10">
           <div className="text-center text-gray-500 text-sm">
-            <p>Compass Navigation Hub • {categories.length} categories • {categories.reduce((acc, cat) => acc + cat.links.length, 0)} links</p>
+            <p>{profile.name} • {categories.length} categories • {categories.reduce((acc, cat) => acc + cat.links.length, 0)} links</p>
           </div>
         </footer>
       </div>
