@@ -27,54 +27,86 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
   const isIconAvatar = avatarValue.startsWith('icon:');
   const isImageAvatar = !isIconAvatar && avatarValue.trim() !== '';
 
-  return (
-    <motion.div
-      className="flex flex-col md:flex-row items-center md:items-start gap-6 p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-    > 
-      <div className="flex-shrink-0">
-        {isIconAvatar ? (
-          <div className="flex items-center justify-center w-24 h-24 md:w-28 md:h-28 rounded-full bg-white/10 border border-white/10">
-            <Icon 
-              name={avatarValue.slice(5)} 
-              size={48} 
-              className="text-white"
-            />
-          </div>
-        ) : isImageAvatar ? (
-          <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border border-white/10">
-            <Image
-              src={avatarValue}
-              alt={name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 96px, 112px"
-            />
-          </div>
-        ) : (
-          <div className="flex items-center justify-center w-24 h-24 md:w-28 md:h-28 rounded-full bg-white/10 border border-white/10">
-            <span className="text-3xl md:text-4xl font-bold text-white">
-              {initials}
-            </span>
-          </div>
-        )}
+  const renderAvatar = (sizeClass: string, iconSize: number, textSizeClass: string) => {
+    if (isIconAvatar) {
+      return (
+        <div className={`flex items-center justify-center ${sizeClass} rounded-lg  bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10`}>
+          <Icon 
+            name={avatarValue.slice(5)} 
+            size={iconSize} 
+            className="text-gray-900 dark:text-white"
+          />
+        </div>
+      );
+    }
+    if (isImageAvatar) {
+      return (
+        <div className={`relative ${sizeClass} rounded-lg  overflow-hidden border border-black/5 dark:border-white/10 shadow-sm`}>
+          <Image
+            src={avatarValue}
+            alt={name}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 40px, 56px"
+          />
+        </div>
+      );
+    }
+    return (
+      <div className={`flex items-center justify-center ${sizeClass} rounded-lg  bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10`}>
+        <span className={`${textSizeClass} font-bold text-gray-900 dark:text-white`}>
+          {initials}
+        </span>
       </div>
+    );
+  };
 
-      <div className="flex-1 text-center md:text-left">
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-          {name}
-        </h1>
-        <p className="text-lg md:text-xl text-gray-400 mb-3">
-          {description}
-        </p>
-        {bio && (
-          <p className="text-gray-500 text-sm md:text-base leading-relaxed max-w-2xl">
-            {bio}
+  return (
+    <>
+      <motion.div
+        className="md:hidden flex flex-row items-center justify-between w-full px-4 py-3 bg-white/5 dark:bg-white/5 backdrop-blur-md border border-black/5 dark:border-white/10 rounded-xl"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+      > 
+        <div className="flex items-center gap-3">
+          {renderAvatar('w-10 h-10', 24, 'text-base')}
+          <h1 className="text-base font-bold text-gray-900 dark:text-white">
+            {name}
+          </h1>
+        </div>
+
+        <div className="text-right">
+          <p className="text-xs text-gray-600 dark:text-gray-400">
+            {description}
           </p>
-        )}
-      </div>
-    </motion.div>
+          {bio && (
+            <p className="text-xs text-gray-500 dark:text-gray-500 leading-relaxed mt-0.5">
+              {bio}
+            </p>
+          )}
+        </div>
+      </motion.div>
+
+      <motion.div
+        className="hidden md:flex flex-row items-center gap-4 p-4 rounded-xl bg-white/5 dark:bg-white/5 backdrop-blur-md border border-black/5 dark:border-white/10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+      > 
+        <div className="flex-shrink-0">
+          {renderAvatar('w-12 h-12', 28, 'text-xl')}
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <h1 className="text-lg font-bold text-gray-900 dark:text-white truncate">
+            {name}
+          </h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+            {description}
+          </p>
+        </div>
+      </motion.div>
+    </>
   );
 }

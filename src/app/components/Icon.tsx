@@ -36,7 +36,6 @@ export default function Icon({ name, size = 24, className = '', color }: IconPro
   const normalizedName = name.toLowerCase().replace(/\s+/g, '-');
   
   if (brandIcons.has(normalizedName)) {
-    console.log('brand icon', normalizedName);
     return (
       <BrandIcon 
         name={normalizedName}

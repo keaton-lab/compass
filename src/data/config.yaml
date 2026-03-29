@@ -57,6 +57,12 @@ categories:
     url: https://chat.openai.com
     icon: MessageSquare
     description: AI 助手
+  - id: gemini
+    name: Gemini
+    url: https://www.gemini.com
+    icon: MessageSquare
+    description: Gemini 助手
+
 - id: dev
   name: Development
   icon: Code2

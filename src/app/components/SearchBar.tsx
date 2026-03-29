@@ -69,7 +69,7 @@ export default function SearchBar({
       <div className="relative">
         <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10" aria-hidden="true">
           <Search 
-            size={18} 
+            size={16} 
             className={`transition-colors ${isFocused ? 'text-blue-400' : 'text-gray-400'}`}
           />
         </div>
@@ -82,21 +82,21 @@ export default function SearchBar({
           onBlur={handleBlur}
           placeholder={placeholder}
           disabled={disabled}
-          className="w-full pl-10 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full pl-9 pr-9 py-2.5 md:py-3 bg-white/5 border border-white/10 rounded-lg md:rounded-xl text-sm md:text-base text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         />
 
         {query && (
           <motion.button
             type="button"
             onClick={handleClear}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 z-10"
+            className="absolute right-2.5 md:right-3 top-1/2 transform -translate-y-1/2 z-10"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             aria-label="Clear search"
           >
-            <X size={18} className="text-gray-400 hover:text-white transition-colors" />
+            <X size={16} className="text-gray-400 hover:text-white transition-colors" />
           </motion.button>
         )}
 
