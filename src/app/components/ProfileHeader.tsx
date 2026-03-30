@@ -29,18 +29,18 @@ export function ProfileHeaderDesktopLeft({ profile }: { profile: Profile }) {
   const renderAvatar = () => {
     if (isIconAvatar) {
       return (
-        <div className="flex items-center justify-center w-14 h-14 rounded-lg bg-gradient-to-br from-black/5 to-black/10 dark:from-white/10 dark:to-white/15 border border-black/5 dark:border-white/10">
+        <div className="flex items-center justify-center w-14 h-14 rounded-lg border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--panel-border)' }}>
           <Icon
             name={avatarValue.slice(5)}
             size={28}
-            className="text-gray-900 dark:text-white"
+            className="text-[var(--text-primary)]"
           />
         </div>
       );
     }
     if (isImageAvatar) {
       return (
-        <div className={`relative w-14 h-14 rounded-lg overflow-hidden border border-black/5 dark:border-white/10 shadow-md`}>
+        <div className={`relative w-14 h-14 rounded-lg overflow-hidden border shadow-md`} style={{ borderColor: 'var(--panel-border)' }}>
           <Image
             src={avatarValue}
             alt={name}
@@ -53,8 +53,8 @@ export function ProfileHeaderDesktopLeft({ profile }: { profile: Profile }) {
     }
     // initials
     return (
-      <div className={`flex items-center justify-center w-14 h-14 rounded-lg bg-gradient-to-br from-black/5 to-black/10 dark:from-white/10 dark:to-white/15 border border-black/5 dark:border-white/10`}>
-        <span className="text-xl font-semibold text-gray-900 dark:text-white">{initials}</span>
+      <div className={`flex items-center justify-center w-14 h-14 rounded-lg border`} style={{ background: 'var(--bg-secondary)', borderColor: 'var(--panel-border)' }}>
+        <span className="text-xl font-semibold text-[var(--text-primary)]">{initials}</span>
       </div>
     );
   };
@@ -68,8 +68,8 @@ export function ProfileHeaderDesktopLeft({ profile }: { profile: Profile }) {
     >
       <div className="flex-shrink-0">{renderAvatar()}</div>
       <div className="flex-1 min-w-0">
-        <h1 className="text-xl font-semibold text-slate-950 dark:text-white truncate">{name}</h1>
-        <p className="mt-1 text-sm text-slate-700 dark:text-slate-300 truncate">{description}</p>
+        <h1 className="text-xl font-semibold text-[var(--text-primary)] truncate">{name}</h1>
+        <p className="mt-1 text-sm text-[var(--text-secondary)] truncate">{description}</p>
         {bio && (
           <p className="mt-0.5 text-sm text-[var(--muted)] truncate">{bio}</p>
         )}
@@ -103,18 +103,18 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
   const renderAvatar = (sizeClass: string, iconSize: number, textSizeClass: string) => {
     if (isIconAvatar) {
       return (
-        <div className={`flex items-center justify-center ${sizeClass} rounded-lg bg-gradient-to-br from-black/5 to-black/10 dark:from-white/10 dark:to-white/15 border border-black/5 dark:border-white/10`}>
+        <div className={`flex items-center justify-center ${sizeClass} rounded-lg border`} style={{ background: 'var(--bg-secondary)', borderColor: 'var(--panel-border)' }}>
           <Icon
             name={avatarValue.slice(5)}
             size={iconSize}
-            className="text-gray-900 dark:text-white"
+            className="text-[var(--text-primary)]"
           />
         </div>
       );
     }
     if (isImageAvatar) {
       return (
-        <div className={`relative ${sizeClass} rounded-lg overflow-hidden border border-black/5 dark:border-white/10 shadow-md`}>
+        <div className={`relative ${sizeClass} rounded-lg overflow-hidden border shadow-md`} style={{ borderColor: 'var(--panel-border)' }}>
           <Image
             src={avatarValue}
             alt={name}
@@ -126,8 +126,8 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
       );
     }
     return (
-      <div className={`flex items-center justify-center ${sizeClass} rounded-lg bg-gradient-to-br from-black/5 to-black/10 dark:from-white/10 dark:to-white/15 border border-black/5 dark:border-white/10`}>
-        <span className={`${textSizeClass} font-bold text-gray-900 dark:text-white`}>
+      <div className={`flex items-center justify-center ${sizeClass} rounded-lg border`} style={{ background: 'var(--bg-secondary)', borderColor: 'var(--panel-border)' }}>
+        <span className={`${textSizeClass} font-bold text-[var(--text-primary)]`}>
           {initials}
         </span>
       </div>
@@ -146,7 +146,7 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
           <div className="flex items-center gap-3 flex-1 min-w-0">
             {renderAvatar('w-11 h-11', 24, 'text-base')}
             <div className="min-w-0">
-              <h1 className="truncate text-lg font-semibold text-slate-950 dark:text-white">
+              <h1 className="truncate text-lg font-semibold text-[var(--text-primary)]">
                 {name}
               </h1>
               <p className="truncate text-sm text-[var(--muted)]">
@@ -169,10 +169,10 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
         </div>
 
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl font-semibold text-slate-950 dark:text-white truncate">
+          <h1 className="text-xl font-semibold text-[var(--text-primary)] truncate">
             {name}
           </h1>
-          <p className="mt-1 text-sm text-slate-700 dark:text-slate-300 truncate">
+          <p className="mt-1 text-sm text-[var(--text-secondary)] truncate">
             {description}
           </p>
           {bio && (

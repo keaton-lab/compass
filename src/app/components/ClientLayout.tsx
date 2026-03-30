@@ -103,7 +103,7 @@ export default function ClientLayout({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                <h2 className="text-lg font-semibold text-slate-950 dark:text-white">未找到结果</h2>
+                <h2 className="text-lg font-semibold text-[var(--text-primary)]">未找到结果</h2>
                 <p className="mt-2 text-sm text-[var(--muted)]">尝试其他关键词，或者检查链接描述中的命名方式。</p>
               </motion.div>
             )}
@@ -115,7 +115,7 @@ export default function ClientLayout({
                 href={profile.repo || ""}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-[var(--muted)] transition-colors hover:text-slate-900 dark:hover:text-white"
+                className="flex items-center gap-2 text-[var(--muted)] hover:opacity-80"
               >
                 <Icon name="github" size={16} />
                 <span className="text-sm">{profile.name}</span>

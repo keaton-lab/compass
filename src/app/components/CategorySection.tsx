@@ -60,10 +60,10 @@ export default function CategorySection({ category }: CategorySectionProps) {
             >
               <Icon name={category.icon} size={20} color={category.color} />
             </div>
-            <h2 className="text-lg font-semibold text-slate-950 dark:text-white md:text-xl">
+            <h2 className="text-lg font-semibold text-[var(--text-primary)] md:text-xl">
               {category.name}
             </h2>
-            <span className="ml-1 rounded-full bg-slate-200 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+            <span className="ml-1 rounded-full px-2 py-0.5 text-xs font-medium text-[var(--text-secondary)]" style={{ backgroundColor: 'var(--bg-secondary)' }}>
               {category.links.length}
             </span>
           </div>
@@ -98,10 +98,10 @@ export default function CategorySection({ category }: CategorySectionProps) {
             >
               <Icon name={category.icon} size={20} color={category.color} />
             </div>
-            <h2 className="text-lg font-semibold text-slate-950 dark:text-white md:text-xl">
+            <h2 className="text-lg font-semibold text-[var(--text-primary)] md:text-xl">
               {category.name}
             </h2>
-            <span className="ml-1 rounded-full bg-slate-200 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+            <span className="ml-1 rounded-full px-2 py-0.5 text-xs font-medium text-[var(--text-secondary)]" style={{ backgroundColor: 'var(--bg-secondary)' }}>
               {category.links.length}
             </span>
           </div>

@@ -56,6 +56,24 @@
   initial-value: rgba(37, 99, 235, 0.12);
 }
 
+@property --text-primary {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #eff6ff;
+}
+
+@property --text-secondary {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #cbd5e1;
+}
+
+@property --bg-secondary {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(7, 19, 34, 0.76);
+}
+
 :root {
   --background: #06111f;
   --foreground: #eff6ff;
@@ -66,6 +84,9 @@
   --grid-line: rgba(129, 160, 201, 0.08);
   --glow-a: rgba(34, 211, 238, 0.1);
   --glow-b: rgba(37, 99, 235, 0.12);
+  --text-primary: #eff6ff;
+  --text-secondary: #cbd5e1;
+  --bg-secondary: rgba(7, 19, 34, 0.76);
 }
 
 [data-theme='light'],
@@ -80,7 +101,10 @@
     --muted 0.35s ease,
     --grid-line 0.35s ease,
     --glow-a 0.35s ease,
-    --glow-b 0.35s ease;
+    --glow-b 0.35s ease,
+    --text-primary 0.35s ease,
+    --text-secondary 0.35s ease,
+    --bg-secondary 0.35s ease;
 }
 
 [data-theme='light'] {
@@ -93,6 +117,9 @@
   --grid-line: rgba(58, 76, 103, 0.06);
   --glow-a: rgba(41, 121, 255, 0.08);
   --glow-b: rgba(0, 229, 255, 0.07);
+  --text-primary: #08111f;
+  --text-secondary: #475569;
+  --bg-secondary: rgba(203, 213, 225, 0.5);
 }
 
 [data-theme='dark'] {
@@ -105,6 +132,9 @@
   --grid-line: rgba(129, 160, 201, 0.08);
   --glow-a: rgba(34, 211, 238, 0.1);
   --glow-b: rgba(37, 99, 235, 0.12);
+  --text-primary: #eff6ff;
+  --text-secondary: #94a3c8;
+  --bg-secondary: rgba(30, 41, 59, 0.5);
 }
 
 [data-theme='ocean'] {
@@ -117,6 +147,9 @@
   --grid-line: rgba(74, 118, 171, 0.08);
   --glow-a: rgba(56, 189, 248, 0.14);
   --glow-b: rgba(59, 130, 246, 0.1);
+  --text-primary: #0b1f33;
+  --text-secondary: #3d5a80;
+  --bg-secondary: rgba(186, 215, 235, 0.5);
 }
 
 html {

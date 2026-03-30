@@ -51,16 +51,16 @@ export default function NavigationCard({ link, color }: NavigationCardProps) {
       </div>
 
       <div className="relative z-10 mt-2 min-w-0 flex-1 md:mt-0">
-        <h3 className="truncate text-[15px] font-medium text-slate-950 transition-colors group-hover:text-slate-950 dark:text-white dark:group-hover:text-white md:text-[15px]">
+        <h3 className="truncate text-[15px] font-medium text-[var(--text-primary)] group-hover:opacity-80 md:text-[15px]">
           {link.name}
         </h3>
-        <p className="mt-0.5 max-w-[24ch] truncate text-xs leading-4 text-slate-500/80 dark:text-slate-400/70">
+        <p className="mt-0.5 max-w-[24ch] truncate text-xs leading-4 text-[var(--muted)]">
           {link.description}
         </p>
       </div>
 
       <motion.div
-        className="absolute right-2 top-2 z-10 text-[var(--muted)] transition-colors group-hover:text-slate-900 dark:group-hover:text-white md:static md:ml-auto md:flex-none"
+        className="absolute right-2 top-2 z-10 text-[var(--muted)] group-hover:opacity-80 md:static md:ml-auto md:flex-none"
         initial={{ x: 0, opacity: 0.55 }}
         whileHover={{ x: 2, opacity: 1 }}
       >

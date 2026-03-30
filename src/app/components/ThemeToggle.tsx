@@ -220,7 +220,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
           aria-label="切换主题"
           aria-expanded={isDesktopOpen}
           onClick={() => setIsDesktopOpen((value) => !value)}
-          className="flex h-9 w-9 items-center justify-center rounded-full border border-black/5 bg-white/60 text-[var(--muted)] shadow-sm backdrop-blur hover:bg-white/80 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          className="flex h-9 w-9 items-center justify-center rounded-full border text-[var(--muted)] shadow-sm backdrop-blur" style={{ borderColor: 'var(--panel-border)', backgroundColor: 'var(--panel)' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.2 }}
