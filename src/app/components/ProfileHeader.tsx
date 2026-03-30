@@ -60,7 +60,12 @@ export function ProfileHeaderDesktopLeft({ profile }: { profile: Profile }) {
   };
 
   return (
-    <div className="flex items-center gap-4">
+    <motion.div
+      className="flex items-center gap-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
       <div className="flex-shrink-0">{renderAvatar()}</div>
       <div className="flex-1 min-w-0">
         <h1 className="text-xl font-semibold text-slate-950 dark:text-white truncate">{name}</h1>
@@ -69,7 +74,7 @@ export function ProfileHeaderDesktopLeft({ profile }: { profile: Profile }) {
           <p className="mt-0.5 text-sm text-[var(--muted)] truncate">{bio}</p>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 

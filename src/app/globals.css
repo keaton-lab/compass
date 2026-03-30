@@ -2,6 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 
+@property --background {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #06111f;
+}
+
+@property --foreground {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #eff6ff;
+}
+
+@property --panel {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(7, 19, 34, 0.76);
+}
+
+@property --panel-strong {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(8, 24, 42, 0.88);
+}
+
+@property --panel-border {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(148, 163, 184, 0.16);
+}
+
+@property --muted {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #93a6bf;
+}
+
+@property --grid-line {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(129, 160, 201, 0.08);
+}
+
+@property --glow-a {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(34, 211, 238, 0.1);
+}
+
+@property --glow-b {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(37, 99, 235, 0.12);
+}
+
 :root {
   --background: #06111f;
   --foreground: #eff6ff;
@@ -12,6 +66,21 @@
   --grid-line: rgba(129, 160, 201, 0.08);
   --glow-a: rgba(34, 211, 238, 0.1);
   --glow-b: rgba(37, 99, 235, 0.12);
+}
+
+[data-theme='light'],
+[data-theme='dark'],
+[data-theme='ocean'] {
+  transition:
+    --background 0.35s ease,
+    --foreground 0.35s ease,
+    --panel 0.35s ease,
+    --panel-strong 0.35s ease,
+    --panel-border 0.35s ease,
+    --muted 0.35s ease,
+    --grid-line 0.35s ease,
+    --glow-a 0.35s ease,
+    --glow-b 0.35s ease;
 }
 
 [data-theme='light'] {

@@ -149,7 +149,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
             />
 
             <motion.div
-              className="glass-panel-strong relative w-full max-w-sm rounded-3xl p-6"
+              className="glass-panel-strong relative w-2/3 max-w-sm rounded-3xl p-6"
               initial={{ scale: 0.9, opacity: 0, y: 12 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 12 }}
@@ -221,6 +221,9 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
           aria-expanded={isDesktopOpen}
           onClick={() => setIsDesktopOpen((value) => !value)}
           className="flex h-9 w-9 items-center justify-center rounded-full border border-black/5 bg-white/60 text-[var(--muted)] shadow-sm backdrop-blur hover:bg-white/80 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2 }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
