@@ -15,11 +15,11 @@ export default function NavigationCard({ link, color }: NavigationCardProps) {
       href={link.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="glass-panel group relative flex min-h-[102px] flex-col overflow-hidden rounded-[20px] p-3 cursor-pointer md:min-h-[88px] md:flex-row md:items-center md:gap-3 md:rounded-[22px] md:p-4"
+      className="glass-panel group relative flex min-h-[88px] flex-col overflow-hidden rounded-[16px] p-3 cursor-pointer md:min-h-[80px] md:flex-row md:items-center md:gap-2.5 md:rounded-[18px] md:p-3.5"
       whileHover={{
         scale: 1.015,
-        y: -3,
-        boxShadow: `0 16px 36px ${color}18`
+        y: -2,
+        boxShadow: `0 12px 28px ${color}18`
       }}
       whileTap={{ scale: 0.98 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
@@ -32,7 +32,7 @@ export default function NavigationCard({ link, color }: NavigationCardProps) {
       />
       <div className="relative z-10 flex items-start justify-between gap-2 md:flex-none">
         <motion.div
-          className="flex h-10 w-10 items-center justify-center rounded-xl border md:h-11 md:w-11"
+          className="flex h-10 w-10 items-center justify-center rounded-lg border md:h-11 md:w-11"
           style={{
             backgroundColor: `${color}18`,
             borderColor: `${color}40`
@@ -50,23 +50,23 @@ export default function NavigationCard({ link, color }: NavigationCardProps) {
         </motion.div>
       </div>
 
-      <div className="relative z-10 mt-3 min-w-0 flex-1 md:mt-0">
-        <h3 className="truncate text-[15px] font-semibold text-slate-950 transition-colors group-hover:text-slate-950 dark:text-white dark:group-hover:text-white md:text-base">
+      <div className="relative z-10 mt-2 min-w-0 flex-1 md:mt-0">
+        <h3 className="truncate text-[15px] font-medium text-slate-950 transition-colors group-hover:text-slate-950 dark:text-white dark:group-hover:text-white md:text-[15px]">
           {link.name}
         </h3>
-        <p className="mt-1 max-w-[26ch] truncate text-[11px] leading-4 text-slate-500/80 dark:text-slate-400/70 md:text-xs">
+        <p className="mt-0.5 max-w-[24ch] truncate text-xs leading-4 text-slate-500/80 dark:text-slate-400/70">
           {link.description}
         </p>
       </div>
 
       <motion.div
-        className="absolute right-3 top-3 z-10 text-[var(--muted)] transition-colors group-hover:text-slate-900 dark:group-hover:text-white md:static md:ml-auto md:flex-none"
+        className="absolute right-2 top-2 z-10 text-[var(--muted)] transition-colors group-hover:text-slate-900 dark:group-hover:text-white md:static md:ml-auto md:flex-none"
         initial={{ x: 0, opacity: 0.55 }}
         whileHover={{ x: 2, opacity: 1 }}
       >
         <svg
-          width="14"
-          height="14"
+          width="11"
+          height="11"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"

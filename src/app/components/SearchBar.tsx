@@ -61,8 +61,8 @@ export default function SearchBar({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="glass-panel relative rounded-[24px] p-1.5">
-        <div className="absolute left-5 top-1/2 z-10 -translate-y-1/2" aria-hidden="true">
+      <div className="glass-panel relative rounded-[20px] p-1.5">
+        <div className="absolute left-4 top-1/2 z-10 -translate-y-1/2" aria-hidden="true">
           <Search 
             size={16}
             className={`transition-colors ${isFocused ? 'text-cyan-400' : 'text-[var(--muted)]'}`}
@@ -77,11 +77,11 @@ export default function SearchBar({
           onBlur={handleBlur}
           placeholder={placeholder}
           disabled={disabled}
-          className="w-full rounded-[20px] border border-transparent bg-transparent py-3 pl-11 pr-4 text-sm text-slate-900 outline-none transition-colors placeholder:text-[var(--muted)] focus:border-cyan-400/30 dark:text-white md:py-3.5 md:text-base disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-[16px] border border-transparent bg-transparent py-3 pl-10 pr-4 text-sm text-slate-900 outline-none transition-colors placeholder:text-[var(--muted)] focus:border-cyan-400/30 dark:text-white md:py-3 md:text-base disabled:cursor-not-allowed disabled:opacity-50"
         />
 
         {showResultCount && query && (
-          <div className="absolute -bottom-7 left-1 text-xs tracking-[0.18em] text-[var(--muted)] uppercase">
+          <div className="absolute -bottom-6 left-1 text-xs tracking-[0.18em] text-[var(--muted)] uppercase">
             {resultCount} {resultCount === 1 ? 'result' : 'results'}
           </div>
         )}

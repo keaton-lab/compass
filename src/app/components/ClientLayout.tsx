@@ -51,8 +51,8 @@ export default function ClientLayout({
     <>
       <ThemeToggle />
       <div className="min-h-screen text-foreground">
-        <div className="mx-auto max-w-[1440px] px-4 pb-24 pt-4 md:px-6 md:pb-16 md:pt-6">
-          <header className="space-y-5">
+        <div className="mx-auto max-w-[1440px] px-4 pb-12 pt-4 md:px-6 md:pb-12 md:pt-6">
+          <header className="space-y-4">
             <ProfileHeader profile={profile} />
 
             {shouldShowSearch && (
@@ -67,24 +67,23 @@ export default function ClientLayout({
             )}
           </header>
 
-          <main className="mt-8 md:mt-10">
-            {filteredCategories.map((category, index) => (
+          <main className="mt-6 md:mt-8">
+            {filteredCategories.map((category) => (
               <CategorySection
                 key={category.id}
                 category={category}
-                index={index}
               />
             ))}
 
             {query && filteredCategories.length === 0 && (
-              <div className="glass-panel-strong py-20 text-center rounded-[32px]">
-                <h2 className="text-2xl font-semibold text-slate-950 dark:text-white">未找到结果</h2>
-                <p className="mt-3 text-[var(--muted)]">尝试其他关键词，或者检查链接描述中的命名方式。</p>
+              <div className="glass-panel-strong py-12 text-center rounded-[20px]">
+                <h2 className="text-lg font-semibold text-slate-950 dark:text-white">未找到结果</h2>
+                <p className="mt-2 text-sm text-[var(--muted)]">尝试其他关键词，或者检查链接描述中的命名方式。</p>
               </div>
             )}
           </main>
 
-          <footer className="mt-10 hidden border-t border-white/10 px-2 py-8 md:block">
+          <footer className="mt-6 hidden border-t border-white/10 px-2 py-4 md:block">
             <div className="flex flex-col items-center gap-2">
               <a
                 href={profile.repo || ""}

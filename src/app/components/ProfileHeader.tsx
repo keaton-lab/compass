@@ -64,7 +64,7 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
   return (
     <>
       <motion.div
-        className="glass-panel md:hidden w-full rounded-[24px] p-4"
+        className="glass-panel md:hidden w-full rounded-[20px] p-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
@@ -83,17 +83,17 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
       </motion.div>
 
       <motion.div
-        className="glass-panel hidden md:flex items-center gap-4 rounded-[28px] px-6 py-5"
+        className="glass-panel hidden md:flex items-center gap-4 rounded-[24px] px-5 py-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
       >
         <div className="flex-shrink-0">
-          {renderAvatar('w-14 h-14', 30, 'text-xl')}
+          {renderAvatar('w-14 h-14', 28, 'text-xl')}
         </div>
 
         <div className="flex-1 min-w-0">
-          <h1 className="text-2xl font-semibold text-slate-950 dark:text-white truncate">
+          <h1 className="text-xl font-semibold text-slate-950 dark:text-white truncate">
             {name}
           </h1>
           <p className="mt-1 text-sm text-slate-700 dark:text-slate-300 truncate">

@@ -9,7 +9,6 @@ import NavigationCard from './NavigationCard';
 
 interface CategorySectionProps {
   category: CategoryType;
-  index: number;
 }
 
 const containerVariants = {
@@ -36,25 +35,24 @@ const itemVariants = {
   }
 } as const;
 
-export default function CategorySection({ category, index }: CategorySectionProps) {
+export default function CategorySection({ category }: CategorySectionProps) {
   const { layout } = useSettings();
   const { animations } = useSettings();
-  const categoryNumber = String(index + 1).padStart(2, '0');
 
-  // Determine grid layout classes based on current settings
+  // Determine grid layout classes based on current settings - more compact
   const gridColumnsClass = layout === 'grid'
-    ? 'grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+    ? 'grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
     : 'grid-cols-1';
-  const gapClass = layout === 'list' ? 'gap-5' : 'gap-3 md:gap-4';
+  const gapClass = layout === 'list' ? 'gap-3' : 'gap-2';
 
   // If animations are disabled, render static markup (no motion components)
   if (!animations) {
     return (
-      <section className="mb-12 md:mb-14">
-        <div className="mb-5 flex flex-col gap-3 md:mb-7 md:flex-row md:items-end md:justify-between md:gap-4">
-          <div className="flex items-center gap-4">
+      <section className="mb-8 md:mb-10">
+        <div className="mb-4 flex flex-col gap-3 md:mb-5 md:flex-row md:items-center md:justify-between md:gap-4">
+          <div className="flex items-center gap-3">
             <div
-              className="flex h-12 w-12 items-center justify-center rounded-2xl border"
+              className="flex h-11 w-11 items-center justify-center rounded-lg border"
               style={{
                 backgroundColor: `${category.color}18`,
                 borderColor: `${category.color}38`
@@ -62,25 +60,12 @@ export default function CategorySection({ category, index }: CategorySectionProp
             >
               <Icon name={category.icon} size={20} color={category.color} />
             </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.32em] text-[var(--muted)]">
-                Sector {categoryNumber}
-              </p>
-              <h2 className="mt-1 text-xl font-semibold text-slate-950 dark:text-white md:text-2xl">
-                {category.name}
-              </h2>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div
-              className="h-px w-16 md:w-28"
-              style={{
-                background: `linear-gradient(to right, transparent, ${category.color}80, transparent)`
-              }}
-            />
-            <p className="text-xs uppercase tracking-[0.28em] text-[var(--muted)]">
-              {category.links.length} links
-            </p>
+            <h2 className="text-lg font-semibold text-slate-950 dark:text-white md:text-xl">
+              {category.name}
+            </h2>
+            <span className="ml-1 rounded-full bg-slate-200 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+              {category.links.length}
+            </span>
           </div>
         </div>
 
@@ -97,15 +82,15 @@ export default function CategorySection({ category, index }: CategorySectionProp
 
   // Animations enabled: use AnimationController to apply animated container
   return (
-    <AnimationController className="mb-12" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-      <section className="mb-12 md:mb-14">
+    <AnimationController className="mb-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+      <section className="mb-8 md:mb-10">
         <motion.div
-          className="mb-5 flex flex-col gap-3 md:mb-7 md:flex-row md:items-end md:justify-between md:gap-4"
+          className="mb-4 flex flex-col gap-3 md:mb-5 md:flex-row md:items-center md:justify-between md:gap-4"
           variants={containerVariants}
         >
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <div
-              className="flex h-12 w-12 items-center justify-center rounded-2xl border"
+              className="flex h-11 w-11 items-center justify-center rounded-lg border"
               style={{
                 backgroundColor: `${category.color}18`,
                 borderColor: `${category.color}38`
@@ -113,25 +98,12 @@ export default function CategorySection({ category, index }: CategorySectionProp
             >
               <Icon name={category.icon} size={20} color={category.color} />
             </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.32em] text-[var(--muted)]">
-                Sector {categoryNumber}
-              </p>
-              <h2 className="mt-1 text-xl font-semibold text-slate-950 dark:text-white md:text-2xl">
-                {category.name}
-              </h2>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div
-              className="h-px w-16 md:w-28"
-              style={{
-                background: `linear-gradient(to right, transparent, ${category.color}80, transparent)`
-              }}
-            />
-            <p className="text-xs uppercase tracking-[0.28em] text-[var(--muted)]">
-              {category.links.length} links
-            </p>
+            <h2 className="text-lg font-semibold text-slate-950 dark:text-white md:text-xl">
+              {category.name}
+            </h2>
+            <span className="ml-1 rounded-full bg-slate-200 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+              {category.links.length}
+            </span>
           </div>
         </motion.div>
 
