@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Icon from './Icon';
+import ThemeToggle from './ThemeToggle';
 import type { Profile } from '../types';
 
 // 新增：桌面端左侧区域的共用头部片段，便于在 Header 一体化布局中复用
@@ -136,16 +137,19 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
       >
-        <div className="flex items-center gap-3">
-          {renderAvatar('w-11 h-11', 24, 'text-base')}
-          <div className="min-w-0">
-            <h1 className="truncate text-lg font-semibold text-slate-950 dark:text-white">
-              {name}
-            </h1>
-            <p className="truncate text-sm text-[var(--muted)]">
-              {description}
-            </p>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            {renderAvatar('w-11 h-11', 24, 'text-base')}
+            <div className="min-w-0">
+              <h1 className="truncate text-lg font-semibold text-slate-950 dark:text-white">
+                {name}
+              </h1>
+              <p className="truncate text-sm text-[var(--muted)]">
+                {description}
+              </p>
+            </div>
           </div>
+          <ThemeToggle mobileOnly />
         </div>
       </motion.div>
 

@@ -52,13 +52,10 @@ export default function ClientLayout({
   return (
     <>
       <div className="min-h-screen text-foreground">
-        <div className="mx-auto max-w-[1440px] px-4 pb-12 pt-12 md:px-6 md:pb-12 lg:px-8">
+        <div className="mx-auto max-w-[1440px] px-4 pb-12 pt-6 md:px-6 md:pb-12 lg:px-8">
           <header className="space-y-4 md:space-y-0 md:flex md:items-center md:justify-between md:gap-6">
-            <div className="md:hidden">
-              <div className="flex items-center justify-between gap-3 mb-3">
-                <div className="flex-1 min-w-0"><ProfileHeader profile={profile} /></div>
-                <ThemeToggle mobileOnly />
-              </div>
+            <div className="md:hidden space-y-3">
+              <ProfileHeader profile={profile} />
               {shouldShowSearch && (
                 <SearchBar
                   onSearch={setSearchQuery}
