@@ -3,6 +3,18 @@
 @tailwind utilities;
 
 :root {
+  --background: #06111f;
+  --foreground: #eff6ff;
+  --panel: rgba(7, 19, 34, 0.76);
+  --panel-strong: rgba(8, 24, 42, 0.88);
+  --panel-border: rgba(148, 163, 184, 0.16);
+  --muted: #93a6bf;
+  --grid-line: rgba(129, 160, 201, 0.08);
+  --glow-a: rgba(34, 211, 238, 0.1);
+  --glow-b: rgba(37, 99, 235, 0.12);
+}
+
+[data-theme='light'] {
   --background: #f6f8fb;
   --foreground: #08111f;
   --panel: rgba(255, 255, 255, 0.78);
@@ -14,7 +26,7 @@
   --glow-b: rgba(0, 229, 255, 0.07);
 }
 
-.dark {
+[data-theme='dark'] {
   --background: #06111f;
   --foreground: #eff6ff;
   --panel: rgba(7, 19, 34, 0.76);
@@ -24,6 +36,18 @@
   --grid-line: rgba(129, 160, 201, 0.08);
   --glow-a: rgba(34, 211, 238, 0.1);
   --glow-b: rgba(37, 99, 235, 0.12);
+}
+
+[data-theme='ocean'] {
+  --background: #edf6ff;
+  --foreground: #0b1f33;
+  --panel: rgba(255, 255, 255, 0.74);
+  --panel-strong: rgba(255, 255, 255, 0.88);
+  --panel-border: rgba(56, 104, 168, 0.14);
+  --muted: #4a6a8a;
+  --grid-line: rgba(74, 118, 171, 0.08);
+  --glow-a: rgba(56, 189, 248, 0.14);
+  --glow-b: rgba(59, 130, 246, 0.1);
 }
 
 html {
