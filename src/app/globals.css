@@ -89,9 +89,7 @@
   --bg-secondary: rgba(7, 19, 34, 0.76);
 }
 
-[data-theme='light'],
-[data-theme='dark'],
-[data-theme='ocean'] {
+html {
   transition:
     --background 0.35s ease,
     --foreground 0.35s ease,
@@ -158,7 +156,7 @@ html {
 
 body {
   color: var(--foreground);
-  background: var(--background);
+  background-color: var(--background);
   font-family: "Geist", "Segoe UI", sans-serif;
   min-height: 100vh;
   background-image:
@@ -193,7 +191,7 @@ body::before {
 
 @layer components {
   .glass-panel {
-    background: var(--panel);
+    background-color: var(--panel);
     border: 1px solid var(--panel-border);
     box-shadow:
       0 16px 40px rgba(2, 8, 23, 0.12),
@@ -202,7 +200,7 @@ body::before {
   }
 
   .glass-panel-strong {
-    background: var(--panel-strong);
+    background-color: var(--panel-strong);
     border: 1px solid var(--panel-border);
     box-shadow:
       0 18px 48px rgba(2, 8, 23, 0.14),
