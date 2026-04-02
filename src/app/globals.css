@@ -90,6 +90,7 @@
 }
 
 html {
+  background-color: var(--background);
   transition:
     --background 0.35s ease,
     --foreground 0.35s ease,
@@ -103,6 +104,10 @@ html {
     --text-primary 0.35s ease,
     --text-secondary 0.35s ease,
     --bg-secondary 0.35s ease;
+}
+
+html.theme-preload {
+  transition: none;
 }
 
 [data-theme='light'] {
@@ -155,8 +160,8 @@ html {
 }
 
 body {
-  color: var(--foreground);
   background-color: var(--background);
+  color: var(--foreground);
   font-family: "Geist", "Segoe UI", sans-serif;
   min-height: 100vh;
   background-image:
