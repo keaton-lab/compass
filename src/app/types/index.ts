@@ -1,3 +1,5 @@
+import type { ThemeId } from '../themes';
+
 export interface Link {
   id: string;
   name: string;
@@ -23,7 +25,7 @@ export interface Profile {
 }
 
 export interface Settings {
-  theme: 'dark' | 'light';
+  theme: ThemeId;
   showSearch: boolean;
   layout: 'grid' | 'list';
   animations: boolean;

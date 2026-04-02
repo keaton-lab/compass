@@ -4,13 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSettings } from '../contexts/SettingsContext';
 import type { ReactNode } from 'react';
 
-import type { TargetAndTransition, Transition } from 'framer-motion';
+import type { Transition } from 'framer-motion';
 
 interface AnimatedWrapperProps {
   children: ReactNode;
-  initial?: TargetAndTransition;
-  animate?: TargetAndTransition;
-  exit?: TargetAndTransition;
+  initial?: Parameters<typeof motion.div>[0]['initial'];
+  animate?: Parameters<typeof motion.div>[0]['animate'];
+  exit?: Parameters<typeof motion.div>[0]['exit'];
   transition?: Transition;
   className?: string;
 }

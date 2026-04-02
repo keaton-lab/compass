@@ -3,7 +3,80 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Icon from './Icon';
+import ThemeToggle from './ThemeToggle';
 import type { Profile } from '../types';
+
+// 新增：桌面端左侧区域的共用头部片段，便于在 Header 一体化布局中复用
+// 仅渲染左侧的头像与个人信息，不包含右侧的操作区
+export function ProfileHeaderDesktopLeft({ profile }: { profile: Profile }) {
+  const { name, avatar, description, bio } = profile;
+
+  const getInitials = (n: string): string => {
+    return n
+      .split(' ')
+      .map(part => part.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const initials = getInitials(name);
+
+  const avatarValue = avatar ?? '';
+  const isIconAvatar = avatarValue.startsWith('icon:');
+  const isImageAvatar = !isIconAvatar && avatarValue.trim() !== '';
+
+  const renderAvatar = () => {
+    if (isIconAvatar) {
+      return (
+        <div className="flex items-center justify-center w-14 h-14 rounded-lg border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--panel-border)' }}>
+          <Icon
+            name={avatarValue.slice(5)}
+            size={28}
+            className="text-[var(--text-primary)]"
+          />
+        </div>
+      );
+    }
+    if (isImageAvatar) {
+      return (
+        <div className={`relative w-14 h-14 rounded-lg overflow-hidden border shadow-md`} style={{ borderColor: 'var(--panel-border)' }}>
+          <Image
+            src={avatarValue}
+            alt={name}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 40px, 56px"
+          />
+        </div>
+      );
+    }
+    // initials
+    return (
+      <div className={`flex items-center justify-center w-14 h-14 rounded-lg border`} style={{ background: 'var(--bg-secondary)', borderColor: 'var(--panel-border)' }}>
+        <span className="text-xl font-semibold text-[var(--text-primary)]">{initials}</span>
+      </div>
+    );
+  };
+
+  return (
+    <motion.div
+      className="flex items-center gap-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="flex-shrink-0">{renderAvatar()}</div>
+      <div className="flex-1 min-w-0">
+        <h1 className="text-xl font-semibold text-[var(--text-primary)] truncate">{name}</h1>
+        <p className="mt-1 text-sm text-[var(--text-secondary)] truncate">{description}</p>
+        {bio && (
+          <p className="mt-0.5 text-sm text-[var(--muted)] truncate">{bio}</p>
+        )}
+      </div>
+    </motion.div>
+  );
+}
 
 interface ProfileHeaderProps {
   profile: Profile;
@@ -11,7 +84,7 @@ interface ProfileHeaderProps {
 
 export default function ProfileHeader({ profile }: ProfileHeaderProps) {
   const { name, avatar, description, bio } = profile;
-  
+
   const getInitials = (name: string): string => {
     return name
       .split(' ')
@@ -30,18 +103,18 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
   const renderAvatar = (sizeClass: string, iconSize: number, textSizeClass: string) => {
     if (isIconAvatar) {
       return (
-        <div className={`flex items-center justify-center ${sizeClass} rounded-lg  bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10`}>
-          <Icon 
-            name={avatarValue.slice(5)} 
-            size={iconSize} 
-            className="text-gray-900 dark:text-white"
+        <div className={`flex items-center justify-center ${sizeClass} rounded-lg border`} style={{ background: 'var(--bg-secondary)', borderColor: 'var(--panel-border)' }}>
+          <Icon
+            name={avatarValue.slice(5)}
+            size={iconSize}
+            className="text-[var(--text-primary)]"
           />
         </div>
       );
     }
     if (isImageAvatar) {
       return (
-        <div className={`relative ${sizeClass} rounded-lg  overflow-hidden border border-black/5 dark:border-white/10 shadow-sm`}>
+        <div className={`relative ${sizeClass} rounded-lg overflow-hidden border shadow-md`} style={{ borderColor: 'var(--panel-border)' }}>
           <Image
             src={avatarValue}
             alt={name}
@@ -53,8 +126,8 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
       );
     }
     return (
-      <div className={`flex items-center justify-center ${sizeClass} rounded-lg  bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10`}>
-        <span className={`${textSizeClass} font-bold text-gray-900 dark:text-white`}>
+      <div className={`flex items-center justify-center ${sizeClass} rounded-lg border`} style={{ background: 'var(--bg-secondary)', borderColor: 'var(--panel-border)' }}>
+        <span className={`${textSizeClass} font-bold text-[var(--text-primary)]`}>
           {initials}
         </span>
       </div>
@@ -64,47 +137,49 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
   return (
     <>
       <motion.div
-        className="md:hidden flex flex-row items-center justify-between w-full px-4 py-3 bg-white/5 dark:bg-white/5 backdrop-blur-md border border-black/5 dark:border-white/10 rounded-xl"
+        className="glass-panel md:hidden w-full rounded-2xl p-4 shadow-md"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-      > 
-        <div className="flex items-center gap-3">
-          {renderAvatar('w-10 h-10', 24, 'text-base')}
-          <h1 className="text-base font-bold text-gray-900 dark:text-white">
-            {name}
-          </h1>
-        </div>
-
-        <div className="text-right">
-          <p className="text-xs text-gray-600 dark:text-gray-400">
-            {description}
-          </p>
-          {bio && (
-            <p className="text-xs text-gray-500 dark:text-gray-500 leading-relaxed mt-0.5">
-              {bio}
-            </p>
-          )}
+      >
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            {renderAvatar('w-11 h-11', 24, 'text-base')}
+            <div className="min-w-0">
+              <h1 className="truncate text-lg font-semibold text-[var(--text-primary)]">
+                {name}
+              </h1>
+              <p className="truncate text-sm text-[var(--muted)]">
+                {description}
+              </p>
+            </div>
+          </div>
+          <ThemeToggle mobileOnly />
         </div>
       </motion.div>
 
       <motion.div
-        className="hidden md:flex flex-row items-center gap-4 p-4 rounded-xl bg-white/5 dark:bg-white/5 backdrop-blur-md border border-black/5 dark:border-white/10"
+        className="glass-panel hidden md:flex items-center gap-4 rounded-3xl px-6 py-4 shadow-xl"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-      > 
+      >
         <div className="flex-shrink-0">
-          {renderAvatar('w-12 h-12', 28, 'text-xl')}
+          {renderAvatar('w-14 h-14', 28, 'text-xl')}
         </div>
 
         <div className="flex-1 min-w-0">
-          <h1 className="text-lg font-bold text-gray-900 dark:text-white truncate">
+          <h1 className="text-xl font-semibold text-[var(--text-primary)] truncate">
             {name}
           </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+          <p className="mt-1 text-sm text-[var(--text-secondary)] truncate">
             {description}
           </p>
+          {bio && (
+            <p className="mt-0.5 text-sm text-[var(--muted)] truncate">
+              {bio}
+            </p>
+          )}
         </div>
       </motion.div>
     </>

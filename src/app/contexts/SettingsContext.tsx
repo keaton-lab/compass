@@ -2,9 +2,11 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import type { Settings } from '../types';
+import { defaultThemeId, getThemePreset, isThemeId, themePresets } from '../themes';
 
 interface SettingsContextType extends Settings {
-  setTheme: (theme: 'dark' | 'light') => void;
+  availableThemes: typeof themePresets;
+  setTheme: (theme: Settings['theme']) => void;
   setLayout: (layout: 'grid' | 'list') => void;
   setAnimations: (animations: boolean) => void;
   setSearchQuery: (query: string) => void;
@@ -18,12 +20,35 @@ const STORAGE_KEY = 'compass-settings';
 
 // Default settings - matching config.yaml defaults
 const DEFAULT_SETTINGS: Settings = {
-  theme: 'dark',
+  theme: defaultThemeId,
   layout: 'grid',
   animations: true,
   showSearch: true,
   searchQuery: '',
 };
+
+function normalizeSettings(partialSettings: Partial<Settings>): Settings {
+  const defaults = getDefaultSettings();
+  const theme = partialSettings.theme;
+
+  return {
+    ...defaults,
+    ...partialSettings,
+    theme: typeof theme === 'string' && isThemeId(theme) ? theme : defaults.theme,
+  };
+}
+
+function applyTheme(theme: Settings['theme']) {
+  if (typeof document === 'undefined') {
+    return;
+  }
+
+  const root = document.documentElement;
+  const themePreset = getThemePreset(theme);
+
+  root.dataset.theme = themePreset.id;
+  root.classList.toggle('dark', themePreset.isDark);
+}
 
 function getDefaultSettings(): Settings {
   return { ...DEFAULT_SETTINGS };
@@ -38,8 +63,7 @@ function getInitialSettings(): Settings {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       const parsed = JSON.parse(stored) as Partial<Settings>;
-      const defaults = getDefaultSettings();
-      return { ...defaults, ...parsed };
+      return normalizeSettings(parsed);
     }
   } catch {
     // Ignore parse errors
@@ -57,6 +81,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setSettings(getInitialSettings());
     setIsHydrated(true);
   }, []);
+
+  useEffect(() => {
+    applyTheme(settings.theme);
+  }, [settings.theme]);
 
   // Persist to localStorage on changes
   useEffect(() => {
@@ -77,7 +105,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       try {
         if (e.newValue) {
           const newSettings = JSON.parse(e.newValue) as Partial<Settings>;
-          setSettings(prev => ({ ...prev, ...newSettings }));
+          setSettings(normalizeSettings(newSettings));
         }
       } catch {
         // Ignore parse errors
@@ -88,7 +116,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  const setTheme = useCallback((theme: 'dark' | 'light') => {
+  const setTheme = useCallback((theme: Settings['theme']) => {
     setSettings(prev => ({ ...prev, theme }));
   }, []);
 
@@ -114,6 +142,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   const value: SettingsContextType = {
     ...settings,
+    availableThemes: themePresets,
     setTheme,
     setLayout,
     setAnimations,

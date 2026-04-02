@@ -2,20 +2,217 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@property --background {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #06111f;
 }
 
-.dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+@property --foreground {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #eff6ff;
+}
+
+@property --panel {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(7, 19, 34, 0.76);
+}
+
+@property --panel-strong {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(8, 24, 42, 0.88);
+}
+
+@property --panel-border {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(148, 163, 184, 0.16);
+}
+
+@property --muted {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #93a6bf;
+}
+
+@property --grid-line {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(129, 160, 201, 0.08);
+}
+
+@property --glow-a {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(34, 211, 238, 0.1);
+}
+
+@property --glow-b {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(37, 99, 235, 0.12);
+}
+
+@property --text-primary {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #eff6ff;
+}
+
+@property --text-secondary {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #cbd5e1;
+}
+
+@property --bg-secondary {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(7, 19, 34, 0.76);
+}
+
+:root {
+  --background: #06111f;
+  --foreground: #eff6ff;
+  --panel: rgba(7, 19, 34, 0.76);
+  --panel-strong: rgba(8, 24, 42, 0.88);
+  --panel-border: rgba(148, 163, 184, 0.16);
+  --muted: #93a6bf;
+  --grid-line: rgba(129, 160, 201, 0.08);
+  --glow-a: rgba(34, 211, 238, 0.1);
+  --glow-b: rgba(37, 99, 235, 0.12);
+  --text-primary: #eff6ff;
+  --text-secondary: #cbd5e1;
+  --bg-secondary: rgba(7, 19, 34, 0.76);
+}
+
+html {
+  transition:
+    --background 0.35s ease,
+    --foreground 0.35s ease,
+    --panel 0.35s ease,
+    --panel-strong 0.35s ease,
+    --panel-border 0.35s ease,
+    --muted 0.35s ease,
+    --grid-line 0.35s ease,
+    --glow-a 0.35s ease,
+    --glow-b 0.35s ease,
+    --text-primary 0.35s ease,
+    --text-secondary 0.35s ease,
+    --bg-secondary 0.35s ease;
+}
+
+[data-theme='light'] {
+  --background: #f6f8fb;
+  --foreground: #08111f;
+  --panel: rgba(255, 255, 255, 0.78);
+  --panel-strong: rgba(255, 255, 255, 0.9);
+  --panel-border: rgba(15, 23, 42, 0.08);
+  --muted: #516076;
+  --grid-line: rgba(58, 76, 103, 0.06);
+  --glow-a: rgba(41, 121, 255, 0.08);
+  --glow-b: rgba(0, 229, 255, 0.07);
+  --text-primary: #08111f;
+  --text-secondary: #475569;
+  --bg-secondary: rgba(203, 213, 225, 0.5);
+}
+
+[data-theme='dark'] {
+  --background: #06111f;
+  --foreground: #eff6ff;
+  --panel: rgba(7, 19, 34, 0.76);
+  --panel-strong: rgba(8, 24, 42, 0.88);
+  --panel-border: rgba(148, 163, 184, 0.16);
+  --muted: #93a6bf;
+  --grid-line: rgba(129, 160, 201, 0.08);
+  --glow-a: rgba(34, 211, 238, 0.1);
+  --glow-b: rgba(37, 99, 235, 0.12);
+  --text-primary: #eff6ff;
+  --text-secondary: #94a3c8;
+  --bg-secondary: rgba(30, 41, 59, 0.5);
+}
+
+[data-theme='ocean'] {
+  --background: #edf6ff;
+  --foreground: #0b1f33;
+  --panel: rgba(255, 255, 255, 0.74);
+  --panel-strong: rgba(255, 255, 255, 0.88);
+  --panel-border: rgba(56, 104, 168, 0.14);
+  --muted: #4a6a8a;
+  --grid-line: rgba(74, 118, 171, 0.08);
+  --glow-a: rgba(56, 189, 248, 0.14);
+  --glow-b: rgba(59, 130, 246, 0.1);
+  --text-primary: #0b1f33;
+  --text-secondary: #3d5a80;
+  --bg-secondary: rgba(186, 215, 235, 0.5);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--background);
+  font-family: "Geist", "Segoe UI", sans-serif;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(circle at 18% 18%, var(--glow-a), transparent 24%),
+    radial-gradient(circle at 82% 12%, var(--glow-b), transparent 22%),
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size:
+    auto,
+    auto,
+    72px 72px,
+    72px 72px;
+  background-attachment: fixed;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.015), transparent 35%),
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.04), transparent 42%);
+  mix-blend-mode: screen;
+  opacity: 0.45;
+}
+
+::selection {
+  background: rgba(56, 189, 248, 0.3);
+  color: var(--foreground);
+}
+
+@layer components {
+  .glass-panel {
+    background-color: var(--panel);
+    border: 1px solid var(--panel-border);
+    box-shadow:
+      0 16px 40px rgba(2, 8, 23, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(18px);
+  }
+
+  .glass-panel-strong {
+    background-color: var(--panel-strong);
+    border: 1px solid var(--panel-border);
+    box-shadow:
+      0 18px 48px rgba(2, 8, 23, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    background-size: auto, auto, 42px 42px, 42px 42px;
+  }
 }
 
 @layer utilities {

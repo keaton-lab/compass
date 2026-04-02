@@ -1,12 +1,6 @@
 'use client';
 
-import * as simpleIcons from 'simple-icons';
-
-function toPascalCase(str: string): string {
-  return str
-    .replace(/[-_](.)/g, (_, c) => c.toUpperCase())
-    .replace(/^(.)/, (_, c) => c.toUpperCase());
-}
+import { brandIconsMap } from '../../data/icons-manifest';
 
 interface BrandIconProps {
   name: string;
@@ -16,14 +10,13 @@ interface BrandIconProps {
 }
 
 export default function BrandIcon({ name, size = 24, className = '', color }: BrandIconProps) {
-  const key = `si${toPascalCase(name)}` as keyof typeof simpleIcons;
-  const iconData = simpleIcons[key] as { path: string; hex: string } | undefined;
+  const iconData = brandIconsMap[name];
   
   if (!iconData) {
-    return <span className={`${className}`} style={{ fontSize: size * 0.5 }}>{name.slice(0, 2)}</span>;
+    return <span className={className} style={{ fontSize: size * 0.5 }}>{name.slice(0, 2)}</span>;
   }
   
-  const fillColor = color ? color : 'currentColor';
+  const fillColor = color || 'currentColor';
   
   return (
     <svg
