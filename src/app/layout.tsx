@@ -1,6 +1,53 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { SettingsProvider } from './contexts/SettingsContext';
+import { defaultThemeId, themePresets } from './themes';
+
+const THEME_STORAGE_KEY = 'compass-settings';
+
+const themeBootScript = `(() => {
+  const root = document.documentElement;
+  const fallbackTheme = '${defaultThemeId}';
+  const storageKey = '${THEME_STORAGE_KEY}';
+  const themeMap = ${JSON.stringify(
+    Object.fromEntries(
+      themePresets.map((theme) => [
+        theme.id,
+        {
+          background: theme.colors.background,
+          isDark: theme.isDark,
+        },
+      ]),
+    ),
+  )};
+
+  root.classList.add('theme-preload');
+
+  const applyTheme = (themeId) => {
+    const theme = Object.prototype.hasOwnProperty.call(themeMap, themeId) ? themeId : fallbackTheme;
+    const themeConfig = themeMap[theme];
+
+    root.dataset.theme = theme;
+    root.classList.toggle('dark', themeConfig.isDark);
+    root.style.colorScheme = themeConfig.isDark ? 'dark' : 'light';
+    root.style.backgroundColor = themeConfig.background;
+  };
+
+  try {
+    const stored = window.localStorage.getItem(storageKey);
+    const parsed = stored ? JSON.parse(stored) : null;
+    const themeId = parsed && typeof parsed.theme === 'string' ? parsed.theme : fallbackTheme;
+
+    applyTheme(themeId);
+  } catch {
+    applyTheme(fallbackTheme);
+  }
+
+  window.requestAnimationFrame(() => {
+    root.style.removeProperty('background-color');
+    root.classList.remove('theme-preload');
+  });
+})();`;
 
 export const metadata: Metadata = {
   title: "Compass - 导航中心",
@@ -17,7 +64,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning data-theme="light">
+    <html lang="en" suppressHydrationWarning data-theme={defaultThemeId}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+      </head>
       <body>
         <SettingsProvider>
           {children}

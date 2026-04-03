@@ -48,6 +48,7 @@ function applyTheme(theme: Settings['theme']) {
 
   root.dataset.theme = themePreset.id;
   root.classList.toggle('dark', themePreset.isDark);
+  root.style.colorScheme = themePreset.isDark ? 'dark' : 'light';
 }
 
 function getDefaultSettings(): Settings {

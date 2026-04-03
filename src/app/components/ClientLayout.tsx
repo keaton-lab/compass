@@ -121,8 +121,9 @@ export default function ClientLayout({
                 <span className="text-sm">{profile.name}</span>
               </a>
               <p className="text-sm text-[var(--muted)]">
-                {categories.length} categories •{" "}
-                {categories.reduce((acc, cat) => acc + cat.links.length, 0)} links
+                {categories.length} Categories •{" "}
+                {categories.reduce((acc, cat) => acc + cat.links.length, 0)} Links •{" "}
+                <a href="/edit" className="text-sm text-[var(--muted)] hover:opacity-80">Edit</a>
               </p>
             </div>
           </footer>

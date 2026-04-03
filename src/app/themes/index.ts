@@ -68,7 +68,7 @@ export const themePresets: ThemePreset[] = [
   },
 ];
 
-export const defaultThemeId: ThemeId = 'light';
+export const defaultThemeId: ThemeId = 'dark';
 
 export function isThemeId(value: string): value is ThemeId {
   return themePresets.some((theme) => theme.id === value);
