@@ -22,7 +22,9 @@ let brandIconsCache: BrandIcon[] | null = null;
 async function loadLucideIconNames(): Promise<string[]> {
   if (lucideIconNamesCache) return lucideIconNamesCache;
   const lucide = await import('lucide-react');
-  lucideIconNamesCache = Object.keys(lucide).filter((key) => key[0] === key[0].toUpperCase() && key !== 'Icon' && key !== 'default');
+  lucideIconNamesCache = Object.keys(lucide).filter(
+    (key) => key[0] === key[0].toUpperCase() && key !== 'Icon' && key !== 'default' && !key.endsWith('Icon')
+  );
   return lucideIconNamesCache;
 }
 
@@ -55,7 +57,19 @@ export default function IconPicker({ value, onChange, onClose }: IconPickerProps
   const loadedRef = useRef<{ lucide: boolean; brand: boolean }>({ lucide: false, brand: false });
 
   useEffect(() => {
+    loadLucideIconNames().then((names) => {
+      setLucideIconNames(names);
+      loadedRef.current.lucide = true;
+    });
+    loadBrandIcons().then((icons) => {
+      setBrandIcons(icons);
+      loadedRef.current.brand = true;
+    });
+  }, []);
+
+  useEffect(() => {
     if (tab === 'lucide' && !loadedRef.current.lucide) {
+      setLoading(true);
       loadLucideIconNames().then((names) => {
         setLucideIconNames(names);
         loadedRef.current.lucide = true;
@@ -150,11 +164,11 @@ export default function IconPicker({ value, onChange, onClose }: IconPickerProps
               tab === 'brand' ? 'bg-[var(--accent)]/20 text-[var(--accent)]' : 'text-[var(--muted)] hover:text-[var(--foreground)]'
             }`}
           >
-            品牌 {brandIcons.length > 0 ? `(${filteredBrandIcons.length})` : ''}
+            品牌 ({filteredBrandIcons.length})
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4" onScroll={handleScroll}>
+        <div className="flex-1 min-h-0 overflow-y-auto p-4" onScroll={handleScroll}>
           {tab === 'lucide' ? (
             loading && lucideIconNames.length === 0 ? (
               <p className="text-center text-sm text-[var(--muted)] py-12">加载图标中...</p>
