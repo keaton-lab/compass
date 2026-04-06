@@ -29,7 +29,7 @@ export default function NotFound() {
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="glass-panel-strong rounded-3xl p-8 md:p-12 max-w-md w-full text-center"
+         className="liquid-glass rounded-3xl p-8 md:p-12 max-w-md w-full text-center"
       >
         <motion.div
           initial={{ y: -20 }}

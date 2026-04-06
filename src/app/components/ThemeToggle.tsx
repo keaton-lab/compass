@@ -6,10 +6,44 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useSettings } from '../contexts/SettingsContext';
 
+/**
+ * 主题图标组件
+ * 根据主题ID渲染对应的图标
+ */
 function ThemeIcon({ id, size = 20, className = '' }: { id: string; size?: number; className?: string }) {
   if (id === 'light') return <Sun size={size} className={className} />;
   if (id === 'dark') return <Moon size={size} className={className} />;
   return <Palette size={size} className={className} />;
+}
+
+/**
+ * 获取主题图标颜色样式
+ * 使用CSS变量实现主题一致的颜色
+ */
+function getThemeIconStyles(themeId: string) {
+  // 使用CSS变量来统一管理颜色
+  switch (themeId) {
+    case 'light':
+      return {
+        wrapper: 'bg-[#fef3c7] dark:bg-[rgba(217,119,6,0.2)]',
+        icon: 'text-[#d97706] dark:text-[#fbbf24]',
+      };
+    case 'dark':
+      return {
+        wrapper: 'bg-[#f1f5f9] dark:bg-[#1e293b]',
+        icon: 'text-[#475569] dark:text-[#cbd5e1]',
+      };
+    case 'ocean':
+      return {
+        wrapper: 'bg-[#e0f2fe] dark:bg-[rgba(3,105,161,0.2)]',
+        icon: 'text-[#0369a1] dark:text-[#38bdf8]',
+      };
+    default:
+      return {
+        wrapper: 'bg-[var(--panel)]',
+        icon: 'text-[var(--muted)]',
+      };
+  }
 }
 
 interface ThemeToggleProps {
@@ -25,10 +59,14 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
   const desktopPanelRef = useRef<HTMLDivElement>(null);
   const desktopTriggerRef = useRef<HTMLButtonElement>(null);
 
+  // 获取当前主题的图标样式
+  const currentIconStyles = getThemeIconStyles(theme);
+
   useEffect(() => {
     setHasMounted(true);
   }, []);
 
+  // 桌面端点击外部关闭
   useEffect(() => {
     if (!isDesktopOpen) return;
 
@@ -56,6 +94,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
     };
   }, [isDesktopOpen]);
 
+  // 移动端ESC关闭和禁止背景滚动
   useEffect(() => {
     if (!isMobileOpen) return;
 
@@ -75,11 +114,15 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
     };
   }, [isMobileOpen]);
 
+  /**
+   * 渲染移动端选项列表
+   */
   function renderMobileOptions() {
     return (
       <div className="grid grid-cols-1 gap-3">
         {availableThemes.map((option) => {
           const isActive = option.id === theme;
+          const iconStyles = getThemeIconStyles(option.id);
 
           return (
             <motion.button
@@ -91,31 +134,19 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
               }}
               className={`flex items-center justify-between gap-3 rounded-2xl border px-4 py-3.5 text-sm font-medium transition-all ${
                 isActive
-                  ? 'border-sky-400/40 bg-sky-500/15 text-slate-950 shadow-lg dark:text-white'
-                  : 'border-black/5 bg-white/40 text-[var(--muted)] hover:bg-white/60 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10'
+                  ? 'border-[var(--accent-border)] bg-[var(--accent-alpha)] text-[var(--foreground)] shadow-lg'
+                  : 'border-[var(--panel-border)] bg-[var(--panel)] text-[var(--muted)] hover:bg-[var(--panel-strong)]'
               }`}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
               <div className="flex items-center gap-3">
-                <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-                  option.id === 'light' ? 'bg-amber-100 dark:bg-amber-900/30' :
-                  option.id === 'dark' ? 'bg-slate-100 dark:bg-slate-800' :
-                  'bg-sky-100 dark:bg-sky-900/30'
-                }`}>
-                  <ThemeIcon
-                    id={option.id}
-                    size={16}
-                    className={
-                      option.id === 'light' ? 'text-amber-600 dark:text-amber-400' :
-                      option.id === 'dark' ? 'text-slate-600 dark:text-slate-300' :
-                      'text-sky-600 dark:text-sky-400'
-                    }
-                  />
+                <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${iconStyles.wrapper}`}>
+                  <ThemeIcon id={option.id} size={16} className={iconStyles.icon} />
                 </div>
                 <span>{option.label}</span>
               </div>
-              {isActive && <Check size={18} className="text-sky-500" />}
+              {isActive && <Check size={18} className="text-[var(--accent)]" />}
             </motion.button>
           );
         })}
@@ -123,6 +154,9 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
     );
   }
 
+  /**
+   * 渲染移动端弹窗（Portal）
+   */
   function renderMobilePortal() {
     if (!hasMounted) {
       return null;
@@ -138,18 +172,20 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
+            {/* 背景遮罩 */}
             <motion.button
               type="button"
               aria-label="关闭主题弹框"
               onClick={() => setIsMobileOpen(false)}
-              className="absolute inset-0 bg-slate-950/18 backdrop-blur-[2px]"
+              className="absolute inset-0 bg-[var(--background)]/80 backdrop-blur-[8px]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             />
 
             <motion.div
-              className="glass-panel-strong relative w-2/3 max-w-sm rounded-3xl p-6"
+              className="liquid-glass relative w-2/3 max-w-sm rounded-3xl p-6"
+              style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
               initial={{ scale: 0.9, opacity: 0, y: 12 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 12 }}
@@ -163,7 +199,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
                 <motion.button
                   type="button"
                   onClick={() => setIsMobileOpen(false)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-black/5 bg-black/5 text-[var(--muted)] hover:bg-black/10 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--panel-border)] bg-[var(--panel)] text-[var(--muted)] hover:bg-[var(--panel-strong)]"
                   whileTap={{ scale: 0.9 }}
                 >
                   <X size={18} />
@@ -179,6 +215,9 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
     );
   }
 
+  /**
+   * 渲染移动端触发按钮
+   */
   function renderMobileTrigger() {
     return (
       <motion.button
@@ -186,22 +225,19 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
         aria-label="切换主题"
         aria-expanded={isMobileOpen}
         onClick={() => setIsMobileOpen(true)}
-        className="fixed right-4 top-4 z-40 flex h-10 w-10 items-center justify-center rounded-full border border-black/5 bg-white/80 text-[var(--muted)] shadow-lg backdrop-blur-md hover:bg-white dark:border-white/10 dark:bg-slate-900/80 md:hidden"
+        className="liquid-glass fixed right-4 top-4 z-40 flex h-10 w-10 items-center justify-center rounded-full text-[var(--muted)] md:hidden"
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
-        <ThemeIcon
-          id={theme}
-          size={20}
-          className={theme === 'light' ? 'text-amber-500' : theme === 'dark' ? 'text-slate-400' : 'text-sky-500'}
-        />
+        <ThemeIcon id={theme} size={20} className={currentIconStyles.icon} />
       </motion.button>
     );
   }
 
+  // 仅移动端模式
   if (mobileOnly) {
     return (
       <>
@@ -211,6 +247,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
     );
   }
 
+  // 紧凑模式（桌面端下拉菜单）
   if (compact) {
     return (
       <div className="relative hidden md:block">
@@ -220,25 +257,21 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
           aria-label="切换主题"
           aria-expanded={isDesktopOpen}
           onClick={() => setIsDesktopOpen((value) => !value)}
-          className="flex h-9 w-9 items-center justify-center rounded-full border text-[var(--muted)] shadow-sm backdrop-blur" style={{ borderColor: 'var(--panel-border)', backgroundColor: 'var(--panel)' }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.2 }}
+          className="liquid-glass flex h-9 w-9 items-center justify-center rounded-full text-[var(--muted)]"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          <ThemeIcon
-            id={theme}
-            size={18}
-            className={theme === 'light' ? 'text-amber-500' : theme === 'dark' ? 'text-slate-300' : 'text-sky-500'}
-          />
+          <ThemeIcon id={theme} size={18} className={currentIconStyles.icon} />
         </motion.button>
 
         <AnimatePresence>
           {isDesktopOpen && (
             <motion.div
               ref={desktopPanelRef}
-              className="absolute right-0 top-full z-50 mt-2 min-w-[180px] rounded-2xl p-3 shadow-xl glass-panel-strong"
+              className="liquid-glass absolute right-0 top-full z-50 mt-2 min-w-[180px] rounded-2xl p-3"
               initial={{ opacity: 0, y: -8, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.95 }}
@@ -251,6 +284,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
               <div className="grid grid-cols-1 gap-1.5">
                 {availableThemes.map((option) => {
                   const isActive = option.id === theme;
+                  const iconStyles = getThemeIconStyles(option.id);
 
                   return (
                     <motion.button
@@ -262,29 +296,17 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
                       }}
                       className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
                         isActive
-                          ? 'bg-sky-500/15 text-slate-950 shadow-sm dark:text-white'
-                          : 'text-[var(--muted)] hover:bg-white/60 dark:hover:bg-white/5'
+                          ? 'bg-[var(--accent-alpha)] text-[var(--foreground)] shadow-sm'
+                          : 'text-[var(--muted)] hover:bg-[var(--panel)]'
                       }`}
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      <div className={`flex h-7 w-7 items-center justify-center rounded-lg ${
-                        option.id === 'light' ? 'bg-amber-100 dark:bg-amber-900/30' :
-                        option.id === 'dark' ? 'bg-slate-100 dark:bg-slate-800' :
-                        'bg-sky-100 dark:bg-sky-900/30'
-                      }`}>
-                        <ThemeIcon
-                          id={option.id}
-                          size={14}
-                          className={
-                            option.id === 'light' ? 'text-amber-600 dark:text-amber-400' :
-                            option.id === 'dark' ? 'text-slate-600 dark:text-slate-300' :
-                            'text-sky-600 dark:text-sky-400'
-                          }
-                        />
+                      <div className={`flex h-7 w-7 items-center justify-center rounded-lg ${iconStyles.wrapper}`}>
+                        <ThemeIcon id={option.id} size={14} className={iconStyles.icon} />
                       </div>
                       <span className="flex-1 text-left">{option.label}</span>
-                      {isActive && <Check size={16} className="text-sky-500" />}
+                      {isActive && <Check size={16} className="text-[var(--accent)]" />}
                     </motion.button>
                   );
                 })}
@@ -296,6 +318,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
     );
   }
 
+  // 完整模式（桌面端按钮组 + 移动端触发器）
   return (
     <>
       {renderMobileTrigger()}
@@ -307,7 +330,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
       >
-        <div className="glass-panel flex items-center gap-2 rounded-full px-3 py-2 shadow-lg">
+        <div className="liquid-glass flex items-center gap-2 rounded-full px-3 py-2">
           <div className="flex items-center gap-2 px-2 text-[var(--muted)]">
             <Palette size={16} />
             <span className="text-xs font-medium">Theme</span>
@@ -324,13 +347,13 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
                   onClick={() => setTheme(option.id)}
                   className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
                     isActive
-                      ? 'border-sky-400/40 bg-sky-500/15 text-slate-950 shadow-sm dark:text-white'
-                      : 'border-black/5 bg-white/40 text-[var(--muted)] hover:bg-white/60 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10'
+                      ? 'border-[var(--accent-border)] bg-[var(--accent-alpha)] text-[var(--foreground)] shadow-sm'
+                      : 'border-[var(--panel-border)] bg-[var(--panel)] text-[var(--muted)] hover:bg-[var(--panel-strong)]'
                   }`}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  {isActive && <Check size={14} />}
+                  {isActive && <Check size={14} className="text-[var(--accent)]" />}
                   <span>{option.label}</span>
                 </motion.button>
               );

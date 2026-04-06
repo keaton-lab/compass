@@ -1,5 +1,7 @@
 import type { ThemeId } from '../themes';
 
+export type { ThemeId };
+
 export interface Link {
   id: string;
   name: string;

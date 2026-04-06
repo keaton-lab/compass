@@ -60,12 +60,7 @@ export function ProfileHeaderDesktopLeft({ profile }: { profile: Profile }) {
   };
 
   return (
-    <motion.div
-      className="flex items-center gap-4"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-    >
+    <div className="flex items-center gap-4">
       <div className="flex-shrink-0">{renderAvatar()}</div>
       <div className="flex-1 min-w-0">
         <h1 className="text-xl font-semibold text-[var(--text-primary)] truncate">{name}</h1>
@@ -74,7 +69,7 @@ export function ProfileHeaderDesktopLeft({ profile }: { profile: Profile }) {
           <p className="mt-0.5 text-sm text-[var(--muted)] truncate">{bio}</p>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -137,7 +132,7 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
   return (
     <>
       <motion.div
-        className="glass-panel md:hidden w-full rounded-2xl p-4 shadow-md"
+        className="liquid-glass md:hidden w-full rounded-2xl p-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
@@ -158,12 +153,7 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
         </div>
       </motion.div>
 
-      <motion.div
-        className="glass-panel hidden md:flex items-center gap-4 rounded-3xl px-6 py-4 shadow-xl"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-      >
+      <div className="hidden md:flex items-center gap-4">
         <div className="flex-shrink-0">
           {renderAvatar('w-14 h-14', 28, 'text-xl')}
         </div>
@@ -181,7 +171,7 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
             </p>
           )}
         </div>
-      </motion.div>
+      </div>
     </>
   );
 }

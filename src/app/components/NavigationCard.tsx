@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import Icon from './Icon';
 import type { Link as LinkType } from '../types';
@@ -10,36 +11,74 @@ interface NavigationCardProps {
 }
 
 export default function NavigationCard({ link, color }: NavigationCardProps) {
+  const cardRef = useRef<HTMLAnchorElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    const card = cardRef.current;
+    const glow = glowRef.current;
+    if (!card) return;
+
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotateX = ((y - centerY) / centerY) * -6;
+    const rotateY = ((x - centerX) / centerX) * 6;
+
+    card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+
+    if (glow) {
+      glow.style.background = `radial-gradient(circle at ${x}px ${y}px, ${color}33 0%, transparent 56%)`;
+      glow.style.opacity = '1';
+    }
+  }, [color]);
+
+  const handleMouseLeave = useCallback(() => {
+    const card = cardRef.current;
+    const glow = glowRef.current;
+    if (!card) return;
+    card.style.transition = 'transform 0.4s ease';
+    card.style.transform = 'perspective(800px) rotateX(0) rotateY(0)';
+    setTimeout(() => {
+      if (card) card.style.transition = '';
+    }, 400);
+    if (glow) {
+      glow.style.opacity = '0';
+    }
+  }, []);
+
   return (
     <motion.a
+      ref={cardRef}
       href={link.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="glass-panel group relative flex min-h-[88px] flex-col overflow-hidden rounded-[16px] p-3 cursor-pointer md:min-h-[80px] md:flex-row md:items-center md:gap-2.5 md:rounded-[18px] md:p-3.5"
-      whileHover={{
-        scale: 1.015,
-        y: -2,
-        boxShadow: `0 12px 28px ${color}18`
-      }}
+      className="liquid-glass group relative flex min-h-[88px] flex-col overflow-hidden rounded-[16px] p-3 cursor-pointer md:min-h-[80px] md:flex-row md:items-center md:gap-2.5 md:rounded-[18px] md:p-3.5"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       whileTap={{ scale: 0.98 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-    >
+    >      {/* Glow effect */}
       <div
-        className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        ref={glowRef}
+        className="absolute inset-0 opacity-0 transition-opacity duration-300 pointer-events-none"
         style={{
           background: `radial-gradient(circle at top right, ${color}26 0%, transparent 56%)`
         }}
       />
+
+      {/* Icon */}
       <div className="relative z-10 flex items-start justify-between gap-2 md:flex-none">
-        <motion.div
+        <div
           className="flex h-10 w-10 items-center justify-center rounded-lg border md:h-11 md:w-11"
           style={{
             backgroundColor: `${color}18`,
             borderColor: `${color}40`
           }}
-          animate={{ rotate: 0 }}
-          whileHover={{ rotate: [0, -8, 8, -4, 4, 0] }}
-          transition={{ duration: 0.4 }}
         >
           <Icon
             name={link.icon}
@@ -47,9 +86,10 @@ export default function NavigationCard({ link, color }: NavigationCardProps) {
             color={color}
             className="transition-transform group-hover:scale-110"
           />
-        </motion.div>
+        </div>
       </div>
 
+      {/* Content */}
       <div className="relative z-10 mt-2 min-w-0 flex-1 md:mt-0">
         <h3 className="truncate text-[15px] font-medium text-[var(--text-primary)] group-hover:opacity-80 md:text-[15px]">
           {link.name}
@@ -59,6 +99,7 @@ export default function NavigationCard({ link, color }: NavigationCardProps) {
         </p>
       </div>
 
+      {/* Arrow */}
       <motion.div
         className="absolute right-2 top-2 z-10 text-[var(--muted)] group-hover:opacity-80 md:static md:ml-auto md:flex-none"
         initial={{ x: 0, opacity: 0.55 }}

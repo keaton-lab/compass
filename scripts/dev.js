@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const generatorScriptPath = path.join(__dirname, 'generate-icons-manifest.js');
-const configPath = path.join(__dirname, '../src/data/config.yaml');
+const configPath = path.join(__dirname, '../src/config.yaml');
 
 function runCommand(command, args, options = {}) {
   return spawn(command, args, {

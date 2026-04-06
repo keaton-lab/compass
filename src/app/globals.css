@@ -74,6 +74,24 @@
   initial-value: rgba(7, 19, 34, 0.76);
 }
 
+@property --accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #0ea5e9;
+}
+
+@property --accent-alpha {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(14, 165, 233, 0.15);
+}
+
+@property --accent-border {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgba(14, 165, 233, 0.4);
+}
+
 :root {
   --background: #06111f;
   --foreground: #eff6ff;
@@ -85,8 +103,11 @@
   --glow-a: rgba(34, 211, 238, 0.1);
   --glow-b: rgba(37, 99, 235, 0.12);
   --text-primary: #eff6ff;
-  --text-secondary: #cbd5e1;
-  --bg-secondary: rgba(7, 19, 34, 0.76);
+  --text-secondary: #94a3c8;
+  --bg-secondary: rgba(30, 41, 59, 0.5);
+  --accent: #0ea5e9;
+  --accent-alpha: rgba(14, 165, 233, 0.15);
+  --accent-border: rgba(14, 165, 233, 0.4);
 }
 
 html {
@@ -103,7 +124,10 @@ html {
     --glow-b 0.35s ease,
     --text-primary 0.35s ease,
     --text-secondary 0.35s ease,
-    --bg-secondary 0.35s ease;
+    --bg-secondary 0.35s ease,
+    --accent 0.35s ease,
+    --accent-alpha 0.35s ease,
+    --accent-border 0.35s ease;
 }
 
 html.theme-preload {
@@ -111,18 +135,21 @@ html.theme-preload {
 }
 
 [data-theme='light'] {
-  --background: #f6f8fb;
+  --background: #edf1f7;
   --foreground: #08111f;
   --panel: rgba(255, 255, 255, 0.78);
   --panel-strong: rgba(255, 255, 255, 0.9);
   --panel-border: rgba(15, 23, 42, 0.08);
   --muted: #516076;
   --grid-line: rgba(58, 76, 103, 0.06);
-  --glow-a: rgba(41, 121, 255, 0.08);
-  --glow-b: rgba(0, 229, 255, 0.07);
+  --glow-a: transparent;
+  --glow-b: transparent;
   --text-primary: #08111f;
   --text-secondary: #475569;
-  --bg-secondary: rgba(203, 213, 225, 0.5);
+  --bg-secondary: rgba(241, 245, 249, 0.6);
+  --accent: #f59e0b;
+  --accent-alpha: rgba(245, 158, 11, 0.15);
+  --accent-border: rgba(245, 158, 11, 0.4);
 }
 
 [data-theme='dark'] {
@@ -138,6 +165,9 @@ html.theme-preload {
   --text-primary: #eff6ff;
   --text-secondary: #94a3c8;
   --bg-secondary: rgba(30, 41, 59, 0.5);
+  --accent: #0ea5e9;
+  --accent-alpha: rgba(14, 165, 233, 0.15);
+  --accent-border: rgba(14, 165, 233, 0.4);
 }
 
 [data-theme='ocean'] {
@@ -153,6 +183,9 @@ html.theme-preload {
   --text-primary: #0b1f33;
   --text-secondary: #3d5a80;
   --bg-secondary: rgba(186, 215, 235, 0.5);
+  --accent: #0284c7;
+  --accent-alpha: rgba(2, 132, 199, 0.15);
+  --accent-border: rgba(2, 132, 199, 0.4);
 }
 
 html {
@@ -190,7 +223,7 @@ body::before {
 }
 
 ::selection {
-  background: rgba(56, 189, 248, 0.3);
+  background: var(--accent-alpha);
   color: var(--foreground);
 }
 
@@ -217,6 +250,105 @@ body::before {
 @media (max-width: 768px) {
   body {
     background-size: auto, auto, 42px 42px, 42px 42px;
+  }
+}
+
+/* 流体玻璃效果 - 支持圆角的渐变边框 */
+@layer components {
+  .liquid-glass {
+    position: relative;
+    background-color: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(0.2px);
+    -webkit-backdrop-filter: blur(0.2px);
+    box-shadow: 
+      0 2px 8px rgba(0, 0, 0, 0.04),
+      0 8px 32px rgba(0, 0, 0, 0.06),
+      inset 0 0.5px 0 0 rgba(255, 255, 255, 0.15);
+    overflow: hidden;
+  }
+
+  /* 渐变边框 - 使用伪元素 + mask 实现圆角 */
+  .liquid-glass::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.4) 0%,
+      rgba(255, 255, 255, 0.12) 30%,
+      rgba(255, 255, 255, 0.05) 50%,
+      rgba(255, 255, 255, 0.12) 70%,
+      rgba(255, 255, 255, 0.35) 100%
+    );
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* 浅色主题边框 */
+  [data-theme='light'] .liquid-glass::before,
+  [data-theme='ocean'] .liquid-glass::before {
+    background: linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.08) 0%,
+      rgba(0, 0, 0, 0.06) 30%,
+      rgba(0, 0, 0, 0.03) 50%,
+      rgba(0, 0, 0, 0.06) 70%,
+      rgba(0, 0, 0, 0.05) 100%
+    );
+  }
+
+  /* 顶部高光 */
+  .liquid-glass::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      transparent 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* 内容层 */
+  .liquid-glass > * {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* 悬停效果 */
+  .liquid-glass:hover::before {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.18) 30%,
+      rgba(255, 255, 255, 0.08) 50%,
+      rgba(255, 255, 255, 0.18) 70%,
+      rgba(255, 255, 255, 0.18) 100%
+    );
+  }
+
+  [data-theme='light'] .liquid-glass:hover::before,
+  [data-theme='ocean'] .liquid-glass:hover::before {
+    background: linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.08) 0%,
+      rgba(0, 0, 0, 0.1) 30%,
+      rgba(0, 0, 0, 0.05) 50%,
+      rgba(0, 0, 0, 0.1) 70%,
+      rgba(0, 0, 0, 0.08) 100%
+    );
   }
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import CategorySection from "./CategorySection";
 import ProfileHeader from "./ProfileHeader";
@@ -17,6 +17,53 @@ interface ClientLayoutProps {
   categories: Category[];
 }
 
+// 3D悬浮效果Hook
+function useTilt3D() {
+  const ref = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const element = ref.current;
+    const glow = glowRef.current;
+    if (!element) return;
+
+    const rect = element.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotateX = ((y - centerY) / centerY) * -4;
+    const rotateY = ((x - centerX) / centerX) * 4;
+
+    element.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+
+    if (glow) {
+      glow.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(56, 189, 248, 0.12) 0%, transparent 50%)`;
+      glow.style.opacity = '1';
+    }
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    const element = ref.current;
+    const glow = glowRef.current;
+    if (!element) return;
+
+    element.style.transition = 'transform 0.5s ease';
+    element.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+    setTimeout(() => {
+      if (element) element.style.transition = '';
+    }, 500);
+
+    if (glow) {
+      glow.style.opacity = '0';
+    }
+  }, []);
+
+  return { ref, glowRef, handleMouseMove, handleMouseLeave };
+}
+
 export default function ClientLayout({
   profile,
   settings,
@@ -24,6 +71,32 @@ export default function ClientLayout({
 }: ClientLayoutProps) {
   const { searchQuery, setSearchQuery } = useSettings();
   const query = searchQuery ?? "";
+
+  const { ref: headerRef, glowRef: headerGlowRef, handleMouseMove, handleMouseLeave } = useTilt3D();
+  const mobileHeaderRef = useRef<HTMLDivElement>(null);
+  const mobileHeaderGlowRef = useRef<HTMLDivElement>(null);
+
+  const handleMobileMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const element = mobileHeaderRef.current;
+    const glow = mobileHeaderGlowRef.current;
+    if (!element) return;
+
+    const rect = element.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    if (glow) {
+      glow.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(56, 189, 248, 0.12) 0%, transparent 50%)`;
+      glow.style.opacity = '1';
+    }
+  }, []);
+
+  const handleMobileMouseLeave = useCallback(() => {
+    const glow = mobileHeaderGlowRef.current;
+    if (glow) {
+      glow.style.opacity = '0';
+    }
+  }, []);
 
   const filteredCategories = useMemo(() => {
     if (!query.trim()) {
@@ -54,11 +127,25 @@ export default function ClientLayout({
       <div className="min-h-screen text-foreground">
         <div className="mx-auto max-w-[1440px] px-4 pb-12 pt-6 md:px-6 md:pb-12 lg:px-8">
           <header className="space-y-4 md:space-y-0 md:flex md:items-center md:justify-between md:gap-6">
+            {/* 移动端布局 */}
             <div className="md:hidden space-y-3">
-              <ProfileHeader profile={profile} />
+              <motion.div
+                ref={mobileHeaderRef}
+                className="relative"
+                onMouseMove={handleMobileMouseMove}
+                onMouseLeave={handleMobileMouseLeave}
+              >
+                {/* Glow effect */}
+                <div
+                  ref={mobileHeaderGlowRef}
+                  className="absolute inset-0 opacity-0 transition-opacity duration-300 pointer-events-none rounded-2xl"
+                />
+                <ProfileHeader profile={profile} />
+              </motion.div>
               {shouldShowSearch && (
                 <SearchBar
                   onSearch={setSearchQuery}
+                  value={query}
                   placeholder="搜索链接、描述或工作入口..."
                   showResultCount={true}
                   resultCount={totalResults}
@@ -66,13 +153,31 @@ export default function ClientLayout({
               )}
             </div>
 
+            {/* 桌面端布局 - 只包裹左侧头像区 */}
             <div className="hidden md:flex w-full items-center justify-between">
-              <ProfileHeaderDesktopLeft profile={profile} />
+              <div ref={headerRef} className="relative" style={{ transformStyle: 'preserve-3d' }}>
+                {/* Glow effect */}
+                <div
+                  ref={headerGlowRef}
+                  className="absolute inset-0 opacity-0 transition-opacity duration-300 pointer-events-none rounded-2xl"
+                />
+                <motion.div
+                  className="liquid-glass rounded-2xl px-5 py-3 w-[400px]"
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                  onMouseMove={handleMouseMove}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <ProfileHeaderDesktopLeft profile={profile} />
+                </motion.div>
+              </div>
               <div className="flex items-center gap-3">
                 {shouldShowSearch && (
                   <SearchBar
                     compact
                     onSearch={setSearchQuery}
+                    value={query}
                     placeholder="搜索链接、描述或工作入口..."
                     showResultCount={true}
                     resultCount={totalResults}
@@ -99,7 +204,7 @@ export default function ClientLayout({
 
             {query && filteredCategories.length === 0 && (
               <motion.div
-                className="glass-panel-strong py-12 text-center rounded-2xl"
+                className="liquid-glass py-12 text-center rounded-2xl"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
               >
