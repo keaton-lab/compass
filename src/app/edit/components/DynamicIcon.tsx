@@ -1,9 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { icons as lucideIcons } from 'lucide-react';
 
 let brandIconsCache: Record<string, { path: string; hex: string }> | null = null;
+const lucideCache: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {};
+
+async function loadLucideIcon(name: string) {
+  if (lucideCache[name]) return lucideCache[name];
+  const lucide = await import('lucide-react');
+  const Icon = (lucide as unknown as Record<string, React.ComponentType<{ size?: number; className?: string }>>)[name];
+  if (Icon) {
+    lucideCache[name] = Icon;
+  }
+  return Icon;
+}
 
 async function loadBrandIcons() {
   if (brandIconsCache) return brandIconsCache;
@@ -51,10 +61,25 @@ function DynamicBrandIcon({ name, size = 20, className = '' }: DynamicIconProps)
   );
 }
 
+function DynamicLucideIcon({ name, size = 20, className = '' }: DynamicIconProps) {
+  const [IconComponent, setIconComponent] = useState<React.ComponentType<{ size?: number; className?: string }> | null>(null);
+
+  useEffect(() => {
+    loadLucideIcon(name).then((Icon) => {
+      if (Icon) setIconComponent(() => Icon);
+    });
+  }, [name]);
+
+  if (!IconComponent) {
+    return <span className={className} style={{ fontSize: size }}>{name.charAt(0)}</span>;
+  }
+  return <IconComponent size={size} className={className} />;
+}
+
 export default function DynamicIcon({ name, size = 20, className = '' }: DynamicIconProps) {
-  const LucideIcon = lucideIcons[name as keyof typeof lucideIcons];
-  if (LucideIcon) {
-    return <LucideIcon size={size} className={className} />;
+  const name0 = name[0];
+  if (name0 && name0 === name0.toUpperCase() && name0 !== name0.toLowerCase()) {
+    return <DynamicLucideIcon name={name} size={size} className={className} />;
   }
   return <DynamicBrandIcon name={name} size={size} className={className} />;
 }

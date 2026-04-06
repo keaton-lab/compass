@@ -135,7 +135,7 @@ html.theme-preload {
 }
 
 [data-theme='light'] {
-  --background: #e5e8ed;
+  --background: #edf1f7;
   --foreground: #08111f;
   --panel: rgba(255, 255, 255, 0.78);
   --panel-strong: rgba(255, 255, 255, 0.9);

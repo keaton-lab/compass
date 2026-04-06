@@ -240,14 +240,6 @@ export default function EditClient({ initialConfig }: EditClientProps) {
 
           <div className="flex-1" />
 
-          {/* Quick add category */}
-          <button
-            onClick={addCategory}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-[var(--muted)] hover:text-[var(--accent)] hover:bg-[var(--accent)]/5 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">添加分类</span>
-          </button>
         </div>
 
         {/* Main content */}
