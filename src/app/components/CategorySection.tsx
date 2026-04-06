@@ -41,7 +41,7 @@ export default function CategorySection({ category }: CategorySectionProps) {
 
   // Determine grid layout classes based on current settings - more compact
   const gridColumnsClass = layout === 'grid'
-    ? 'grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
+    ? 'grid-cols-2 xsm:grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
     : 'grid-cols-1';
   const gapClass = layout === 'list' ? 'gap-3' : 'gap-2';
 

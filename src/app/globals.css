@@ -122,7 +122,7 @@ html.theme-preload {
   --glow-b: rgba(0, 229, 255, 0.07);
   --text-primary: #08111f;
   --text-secondary: #475569;
-  --bg-secondary: rgba(203, 213, 225, 0.5);
+  --bg-secondary: rgba(241, 245, 249, 0.6);
 }
 
 [data-theme='dark'] {
@@ -220,8 +220,66 @@ body::before {
   }
 }
 
+/* Liquid Glass Effects */
+@layer components {
+  .liquid-glass-base {
+    position: relative;
+    overflow: hidden;
+    will-change: transform, box-shadow;
+    transform-origin: center center;
+  }
+
+  .liquid-glass-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    pointer-events: none;
+    will-change: backdrop-filter, -webkit-backdrop-filter;
+  }
+
+  .liquid-glass-clone {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: inherit;
+    z-index: 1;
+    will-change: filter;
+    contain: strict;
+  }
+
+  .use-backdrop-filter .liquid-glass-clone {
+    display: none;
+  }
+
+  .use-backdrop-filter .liquid-glass-inner {
+    backdrop-filter: url(#liquidGlassFilter);
+    -webkit-backdrop-filter: url(#liquidGlassFilter);
+  }
+
+  /* Ambient orbs for glass to refract */
+  .ambient-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.4;
+    pointer-events: none;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Performance optimizations for liquid glass */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    will-change: transform;
   }
 }
