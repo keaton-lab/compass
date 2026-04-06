@@ -10,8 +10,8 @@ interface SearchBarProps {
   disabled?: boolean;
   showResultCount?: boolean;
   resultCount?: number;
-  // 新增紧凑模式开关，默认关闭，保持向后兼容
   compact?: boolean;
+  value?: string;
 }
 
 export default function SearchBar({
@@ -21,11 +21,20 @@ export default function SearchBar({
   showResultCount = false,
   resultCount = 0,
   compact = false,
+  value: externalValue,
 }: SearchBarProps) {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(externalValue ?? "");
   const [isFocused, setIsFocused] = useState(false);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const prevExternalValue = useRef(externalValue);
+
+  useEffect(() => {
+    if (externalValue !== undefined && externalValue !== prevExternalValue.current) {
+      prevExternalValue.current = externalValue;
+      setQuery(externalValue);
+    }
+  }, [externalValue]);
 
   const handleSearch = useCallback(
     (searchQuery: string) => {
@@ -136,7 +145,7 @@ export default function SearchBar({
         className="liquid-glass relative rounded-2xl p-0.5"
         animate={{
           boxShadow: isFocused
-            ? "0 20px 50px rgba(0, 0, 0, 0.12), 0 0 0 2px rgba(56, 189, 248, 0.2)"
+            ? `0 20px 50px rgba(0, 0, 0, 0.12), 0 0 0 2px var(--accent-alpha)`
             : "0 16px 40px rgba(0, 0, 0, 0.08)",
         }}
         transition={{ duration: 0.2 }}

@@ -20,9 +20,11 @@ interface ClientLayoutProps {
 // 3D悬浮效果Hook
 function useTilt3D() {
   const ref = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const element = ref.current;
+    const glow = glowRef.current;
     if (!element) return;
 
     const rect = element.getBoundingClientRect();
@@ -36,10 +38,16 @@ function useTilt3D() {
     const rotateY = ((x - centerX) / centerX) * 4;
 
     element.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+
+    if (glow) {
+      glow.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(56, 189, 248, 0.12) 0%, transparent 50%)`;
+      glow.style.opacity = '1';
+    }
   }, []);
 
   const handleMouseLeave = useCallback(() => {
     const element = ref.current;
+    const glow = glowRef.current;
     if (!element) return;
 
     element.style.transition = 'transform 0.5s ease';
@@ -47,9 +55,13 @@ function useTilt3D() {
     setTimeout(() => {
       if (element) element.style.transition = '';
     }, 500);
+
+    if (glow) {
+      glow.style.opacity = '0';
+    }
   }, []);
 
-  return { ref, handleMouseMove, handleMouseLeave };
+  return { ref, glowRef, handleMouseMove, handleMouseLeave };
 }
 
 export default function ClientLayout({
@@ -60,7 +72,31 @@ export default function ClientLayout({
   const { searchQuery, setSearchQuery } = useSettings();
   const query = searchQuery ?? "";
 
-  const { ref: headerRef, handleMouseMove, handleMouseLeave } = useTilt3D();
+  const { ref: headerRef, glowRef: headerGlowRef, handleMouseMove, handleMouseLeave } = useTilt3D();
+  const mobileHeaderRef = useRef<HTMLDivElement>(null);
+  const mobileHeaderGlowRef = useRef<HTMLDivElement>(null);
+
+  const handleMobileMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const element = mobileHeaderRef.current;
+    const glow = mobileHeaderGlowRef.current;
+    if (!element) return;
+
+    const rect = element.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    if (glow) {
+      glow.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(56, 189, 248, 0.12) 0%, transparent 50%)`;
+      glow.style.opacity = '1';
+    }
+  }, []);
+
+  const handleMobileMouseLeave = useCallback(() => {
+    const glow = mobileHeaderGlowRef.current;
+    if (glow) {
+      glow.style.opacity = '0';
+    }
+  }, []);
 
   const filteredCategories = useMemo(() => {
     if (!query.trim()) {
@@ -93,10 +129,23 @@ export default function ClientLayout({
           <header className="space-y-4 md:space-y-0 md:flex md:items-center md:justify-between md:gap-6">
             {/* 移动端布局 */}
             <div className="md:hidden space-y-3">
-              <ProfileHeader profile={profile} />
+              <motion.div
+                ref={mobileHeaderRef}
+                className="relative"
+                onMouseMove={handleMobileMouseMove}
+                onMouseLeave={handleMobileMouseLeave}
+              >
+                {/* Glow effect */}
+                <div
+                  ref={mobileHeaderGlowRef}
+                  className="absolute inset-0 opacity-0 transition-opacity duration-300 pointer-events-none rounded-2xl"
+                />
+                <ProfileHeader profile={profile} />
+              </motion.div>
               {shouldShowSearch && (
                 <SearchBar
                   onSearch={setSearchQuery}
+                  value={query}
                   placeholder="搜索链接、描述或工作入口..."
                   showResultCount={true}
                   resultCount={totalResults}
@@ -106,23 +155,29 @@ export default function ClientLayout({
 
             {/* 桌面端布局 - 只包裹左侧头像区 */}
             <div className="hidden md:flex w-full items-center justify-between">
-              <motion.div
-                ref={headerRef}
-                className="liquid-glass rounded-2xl px-5 py-3 w-[400px]"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
-                style={{ transformStyle: 'preserve-3d' }}
-              >
-                <ProfileHeaderDesktopLeft profile={profile} />
-              </motion.div>
+              <div ref={headerRef} className="relative" style={{ transformStyle: 'preserve-3d' }}>
+                {/* Glow effect */}
+                <div
+                  ref={headerGlowRef}
+                  className="absolute inset-0 opacity-0 transition-opacity duration-300 pointer-events-none rounded-2xl"
+                />
+                <motion.div
+                  className="liquid-glass rounded-2xl px-5 py-3 w-[400px]"
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                  onMouseMove={handleMouseMove}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <ProfileHeaderDesktopLeft profile={profile} />
+                </motion.div>
+              </div>
               <div className="flex items-center gap-3">
                 {shouldShowSearch && (
                   <SearchBar
                     compact
                     onSearch={setSearchQuery}
+                    value={query}
                     placeholder="搜索链接、描述或工作入口..."
                     showResultCount={true}
                     resultCount={totalResults}

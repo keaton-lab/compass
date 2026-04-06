@@ -79,7 +79,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   // Hydrate from localStorage on mount
   useEffect(() => {
-    setSettings(getInitialSettings());
+    const initial = getInitialSettings();
+    setSettings({ ...initial, searchQuery: '' });
     setIsHydrated(true);
   }, []);
 
