@@ -4,7 +4,7 @@ const yaml = require('js-yaml');
 const lucideReact = require('lucide-react');
 const simpleIcons = require('simple-icons');
 
-const configPath = path.join(__dirname, '../src/data/config.yaml');
+const configPath = path.join(__dirname, '../src/config.yaml');
 const configContent = fs.readFileSync(configPath, 'utf8');
 const config = yaml.load(configContent);
 

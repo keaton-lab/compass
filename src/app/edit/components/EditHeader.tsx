@@ -31,7 +31,7 @@ export default function EditHeader({ onUndo, onRedo, canUndo, canRedo, yamlConte
           编辑配置
         </h1>
         <p className="text-sm text-[var(--muted)] mt-1">
-          修改配置后复制 YAML 到 src/data/config.yaml 文件
+          修改配置后复制 YAML 到 src/config.yaml 文件
         </p>
       </div>
 

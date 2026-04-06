@@ -18,7 +18,7 @@ npm run lint    # ESLint 检查
 
 ## 图标系统（⚠️ 重要）
 
-图标通过 `scripts/generate-icons-manifest.js` 从 `src/data/config.yaml` **自动生成**到 `src/data/icons-manifest.ts`。
+图标通过 `scripts/generate-icons-manifest.js` 从 `src/config.yaml` **自动生成**到 `src/data/icons-manifest.ts`。
 
 - **永远不要手动编辑** `src/data/icons-manifest.ts`
 - 添加图标：在 `config.yaml` 中使用图标名称，开发服务器自动重新生成
@@ -32,7 +32,7 @@ npm run lint    # ESLint 检查
 
 ## 配置驱动架构
 
-所有内容来自 `src/data/config.yaml`：
+所有内容来自 `src/config.yaml`：
 
 ```yaml
 profile:

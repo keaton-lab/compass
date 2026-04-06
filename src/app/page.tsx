@@ -7,7 +7,7 @@ import type { Config } from './types';
 export const dynamic = 'force-static';
 
 function loadConfig(): Config {
-  const configPath = path.join(process.cwd(), 'src', 'data', 'config.yaml');
+  const configPath = path.join(process.cwd(), 'src', 'config.yaml');
   const fileContents = fs.readFileSync(configPath, 'utf8');
   return yamlLoad(fileContents) as Config;
 }
