@@ -11,6 +11,7 @@ import { validateCategoryName } from '../utils/validators';
 
 interface CategoryEditorProps {
   category: Category;
+  collapsed: boolean;
   onUpdate: (field: keyof Category, value: string) => void;
   onDelete: () => void;
   onUpdateLink: (linkIndex: number, field: keyof Category['links'][number], value: string) => void;
@@ -22,10 +23,12 @@ interface CategoryEditorProps {
   onMoveDown?: () => void;
   canMoveUp?: boolean;
   canMoveDown?: boolean;
+  onToggleCollapse: () => void;
 }
 
 export default function CategoryEditor({
   category,
+  collapsed,
   onUpdate,
   onDelete,
   onUpdateLink,
@@ -37,8 +40,8 @@ export default function CategoryEditor({
   onMoveDown,
   canMoveUp,
   canMoveDown,
+  onToggleCollapse,
 }: CategoryEditorProps) {
-  const [collapsed, setCollapsed] = useState(false);
   const [showIconPicker, setShowIconPicker] = useState(false);
   const nameError = validateCategoryName(category.name);
 
@@ -72,7 +75,7 @@ export default function CategoryEditor({
             </div>
 
             <button
-              onClick={() => setCollapsed(!collapsed)}
+              onClick={onToggleCollapse}
               className="p-1 rounded hover:bg-[var(--muted)]/10 transition-colors text-[var(--muted)]"
             >
               {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}

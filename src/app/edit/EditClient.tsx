@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { dump as yamlDump, load as yamlLoad } from 'js-yaml';
-import { Plus, User, Settings, FolderOpen, Code2, AlertCircle, Check } from 'lucide-react';
+import { Plus, User, Settings, FolderOpen, Code2, AlertCircle, Check, Minus } from 'lucide-react';
 import type { Config } from '../types';
 import { useEditState } from './hooks/use-edit-state';
 import EditHeader from './components/EditHeader';
@@ -21,6 +21,7 @@ export default function EditClient({ initialConfig }: EditClientProps) {
   const [activeSection, setActiveSection] = useState<EditSection>('profile');
   const [yamlError, setYamlError] = useState<string | null>(null);
   const [yamlInput, setYamlInput] = useState<string>('');
+  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
 
   const yamlContent = useMemo(() => {
     return yamlDump(config, { indent: 2, lineWidth: -1, noRefs: true, sortKeys: false });
@@ -193,6 +194,26 @@ export default function EditClient({ initialConfig }: EditClientProps) {
     });
   }, [setConfig]);
 
+  const toggleCategoryCollapse = useCallback((categoryId: string) => {
+    setCollapsedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(categoryId)) {
+        next.delete(categoryId);
+      } else {
+        next.add(categoryId);
+      }
+      return next;
+    });
+  }, []);
+
+  const toggleAllCategories = useCallback(() => {
+    if (collapsedCategories.size === config.categories.length) {
+      setCollapsedCategories(new Set());
+    } else {
+      setCollapsedCategories(new Set(config.categories.map((c) => c.id)));
+    }
+  }, [collapsedCategories.size, config.categories]);
+
   const sections: { key: EditSection; label: string; icon: React.ReactNode; count?: number }[] = [
     { key: 'profile', label: '个人资料', icon: <User className="w-4 h-4" /> },
     { key: 'settings', label: '设置', icon: <Settings className="w-4 h-4" /> },
@@ -282,13 +303,28 @@ export default function EditClient({ initialConfig }: EditClientProps) {
                   <FolderOpen className="w-4 h-4 text-[var(--accent)]" />
                   分类和链接
                 </h2>
-                <button
-                  onClick={addCategory}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--accent)] text-white hover:bg-[var(--accent)]/90 transition-colors"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  添加分类
-                </button>
+                <div className="flex items-center gap-2">
+                  {config.categories.length > 0 && (
+                    <button
+                      onClick={toggleAllCategories}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--panel-border)] text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/10 transition-colors"
+                    >
+                      {collapsedCategories.size === config.categories.length ? (
+                        <Plus className="w-3.5 h-3.5" />
+                      ) : (
+                        <Minus className="w-3.5 h-3.5" />
+                      )}
+                      {collapsedCategories.size === config.categories.length ? '展开全部' : '折叠全部'}
+                    </button>
+                  )}
+                  <button
+                    onClick={addCategory}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--accent)] text-white hover:bg-[var(--accent)]/90 transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    添加分类
+                  </button>
+                </div>
               </div>
               <div className="p-5">
                 {config.categories.length === 0 ? (
@@ -303,6 +339,8 @@ export default function EditClient({ initialConfig }: EditClientProps) {
                       <CategoryEditor
                         key={category.id}
                         category={category}
+                        collapsed={collapsedCategories.has(category.id)}
+                        onToggleCollapse={() => toggleCategoryCollapse(category.id)}
                         onUpdate={(field, value) => updateCategory(catIdx, field, value)}
                         onDelete={() => deleteCategory(catIdx)}
                         onUpdateLink={(linkIdx, field, value) => updateLink(catIdx, linkIdx, field, value)}
