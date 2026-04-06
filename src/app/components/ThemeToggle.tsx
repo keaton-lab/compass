@@ -5,7 +5,6 @@ import { Check, Moon, Palette, Sun, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useSettings } from '../contexts/SettingsContext';
-import { getThemePreset } from '../themes';
 
 /**
  * 主题图标组件
