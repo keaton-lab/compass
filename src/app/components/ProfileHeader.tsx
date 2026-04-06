@@ -137,7 +137,7 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
   return (
     <>
       <motion.div
-        className="glass-panel md:hidden w-full rounded-2xl p-4 shadow-md"
+        className="liquid-glass md:hidden w-full rounded-2xl p-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
@@ -159,10 +159,10 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
       </motion.div>
 
       <motion.div
-        className="glass-panel hidden md:flex items-center gap-4 rounded-3xl px-6 py-4 shadow-xl"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+        className="hidden md:flex items-center gap-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
       >
         <div className="flex-shrink-0">
           {renderAvatar('w-14 h-14', 28, 'text-xl')}

@@ -220,66 +220,107 @@ body::before {
   }
 }
 
-/* Liquid Glass Effects */
+/* 流体玻璃效果 - 支持圆角的渐变边框 */
 @layer components {
-  .liquid-glass-base {
+  .liquid-glass {
     position: relative;
+    background-color: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(0.5px);
+    -webkit-backdrop-filter: blur(0.5px);
+    box-shadow: 
+      0 2px 8px rgba(0, 0, 0, 0.04),
+      0 8px 32px rgba(0, 0, 0, 0.06),
+      inset 0 0.5px 0 0 rgba(255, 255, 255, 0.15);
     overflow: hidden;
-    will-change: transform, box-shadow;
-    transform-origin: center center;
   }
 
-  .liquid-glass-inner {
+  /* 渐变边框 - 使用伪元素 + mask 实现圆角 */
+  .liquid-glass::before {
+    content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     border-radius: inherit;
+    padding: 1.5px;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.4) 0%,
+      rgba(255, 255, 255, 0.12) 30%,
+      rgba(255, 255, 255, 0.05) 50%,
+      rgba(255, 255, 255, 0.12) 70%,
+      rgba(255, 255, 255, 0.35) 100%
+    );
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
     pointer-events: none;
-    will-change: backdrop-filter, -webkit-backdrop-filter;
-  }
-
-  .liquid-glass-clone {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    border-radius: inherit;
     z-index: 1;
-    will-change: filter;
-    contain: strict;
   }
 
-  .use-backdrop-filter .liquid-glass-clone {
-    display: none;
+  /* 浅色主题边框 */
+  [data-theme='light'] .liquid-glass::before,
+  [data-theme='ocean'] .liquid-glass::before {
+    background: linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.08) 0%,
+      rgba(0, 0, 0, 0.06) 30%,
+      rgba(0, 0, 0, 0.03) 50%,
+      rgba(0, 0, 0, 0.06) 70%,
+      rgba(0, 0, 0, 0.05) 100%
+    );
   }
 
-  .use-backdrop-filter .liquid-glass-inner {
-    backdrop-filter: url(#liquidGlassFilter);
-    -webkit-backdrop-filter: url(#liquidGlassFilter);
-  }
-
-  /* Ambient orbs for glass to refract */
-  .ambient-orb {
+  /* 顶部高光 */
+  .liquid-glass::after {
+    content: '';
     position: absolute;
-    border-radius: 50%;
-    filter: blur(60px);
-    opacity: 0.4;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      transparent 100%
+    );
     pointer-events: none;
+    z-index: 1;
+  }
+
+  /* 内容层 */
+  .liquid-glass > * {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* 悬停效果 */
+  .liquid-glass:hover::before {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.18) 30%,
+      rgba(255, 255, 255, 0.08) 50%,
+      rgba(255, 255, 255, 0.18) 70%,
+      rgba(255, 255, 255, 0.18) 100%
+    );
+  }
+
+  [data-theme='light'] .liquid-glass:hover::before,
+  [data-theme='ocean'] .liquid-glass:hover::before {
+    background: linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.08) 0%,
+      rgba(0, 0, 0, 0.1) 30%,
+      rgba(0, 0, 0, 0.05) 50%,
+      rgba(0, 0, 0, 0.1) 70%,
+      rgba(0, 0, 0, 0.08) 100%
+    );
   }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
-  }
-
-  /* Performance optimizations for liquid glass */
-  .gpu-accelerated {
-    transform: translateZ(0);
-    will-change: transform;
   }
 }

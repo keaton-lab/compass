@@ -74,13 +74,12 @@ export default function SearchBar({
   // 桌面模式：始终展开显示搜索框
   if (compact) {
     return (
-      <div className="hidden md:flex items-center" aria-label="搜索" role="search">
+      <div className="hidden md:flex items-center relative" aria-label="搜索" role="search">
         <motion.div
-          className="flex items-center h-10 min-w-[320px] rounded-2xl pl-3 pr-2 shadow-md border overflow-hidden"
-          style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--panel-border)' }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.2 }}
+          className="liquid-glass flex items-center h-10 min-w-[320px] rounded-2xl pl-3 pr-2 overflow-hidden"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
         >
           <Search size={16} className="text-[var(--muted)] shrink-0" />
           <input
@@ -94,25 +93,30 @@ export default function SearchBar({
             className="flex-1 bg-transparent text-sm text-[var(--text-primary)] outline-none placeholder:text-[var(--muted)] ml-2"
           />
           {query && (
-            <button
+            <motion.button
               type="button"
               onClick={handleClear}
               aria-label="清除搜索"
-              className="ml-2 p-1 rounded-full border" style={{ borderColor: 'var(--panel-border)', backgroundColor: 'var(--panel)', color: 'var(--muted)' }}
+              className="ml-2 p-1 rounded-full border"
+              style={{ borderColor: 'var(--panel-border)', backgroundColor: 'var(--panel)', color: 'var(--muted)' }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              whileTap={{ scale: 0.9 }}
             >
               <X size={14} />
-            </button>
+            </motion.button>
           )}
         </motion.div>
         <AnimatePresence>
           {showResultCount && query && (
             <motion.div
-              className="absolute left-0 -bottom-5 text-xs tracking-[0.15em] text-[var(--muted)] uppercase"
+              className="absolute left-0 -bottom-6 text-xs tracking-[0.15em] text-[var(--muted)] uppercase"
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
             >
-              {resultCount} {resultCount === 1 ? "result" : "results"}
+              {resultCount} 个结果
             </motion.div>
           )}
         </AnimatePresence>
@@ -129,7 +133,7 @@ export default function SearchBar({
       transition={{ duration: 0.3 }}
     >
       <motion.div
-        className="glass-panel relative rounded-2xl p-0.125 shadow-md"
+        className="liquid-glass relative rounded-2xl p-0.5"
         animate={{
           boxShadow: isFocused
             ? "0 20px 50px rgba(0, 0, 0, 0.12), 0 0 0 2px rgba(56, 189, 248, 0.2)"

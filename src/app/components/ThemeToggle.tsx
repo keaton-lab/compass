@@ -142,14 +142,15 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
               type="button"
               aria-label="关闭主题弹框"
               onClick={() => setIsMobileOpen(false)}
-              className="absolute inset-0 bg-slate-950/18 backdrop-blur-[2px]"
+              className="absolute inset-0 bg-slate-950/18 backdrop-blur-[8px]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             />
 
             <motion.div
-              className="glass-panel-strong relative w-2/3 max-w-sm rounded-3xl p-6"
+              className="liquid-glass relative w-2/3 max-w-sm rounded-3xl p-6"
+              style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
               initial={{ scale: 0.9, opacity: 0, y: 12 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 12 }}
@@ -186,7 +187,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
         aria-label="切换主题"
         aria-expanded={isMobileOpen}
         onClick={() => setIsMobileOpen(true)}
-        className="fixed right-4 top-4 z-40 flex h-10 w-10 items-center justify-center rounded-full border border-black/5 bg-white/80 text-[var(--muted)] shadow-lg backdrop-blur-md hover:bg-white dark:border-white/10 dark:bg-slate-900/80 md:hidden"
+        className="liquid-glass fixed right-4 top-4 z-40 flex h-10 w-10 items-center justify-center rounded-full text-[var(--muted)] md:hidden"
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
@@ -220,17 +221,16 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
           aria-label="切换主题"
           aria-expanded={isDesktopOpen}
           onClick={() => setIsDesktopOpen((value) => !value)}
-          className="flex h-9 w-9 items-center justify-center rounded-full border text-[var(--muted)] shadow-sm backdrop-blur" style={{ borderColor: 'var(--panel-border)', backgroundColor: 'var(--panel)' }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.2 }}
+          className="liquid-glass flex h-9 w-9 items-center justify-center rounded-full text-[var(--muted)]"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
           <ThemeIcon
             id={theme}
             size={18}
-            className={theme === 'light' ? 'text-amber-500' : theme === 'dark' ? 'text-slate-300' : 'text-sky-500'}
           />
         </motion.button>
 
@@ -238,7 +238,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
           {isDesktopOpen && (
             <motion.div
               ref={desktopPanelRef}
-              className="absolute right-0 top-full z-50 mt-2 min-w-[180px] rounded-2xl p-3 shadow-xl glass-panel-strong"
+              className="liquid-glass absolute right-0 top-full z-50 mt-2 min-w-[180px] rounded-2xl p-3"
               initial={{ opacity: 0, y: -8, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.95 }}
@@ -307,7 +307,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
       >
-        <div className="glass-panel flex items-center gap-2 rounded-full px-3 py-2 shadow-lg">
+         <div className="liquid-glass flex items-center gap-2 rounded-full px-3 py-2">
           <div className="flex items-center gap-2 px-2 text-[var(--muted)]">
             <Palette size={16} />
             <span className="text-xs font-medium">Theme</span>

@@ -57,13 +57,12 @@ export default function NavigationCard({ link, color }: NavigationCardProps) {
       href={link.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="glass-panel group relative flex min-h-[88px] flex-col overflow-hidden rounded-[16px] p-3 cursor-pointer md:min-h-[80px] md:flex-row md:items-center md:gap-2.5 md:rounded-[18px] md:p-3.5"
+      className="liquid-glass group relative flex min-h-[88px] flex-col overflow-hidden rounded-[16px] p-3 cursor-pointer md:min-h-[80px] md:flex-row md:items-center md:gap-2.5 md:rounded-[18px] md:p-3.5"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       whileTap={{ scale: 0.98 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-    >
-      {/* Glow effect */}
+    >      {/* Glow effect */}
       <div
         ref={glowRef}
         className="absolute inset-0 opacity-0 transition-opacity duration-300 pointer-events-none"

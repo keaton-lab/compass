@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import CategorySection from "./CategorySection";
 import ProfileHeader from "./ProfileHeader";
@@ -17,6 +17,41 @@ interface ClientLayoutProps {
   categories: Category[];
 }
 
+// 3D悬浮效果Hook
+function useTilt3D() {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const element = ref.current;
+    if (!element) return;
+
+    const rect = element.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotateX = ((y - centerY) / centerY) * -4;
+    const rotateY = ((x - centerX) / centerX) * 4;
+
+    element.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    element.style.transition = 'transform 0.5s ease';
+    element.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+    setTimeout(() => {
+      if (element) element.style.transition = '';
+    }, 500);
+  }, []);
+
+  return { ref, handleMouseMove, handleMouseLeave };
+}
+
 export default function ClientLayout({
   profile,
   settings,
@@ -24,6 +59,8 @@ export default function ClientLayout({
 }: ClientLayoutProps) {
   const { searchQuery, setSearchQuery } = useSettings();
   const query = searchQuery ?? "";
+
+  const { ref: headerRef, handleMouseMove, handleMouseLeave } = useTilt3D();
 
   const filteredCategories = useMemo(() => {
     if (!query.trim()) {
@@ -54,6 +91,7 @@ export default function ClientLayout({
       <div className="min-h-screen text-foreground">
         <div className="mx-auto max-w-[1440px] px-4 pb-12 pt-6 md:px-6 md:pb-12 lg:px-8">
           <header className="space-y-4 md:space-y-0 md:flex md:items-center md:justify-between md:gap-6">
+            {/* 移动端布局 */}
             <div className="md:hidden space-y-3">
               <ProfileHeader profile={profile} />
               {shouldShowSearch && (
@@ -66,8 +104,20 @@ export default function ClientLayout({
               )}
             </div>
 
+            {/* 桌面端布局 - 只包裹左侧头像区 */}
             <div className="hidden md:flex w-full items-center justify-between">
-              <ProfileHeaderDesktopLeft profile={profile} />
+              <motion.div
+                ref={headerRef}
+                className="liquid-glass rounded-2xl px-5 py-3 w-[400px]"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+                style={{ transformStyle: 'preserve-3d' }}
+              >
+                <ProfileHeaderDesktopLeft profile={profile} />
+              </motion.div>
               <div className="flex items-center gap-3">
                 {shouldShowSearch && (
                   <SearchBar
@@ -99,7 +149,7 @@ export default function ClientLayout({
 
             {query && filteredCategories.length === 0 && (
               <motion.div
-                className="glass-panel-strong py-12 text-center rounded-2xl"
+                className="liquid-glass py-12 text-center rounded-2xl"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
               >
