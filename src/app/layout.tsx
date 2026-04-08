@@ -5,11 +5,14 @@ import { getThemePreset, getThemeStyleVariables, themePresets } from './themes';
 import { loadConfig, loadInitialTheme } from './load-config';
 
 const THEME_STORAGE_KEY = 'compass-settings';
+const VALID_THEMES = ['light', 'dark', 'ocean'];
+
 function getThemeBootScript(initialTheme: string) {
   return `(() => {
   const root = document.documentElement;
   const fallbackTheme = '${initialTheme}';
   const storageKey = '${THEME_STORAGE_KEY}';
+  const validThemes = ${JSON.stringify(VALID_THEMES)};
   const themeMap = ${JSON.stringify(
     Object.fromEntries(
       themePresets.map((theme) => [
@@ -39,7 +42,7 @@ function getThemeBootScript(initialTheme: string) {
   root.classList.add('theme-preload');
 
   const applyTheme = (themeId) => {
-    const theme = Object.prototype.hasOwnProperty.call(themeMap, themeId) ? themeId : fallbackTheme;
+    const theme = validThemes.includes(themeId) ? themeId : fallbackTheme;
     const themeConfig = themeMap[theme];
 
     root.dataset.theme = theme;
@@ -53,7 +56,7 @@ function getThemeBootScript(initialTheme: string) {
   try {
     const stored = window.localStorage.getItem(storageKey);
     const parsed = stored ? JSON.parse(stored) : null;
-    const themeId = parsed && typeof parsed.theme === 'string' ? parsed.theme : fallbackTheme;
+    const themeId = parsed && typeof parsed.theme === 'string' && validThemes.includes(parsed.theme) ? parsed.theme : fallbackTheme;
 
     applyTheme(themeId);
   } catch {

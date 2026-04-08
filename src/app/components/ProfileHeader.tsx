@@ -91,15 +91,21 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
   return (
     <>
       {/* 移动端 */}
-      <div className="flex items-center justify-between gap-3 md:hidden">
-        <div className="flex min-w-0 flex-1 items-center gap-3">
-          <ProfileAvatar name={name} avatar={avatar} sizeClass="h-10 w-10" iconSize={20} textSizeClass="text-sm" />
-          <div className="min-w-0">
-            <h1 className="truncate text-base font-semibold text-[var(--text-primary)]">{name}</h1>
-            <p className="truncate text-sm text-[var(--muted)]">{description}</p>
+      <div
+        className="rounded-2xl border bg-[var(--panel)] p-4 shadow-[0_10px_30px_rgba(15,23,42,0.05)] md:hidden"
+        style={{ borderColor: 'var(--panel-border)' }}
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex min-w-0 flex-1 items-center gap-3.5">
+            <ProfileAvatar name={name} avatar={avatar} sizeClass="h-14 w-14" iconSize={26} textSizeClass="text-base" />
+            <div className="min-w-0 flex-1">
+              <h1 className="truncate text-lg font-semibold tracking-[0.01em] text-[var(--text-primary)]">{name}</h1>
+              <p className="mt-1 line-clamp-2 text-sm leading-6 text-[var(--text-secondary)]">{description}</p>
+            </div>
           </div>
+          <DeferredThemeToggle mobileOnly />
         </div>
-        <DeferredThemeToggle mobileOnly />
+        {bio && <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{bio}</p>}
       </div>
 
       {/* 桌面端 */}

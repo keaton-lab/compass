@@ -53,15 +53,13 @@ export default function ClientLayout({
     : '';
 
   return (
-    <div className="min-h-screen text-foreground">
-      <div className="mx-auto max-w-[1400px] px-4 pb-10 pt-4 md:px-6 md:pt-5 lg:px-8">
+    <div className="flex min-h-screen flex-col text-foreground">
+      <div className="mx-auto w-full max-w-[1400px] flex-1 px-4 pt-4 pb-10 md:px-6 md:pt-5 md:pb-12 lg:px-8">
         {/* 头部区域 */}
         <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           {/* 移动端头部 */}
           <div className="md:hidden">
-            <div className="flex items-center justify-between">
-              <ProfileHeader profile={profile} />
-            </div>
+            <ProfileHeader profile={profile} />
             {shouldShowSearch && (
               <div className="mt-4">
                 <SearchBar
@@ -118,18 +116,16 @@ export default function ClientLayout({
             </div>
           )}
         </main>
+      </div>
 
-        {/* 页脚 */}
-        <footer className="mt-10 hidden md:block">
-          <div className="flex items-center justify-between rounded-lg border bg-[var(--panel)] px-4 py-3" style={{ borderColor: 'var(--panel-border)' }}>
-            <div className="flex items-center gap-4 text-sm text-[var(--muted)]">
-              <span>{categories.length} 个分类</span>
-              <span className="text-[var(--panel-border)]">•</span>
-              <span>{totalLinks} 个链接</span>
-            </div>
-            <div className="flex items-center gap-4">
+      {/* 页脚 - 贴近底部，无框 */}
+      <footer className="mt-auto py-5">
+        <div className="mx-auto h-px w-full max-w-[180px] bg-gradient-to-r from-transparent via-[var(--panel-border)] to-transparent opacity-40 md:max-w-sm" />
+        <div className="mx-auto mt-5 flex max-w-[1400px] flex-col items-center gap-2 px-4 text-center md:px-6 lg:px-8">
+          <div className="flex items-center justify-center">
+            {profile.repo ? (
               <a
-                href={profile.repo || ''}
+                href={profile.repo}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`flex items-center gap-1.5 text-sm text-[var(--muted)] ${footerLinkClass}`}
@@ -137,13 +133,22 @@ export default function ClientLayout({
                 <Icon name="github" size={14} />
                 <span>{profile.name}</span>
               </a>
-              <a href="/edit" className={`text-sm text-[var(--muted)] ${footerLinkClass}`}>
-                编辑
-              </a>
-            </div>
+            ) : (
+              <div className="flex items-center gap-1.5 text-sm text-[var(--muted)]">
+                <Icon name="github" size={14} />
+                <span>{profile.name}</span>
+              </div>
+            )}
           </div>
-        </footer>
-      </div>
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm text-[var(--muted)]">
+            <span>{categories.length} categories</span>
+            <span>{totalLinks} links</span>
+            <a href="/edit" className={footerLinkClass}>
+              edit
+            </a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

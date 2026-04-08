@@ -24,8 +24,8 @@ function getThemeIconStyles(themeId: string) {
       };
     case 'ocean':
       return {
-        wrapper: 'bg-[#21262d]',
-        icon: 'text-[#58a6ff]',
+        wrapper: 'bg-[#eef8fb]',
+        icon: 'text-[#4aa6c8]',
       };
     default:
       return {

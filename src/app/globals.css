@@ -53,19 +53,19 @@
 }
 
 [data-theme='ocean'] {
-  /* 海洋主题 - 调整为石墨蓝调 */
-  --background: #0d1117;
-  --foreground: #e6edf3;
-  --panel: #161b22;
-  --panel-strong: #1c2128;
-  --panel-border: #30363d;
-  --muted: #7d8590;
-  --text-primary: #e6edf3;
-  --text-secondary: #8b949e;
-  --bg-secondary: #21262d;
-  --accent: #58a6ff;
-  --accent-alpha: rgba(88, 166, 255, 0.12);
-  --accent-border: rgba(88, 166, 255, 0.25);
+  /* 海洋主题 - 玻璃海盐感 */
+  --background: #f8fdff;
+  --foreground: #17384a;
+  --panel: rgba(255, 255, 255, 0.82);
+  --panel-strong: rgba(240, 249, 252, 0.92);
+  --panel-border: rgba(165, 206, 223, 0.45);
+  --muted: #6e8b99;
+  --text-primary: #17384a;
+  --text-secondary: #547181;
+  --bg-secondary: #eef8fb;
+  --accent: #4aa6c8;
+  --accent-alpha: rgba(74, 166, 200, 0.10);
+  --accent-border: rgba(74, 166, 200, 0.20);
 }
 
 html {
@@ -102,6 +102,12 @@ body::before {
   background-image:
     linear-gradient(rgba(184, 149, 78, 0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(184, 149, 78, 0.04) 1px, transparent 1px);
+}
+
+[data-theme='ocean'] body::before {
+  background-image:
+    linear-gradient(rgba(74, 166, 200, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74, 166, 200, 0.035) 1px, transparent 1px);
 }
 
 html.theme-preload body,

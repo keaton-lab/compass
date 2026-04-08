@@ -122,7 +122,31 @@ export function SettingsProvider({
     searchQuery: '',
   }));
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isDomReady, setIsDomReady] = useState(false);
+  const [hasRestoredSettings, setHasRestoredSettings] = useState(false);
   const lastAppliedThemeRef = useRef<Settings['theme'] | null>(null);
+
+  // 等待 DOM 就绪（data-theme-ready 属性由引导脚本设置）
+  useEffect(() => {
+    if (document.documentElement.hasAttribute('data-theme-ready')) {
+      setIsDomReady(true);
+      return;
+    }
+
+    const observer = new MutationObserver(() => {
+      if (document.documentElement.hasAttribute('data-theme-ready')) {
+        setIsDomReady(true);
+        observer.disconnect();
+      }
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme-ready'],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   // 标记客户端水合完成
   useEffect(() => {
@@ -132,7 +156,7 @@ export function SettingsProvider({
   // 水合完成后从 localStorage 读取设置
   useEffect(() => {
     if (!isHydrated) return;
-    
+
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (!stored) {
@@ -140,11 +164,17 @@ export function SettingsProvider({
       }
 
       const parsed = JSON.parse(stored) as Partial<Settings>;
-      const normalized = normalizeSettings(parsed, initialSettings);
+      // 直接使用存储的设置，只验证 theme 是否有效
+      const validTheme = typeof parsed.theme === 'string' && isThemeId(parsed.theme) 
+        ? parsed.theme 
+        : defaultThemeId;
 
       setSettings((prev) => {
-        const next = {
-          ...normalized,
+        const next: Settings = {
+          theme: validTheme,
+          layout: parsed.layout ?? prev.layout,
+          animations: parsed.animations ?? prev.animations,
+          showSearch: parsed.showSearch ?? prev.showSearch,
           searchQuery: prev.searchQuery,
         };
 
@@ -161,27 +191,33 @@ export function SettingsProvider({
       });
     } catch {
       // Ignore parse errors
+    } finally {
+      setHasRestoredSettings(true);
     }
-  }, [isHydrated, initialSettings]);
+  }, [isHydrated]);
 
   useEffect(() => {
-    if (document.documentElement.dataset.theme === settings.theme) {
-      lastAppliedThemeRef.current = settings.theme;
+    if (!isDomReady || !hasRestoredSettings) return;
+    if (lastAppliedThemeRef.current === settings.theme) {
       return;
     }
 
     applyTheme(settings.theme);
     lastAppliedThemeRef.current = settings.theme;
-  }, [settings.theme]);
+  }, [settings.theme, isDomReady, hasRestoredSettings]);
 
   // Persist to localStorage on changes
   useEffect(() => {
+    if (!hasRestoredSettings) {
+      return;
+    }
+
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
     } catch {
       // Ignore storage errors
     }
-  }, [settings]);
+  }, [settings, hasRestoredSettings]);
 
   // Cross-tab synchronization
   useEffect(() => {
