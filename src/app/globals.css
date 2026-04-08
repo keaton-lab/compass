@@ -3,77 +3,69 @@
 @tailwind utilities;
 
 :root {
-  --theme-transition-duration: 280ms;
-  --theme-transition-easing: cubic-bezier(0.22, 1, 0.36, 1);
-  --background: #0d1519;
-  --foreground: #ecf2f2;
-  --panel: #121d22;
-  --panel-strong: #17242a;
-  --panel-border: #27363d;
-  --muted: #8ea2a8;
-  --grid-line: rgba(78, 125, 138, 0.08);
-  --glow-a: transparent;
-  --glow-b: transparent;
-  --text-primary: #ecf2f2;
-  --text-secondary: #b3c5ca;
-  --bg-secondary: #203138;
-  --accent: #18b6a4;
-  --accent-alpha: rgba(24, 182, 164, 0.14);
-  --accent-border: rgba(24, 182, 164, 0.3);
+  --theme-transition-duration: 200ms;
+  --theme-transition-easing: ease-out;
+
+  /* 深色主题 - 石墨灰 + 琥珀铜 */
+  --background: #0f1113;
+  --foreground: #f0f0f0;
+  --panel: #181a1d;
+  --panel-strong: #1e2024;
+  --panel-border: #2a2d32;
+  --muted: #6b7280;
+  --text-primary: #f0f0f0;
+  --text-secondary: #9ca3af;
+  --bg-secondary: #25282d;
+  --accent: #c9a45c;
+  --accent-alpha: rgba(201, 164, 92, 0.12);
+  --accent-border: rgba(201, 164, 92, 0.25);
 }
 
 [data-theme='light'] {
-  --background: #f7f4ee;
-  --foreground: #1d262b;
-  --panel: #fcf8f2;
-  --panel-strong: #fffdfa;
-  --panel-border: #d8d0c4;
-  --muted: #6f655b;
-  --grid-line: rgba(127, 113, 96, 0.05);
-  --glow-a: rgba(231, 207, 174, 0.2);
-  --glow-b: rgba(248, 236, 217, 0.28);
-  --text-primary: #1d262b;
-  --text-secondary: #62584d;
-  --bg-secondary: #f1ebe2;
-  --accent: #b56d3c;
-  --accent-alpha: rgba(181, 109, 60, 0.12);
-  --accent-border: rgba(181, 109, 60, 0.24);
+  /* 浅色主题 - 纯净白 + 深炭灰 */
+  --background: #fafafa;
+  --foreground: #1f2937;
+  --panel: #ffffff;
+  --panel-strong: #f5f5f5;
+  --panel-border: #e5e7eb;
+  --muted: #6b7280;
+  --text-primary: #1f2937;
+  --text-secondary: #4b5563;
+  --bg-secondary: #f3f4f6;
+  --accent: #b8954e;
+  --accent-alpha: rgba(184, 149, 78, 0.1);
+  --accent-border: rgba(184, 149, 78, 0.2);
 }
 
 [data-theme='dark'] {
-  --background: #0d1519;
-  --foreground: #ecf2f2;
-  --panel: #121d22;
-  --panel-strong: #17242a;
-  --panel-border: #27363d;
-  --muted: #8ea2a8;
-  --grid-line: rgba(78, 125, 138, 0.08);
-  --glow-a: transparent;
-  --glow-b: transparent;
-  --text-primary: #ecf2f2;
-  --text-secondary: #b3c5ca;
-  --bg-secondary: #203138;
-  --accent: #18b6a4;
-  --accent-alpha: rgba(24, 182, 164, 0.14);
-  --accent-border: rgba(24, 182, 164, 0.3);
+  --background: #0f1113;
+  --foreground: #f0f0f0;
+  --panel: #181a1d;
+  --panel-strong: #1e2024;
+  --panel-border: #2a2d32;
+  --muted: #6b7280;
+  --text-primary: #f0f0f0;
+  --text-secondary: #9ca3af;
+  --bg-secondary: #25282d;
+  --accent: #c9a45c;
+  --accent-alpha: rgba(201, 164, 92, 0.12);
+  --accent-border: rgba(201, 164, 92, 0.25);
 }
 
 [data-theme='ocean'] {
-  --background: #e8f4f7;
-  --foreground: #173247;
-  --panel: #f4fafc;
-  --panel-strong: #ffffff;
-  --panel-border: #c2d5de;
-  --muted: #5e7584;
-  --grid-line: rgba(86, 143, 176, 0.08);
-  --glow-a: transparent;
-  --glow-b: transparent;
-  --text-primary: #173247;
-  --text-secondary: #577081;
-  --bg-secondary: #dbeaf0;
-  --accent: #18766a;
-  --accent-alpha: rgba(24, 118, 106, 0.12);
-  --accent-border: rgba(24, 118, 106, 0.28);
+  /* 海洋主题 - 调整为石墨蓝调 */
+  --background: #0d1117;
+  --foreground: #e6edf3;
+  --panel: #161b22;
+  --panel-strong: #1c2128;
+  --panel-border: #30363d;
+  --muted: #7d8590;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --bg-secondary: #21262d;
+  --accent: #58a6ff;
+  --accent-alpha: rgba(88, 166, 255, 0.12);
+  --accent-border: rgba(88, 166, 255, 0.25);
 }
 
 html {
@@ -86,79 +78,52 @@ body {
   min-height: 100vh;
   background-color: var(--background);
   color: var(--foreground);
-  font-family: "Geist", "Segoe UI", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
 }
 
-body::before,
-body::after {
+/* 细微网格背景 */
+body::before {
   content: '';
   pointer-events: none;
   position: fixed;
   inset: 0;
   z-index: -1;
+  background-image:
+    linear-gradient(rgba(201, 164, 92, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201, 164, 92, 0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: center center;
 }
 
-body::before {
-  background:
-    radial-gradient(circle at top left, var(--glow-a) 0%, transparent 44%),
-    radial-gradient(circle at top right, var(--glow-b) 0%, transparent 38%);
-  opacity: 1;
-}
-
-body::after {
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--accent) 16%, transparent) 0%, transparent 45%),
-    radial-gradient(circle at 14% 18%, color-mix(in srgb, var(--accent) 18%, transparent) 0%, transparent 34%),
-    radial-gradient(circle at 84% 12%, color-mix(in srgb, var(--panel-strong) 88%, white 12%) 0%, transparent 36%);
-  opacity: 0.38;
+[data-theme='light'] body::before {
+  background-image:
+    linear-gradient(rgba(184, 149, 78, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(184, 149, 78, 0.04) 1px, transparent 1px);
 }
 
 html.theme-preload body,
-html.theme-preload body::before,
-html.theme-preload body::after,
 html.theme-preload *,
 html.theme-preload *::before,
-html.theme-preload *::after,
-html.theme-preload [style] {
+html.theme-preload *::after {
   transition: none !important;
   animation: none !important;
 }
 
 html.theme-switching body,
 html.theme-switching body::before,
-html.theme-switching body::after,
-html.theme-switching *,
-html.theme-switching *::before,
-html.theme-switching *::after,
-html.theme-switching [style] {
-  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform, backdrop-filter;
+html.theme-switching .glass-panel,
+html.theme-switching .glass-panel-strong {
+  transition-property: background-color, border-color, color;
   transition-duration: var(--theme-transition-duration);
   transition-timing-function: var(--theme-transition-easing);
 }
 
-html.theme-switching body::after {
-  animation: theme-wash var(--theme-transition-duration) var(--theme-transition-easing);
-}
-
-@keyframes theme-wash {
-  0% {
-    opacity: 0;
-    transform: scale(1.04);
-  }
-  35% {
-    opacity: 0.62;
-    transform: scale(1.015);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1);
-  }
-}
-
 ::selection {
   background: var(--accent-alpha);
-  color: var(--foreground);
+  color: var(--accent);
 }
 
 @layer components {
@@ -171,30 +136,6 @@ html.theme-switching body::after {
     background-color: var(--panel-strong);
     border: 1px solid var(--panel-border);
   }
-
-  .liquid-glass {
-    background-color: var(--panel-strong);
-    border: 1px solid var(--panel-border);
-  }
-
-  .liquid-glass > * {
-    position: relative;
-    z-index: 1;
-  }
-
-  .accordion-trigger[data-state='open'] .accordion-chevron {
-    transform: rotate(180deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation: none !important;
-    scroll-behavior: auto !important;
-    transition: none !important;
-  }
 }
 
 @layer utilities {
@@ -205,5 +146,15 @@ html.theme-switching body::after {
   .content-auto {
     content-visibility: auto;
     contain-intrinsic-size: 1px 520px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    scroll-behavior: auto !important;
+    transition: none !important;
   }
 }

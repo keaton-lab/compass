@@ -15,7 +15,7 @@ interface SearchBarProps {
 
 export default function SearchBar({
   onSearch,
-  placeholder = '搜索链接、描述或工作入口...',
+  placeholder = '搜索链接...',
   disabled = false,
   showResultCount = false,
   resultCount = 0,
@@ -76,7 +76,7 @@ export default function SearchBar({
     return (
       <div className="relative hidden items-center md:flex" aria-label="搜索" role="search">
         <div
-          className="flex h-11 min-w-[320px] items-center rounded-[18px] border bg-[var(--panel-strong)] pl-3 pr-2"
+          className="flex h-10 min-w-[280px] items-center rounded-lg border bg-[var(--panel-strong)] pl-3 pr-2 transition-colors duration-200 focus-within:border-[var(--accent)]"
           style={{ borderColor: 'var(--panel-border)' }}
         >
           <Search size={16} className="shrink-0 text-[var(--muted)]" />
@@ -92,15 +92,14 @@ export default function SearchBar({
               type="button"
               onClick={handleClear}
               aria-label="清除搜索"
-              className="ml-2 flex h-7 w-7 items-center justify-center rounded-[10px] border bg-[var(--background)] text-[var(--muted)]"
-              style={{ borderColor: 'var(--panel-border)' }}
+              className="ml-2 flex h-6 w-6 items-center justify-center rounded-md text-[var(--muted)] transition-colors duration-200 hover:text-[var(--text-primary)]"
             >
               <X size={14} />
             </button>
           )}
         </div>
         {showResultCount && query && (
-          <div className="absolute -bottom-6 left-1 text-xs text-[var(--muted)]">
+          <div className="absolute -bottom-5 left-1 text-xs text-[var(--muted)]">
             {resultCount} 个结果
           </div>
         )}
@@ -111,11 +110,11 @@ export default function SearchBar({
   return (
     <div className="relative w-full max-w-2xl">
       <div
-        className="relative rounded-[18px] border bg-[var(--panel-strong)]"
+        className="relative rounded-lg border bg-[var(--panel-strong)] transition-colors duration-200 focus-within:border-[var(--accent)]"
         style={{ borderColor: 'var(--panel-border)' }}
       >
-        <div className="absolute left-4 top-1/2 z-10 -translate-y-1/2" aria-hidden="true">
-          <Search size={18} className="text-[var(--muted)]" />
+        <div className="absolute left-3 top-1/2 z-10 -translate-y-1/2" aria-hidden="true">
+          <Search size={16} className="text-[var(--muted)]" />
         </div>
 
         <input
@@ -124,15 +123,14 @@ export default function SearchBar({
           onChange={handleChange}
           placeholder={placeholder}
           disabled={disabled}
-          className="w-full rounded-[18px] bg-transparent py-3 pl-11 pr-11 text-sm text-[var(--text-primary)] outline-none placeholder:text-[var(--muted)] md:py-3.5 md:text-base disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-lg bg-transparent py-2.5 pl-10 pr-10 text-sm text-[var(--text-primary)] outline-none placeholder:text-[var(--muted)] md:py-3 md:text-base disabled:cursor-not-allowed disabled:opacity-50"
         />
 
         {query && (
           <button
             type="button"
             onClick={handleClear}
-            className="absolute inset-y-0 right-3 my-auto flex h-7 w-7 items-center justify-center rounded-[10px] border bg-[var(--background)] text-[var(--muted)]"
-            style={{ borderColor: 'var(--panel-border)' }}
+            className="absolute inset-y-0 right-2 my-auto flex h-7 w-7 items-center justify-center rounded-md text-[var(--muted)] transition-colors duration-200 hover:text-[var(--text-primary)]"
           >
             <X size={14} />
           </button>
@@ -140,7 +138,7 @@ export default function SearchBar({
       </div>
 
       {showResultCount && query && (
-        <div className="absolute -bottom-6 left-1 text-xs text-[var(--muted)]">
+        <div className="absolute -bottom-5 left-1 text-xs text-[var(--muted)]">
           {resultCount} 个结果
         </div>
       )}

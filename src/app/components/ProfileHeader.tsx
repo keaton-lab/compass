@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Icon from './Icon';
-import ThemeToggle from './ThemeToggle';
+import DeferredThemeToggle from './DeferredThemeToggle';
 import type { Profile } from '../types';
 
 function getInitials(name: string): string {
@@ -35,7 +35,7 @@ function ProfileAvatar({
   if (isIconAvatar) {
     return (
       <div
-        className={`flex items-center justify-center rounded-[18px] border bg-[var(--bg-secondary)] ${sizeClass}`}
+        className={`flex items-center justify-center rounded-lg border bg-[var(--bg-secondary)] ${sizeClass}`}
         style={{ borderColor: 'var(--panel-border)' }}
       >
         <Icon name={avatarValue.slice(5)} size={iconSize} className="text-[var(--text-primary)]" />
@@ -46,17 +46,17 @@ function ProfileAvatar({
   if (isImageAvatar) {
     return (
       <div
-        className={`relative overflow-hidden rounded-[18px] border bg-[var(--bg-secondary)] ${sizeClass}`}
+        className={`relative overflow-hidden rounded-lg border bg-[var(--bg-secondary)] ${sizeClass}`}
         style={{ borderColor: 'var(--panel-border)' }}
       >
-        <Image src={avatarValue} alt={name} fill className="object-cover" sizes="(max-width: 768px) 44px, 56px" />
+        <Image src={avatarValue} alt={name} fill className="object-cover" sizes="(max-width: 768px) 40px, 48px" />
       </div>
     );
   }
 
   return (
     <div
-      className={`flex items-center justify-center rounded-[18px] border bg-[var(--bg-secondary)] ${sizeClass}`}
+      className={`flex items-center justify-center rounded-lg border bg-[var(--bg-secondary)] ${sizeClass}`}
       style={{ borderColor: 'var(--panel-border)' }}
     >
       <span className={`${textSizeClass} font-semibold text-[var(--text-primary)]`}>{initials}</span>
@@ -68,14 +68,14 @@ export function ProfileHeaderDesktopLeft({ profile }: { profile: Profile }) {
   const { name, avatar, description, bio } = profile;
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-3">
       <div className="shrink-0">
-        <ProfileAvatar name={name} avatar={avatar} sizeClass="h-14 w-14" iconSize={28} textSizeClass="text-xl" />
+        <ProfileAvatar name={name} avatar={avatar} sizeClass="h-12 w-12" iconSize={24} textSizeClass="text-lg" />
       </div>
       <div className="min-w-0 flex-1">
-        <h1 className="truncate text-xl font-semibold text-[var(--text-primary)]">{name}</h1>
-        <p className="mt-1 truncate text-sm text-[var(--text-secondary)]">{description}</p>
-        {bio && <p className="mt-0.5 truncate text-sm text-[var(--muted)]">{bio}</p>}
+        <h1 className="truncate text-lg font-semibold text-[var(--text-primary)]">{name}</h1>
+        <p className="truncate text-sm text-[var(--text-secondary)]">{description}</p>
+        {bio && <p className="truncate text-xs text-[var(--muted)]">{bio}</p>}
       </div>
     </div>
   );
@@ -90,27 +90,27 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
 
   return (
     <>
-      <div className="glass-panel-strong w-full rounded-[22px] p-4 md:hidden">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex min-w-0 flex-1 items-center gap-3">
-            <ProfileAvatar name={name} avatar={avatar} sizeClass="h-11 w-11" iconSize={24} textSizeClass="text-base" />
-            <div className="min-w-0">
-              <h1 className="truncate text-lg font-semibold text-[var(--text-primary)]">{name}</h1>
-              <p className="truncate text-sm text-[var(--muted)]">{description}</p>
-            </div>
+      {/* 移动端 */}
+      <div className="flex items-center justify-between gap-3 md:hidden">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <ProfileAvatar name={name} avatar={avatar} sizeClass="h-10 w-10" iconSize={20} textSizeClass="text-sm" />
+          <div className="min-w-0">
+            <h1 className="truncate text-base font-semibold text-[var(--text-primary)]">{name}</h1>
+            <p className="truncate text-sm text-[var(--muted)]">{description}</p>
           </div>
-          <ThemeToggle mobileOnly />
         </div>
+        <DeferredThemeToggle mobileOnly />
       </div>
 
-      <div className="hidden items-center gap-4 md:flex">
+      {/* 桌面端 */}
+      <div className="hidden items-center gap-3 md:flex">
         <div className="shrink-0">
-          <ProfileAvatar name={name} avatar={avatar} sizeClass="h-14 w-14" iconSize={28} textSizeClass="text-xl" />
+          <ProfileAvatar name={name} avatar={avatar} sizeClass="h-12 w-12" iconSize={24} textSizeClass="text-lg" />
         </div>
         <div className="min-w-0 flex-1">
-          <h1 className="truncate text-xl font-semibold text-[var(--text-primary)]">{name}</h1>
-          <p className="mt-1 truncate text-sm text-[var(--text-secondary)]">{description}</p>
-          {bio && <p className="mt-0.5 truncate text-sm text-[var(--muted)]">{bio}</p>}
+          <h1 className="truncate text-lg font-semibold text-[var(--text-primary)]">{name}</h1>
+          <p className="truncate text-sm text-[var(--text-secondary)]">{description}</p>
+          {bio && <p className="truncate text-xs text-[var(--muted)]">{bio}</p>}
         </div>
       </div>
     </>

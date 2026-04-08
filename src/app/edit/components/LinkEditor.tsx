@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import type { Link as LinkType } from '../../types';
-import IconPicker from './IconPicker';
+import LazyIconPicker from './LazyIconPicker';
 import DynamicIcon from './DynamicIcon';
 import DeleteConfirmButton from './DeleteConfirmButton';
 import { validateLinkName, validateLinkUrl } from '../utils/validators';
@@ -116,7 +116,7 @@ export default function LinkEditor({
       </div>
 
       {showIconPicker && (
-        <IconPicker
+        <LazyIconPicker
           value={link.icon}
           onChange={(icon) => onUpdate('icon', icon)}
           onClose={() => setShowIconPicker(false)}

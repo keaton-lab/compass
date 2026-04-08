@@ -1,15 +1,21 @@
 'use client';
 
-import { Accordion, Tabs } from 'radix-ui';
+import dynamic from 'next/dynamic';
 import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { dump as yamlDump, load as yamlLoad } from 'js-yaml';
-import { Plus, User, Settings, FolderOpen, Code2, AlertCircle, Check, Minus } from 'lucide-react';
+import { User, Settings, FolderOpen, Code2, AlertCircle, Check } from 'lucide-react';
 import type { Config } from '../types';
 import { useEditState } from './hooks/use-edit-state';
 import EditHeader from './components/EditHeader';
 import ProfileEditor from './components/ProfileEditor';
-import SettingsEditor from './components/SettingsEditor';
-import CategoryEditor from './components/CategoryEditor';
+
+const SettingsEditor = dynamic(() => import('./components/SettingsEditor'), {
+  loading: () => <SectionLoading />,
+});
+
+const CategoriesEditorSection = dynamic(() => import('./components/CategoriesEditorSection'), {
+  loading: () => <SectionLoading />,
+});
 
 interface EditClientProps {
   initialConfig: Config;
@@ -56,6 +62,15 @@ export default function EditClient({ initialConfig }: EditClientProps) {
       return next.size === prev.size ? prev : next;
     });
   }, [config.categories]);
+
+  const handleSectionChange = useCallback((nextSection: EditSection) => {
+    if (nextSection === 'yaml') {
+      setYamlInput(yamlContent);
+      setYamlError(null);
+    }
+
+    setActiveSection(nextSection);
+  }, [yamlContent]);
 
   const handleYamlChange = useCallback((value: string) => {
     setYamlInput(value);
@@ -258,37 +273,35 @@ export default function EditClient({ initialConfig }: EditClientProps) {
           yamlContent={yamlContent}
         />
 
-        <Tabs.Root
-          value={activeSection}
-          onValueChange={(value) => {
-            const nextSection = value as EditSection;
-            if (nextSection === 'yaml') {
-              setYamlInput(yamlContent);
-              setYamlError(null);
-            }
-            setActiveSection(nextSection);
-          }}
-          className="min-w-0"
-        >
-          <div className="mb-6 overflow-x-auto pb-1">
-            <Tabs.List className="inline-flex rounded-[22px] border bg-[var(--panel-strong)] p-1" style={{ borderColor: 'var(--panel-border)' }}>
-              {sections.map(({ key, label, icon, count }) => (
-                <Tabs.Trigger
+        <div className="mb-6 overflow-x-auto pb-1">
+          <div className="inline-flex rounded-[22px] border bg-[var(--panel-strong)] p-1" style={{ borderColor: 'var(--panel-border)' }}>
+            {sections.map(({ key, label, icon, count }) => {
+              const isActive = key === activeSection;
+
+              return (
+                <button
                   key={key}
-                  value={key}
-                  className="flex items-center gap-2 rounded-[18px] px-4 py-2.5 text-sm font-medium whitespace-nowrap text-[var(--muted)] outline-none transition-colors data-[state=active]:bg-[var(--accent-alpha)] data-[state=active]:text-[var(--foreground)]"
+                  type="button"
+                  onClick={() => handleSectionChange(key)}
+                  className={`flex items-center gap-2 rounded-[18px] px-4 py-2.5 text-sm font-medium whitespace-nowrap outline-none transition-colors ${
+                    isActive
+                      ? 'bg-[var(--accent-alpha)] text-[var(--foreground)]'
+                      : 'text-[var(--muted)]'
+                  }`}
                 >
                   {icon}
                   <span>{label}</span>
                   {count !== undefined && (
                     <span className="text-xs opacity-60">({count})</span>
                   )}
-                </Tabs.Trigger>
-              ))}
-            </Tabs.List>
+                </button>
+              );
+            })}
           </div>
+        </div>
 
-          <Tabs.Content value="profile" className="outline-none">
+        {activeSection === 'profile' && (
+          <div className="outline-none">
             <section className="rounded-[24px] border bg-[var(--panel-strong)]" style={{ borderColor: 'var(--panel-border)' }}>
               <div className="border-b px-5 py-4" style={{ borderColor: 'var(--panel-border)' }}>
                 <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--foreground)]">
@@ -300,9 +313,11 @@ export default function EditClient({ initialConfig }: EditClientProps) {
                 <ProfileEditor profile={config.profile} onChange={updateProfile} />
               </div>
             </section>
-          </Tabs.Content>
+          </div>
+        )}
 
-          <Tabs.Content value="settings" className="outline-none">
+        {activeSection === 'settings' && (
+          <div className="outline-none">
             <section className="rounded-[24px] border bg-[var(--panel-strong)]" style={{ borderColor: 'var(--panel-border)' }}>
               <div className="border-b px-5 py-4" style={{ borderColor: 'var(--panel-border)' }}>
                 <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--foreground)]">
@@ -314,80 +329,33 @@ export default function EditClient({ initialConfig }: EditClientProps) {
                 <SettingsEditor settings={config.settings} onChange={updateSettings} />
               </div>
             </section>
-          </Tabs.Content>
+          </div>
+        )}
 
-          <Tabs.Content value="categories" className="outline-none">
-            <section className="rounded-[24px] border bg-[var(--panel-strong)]" style={{ borderColor: 'var(--panel-border)' }}>
-              <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: 'var(--panel-border)' }}>
-                <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--foreground)]">
-                  <FolderOpen className="w-4 h-4 text-[var(--accent)]" />
-                  分类和链接
-                </h2>
-                <div className="flex items-center gap-2">
-                  {config.categories.length > 0 && (
-                    <button
-                      type="button"
-                      onClick={toggleAllCategories}
-                      className="flex items-center gap-1.5 rounded-[16px] border px-3 py-2 text-xs font-medium text-[var(--muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--foreground)]"
-                      style={{ borderColor: 'var(--panel-border)' }}
-                    >
-                      {collapsedCategories.size === config.categories.length ? (
-                        <Plus className="w-3.5 h-3.5" />
-                      ) : (
-                        <Minus className="w-3.5 h-3.5" />
-                      )}
-                      {collapsedCategories.size === config.categories.length ? '展开全部' : '折叠全部'}
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={addCategory}
-                    className="flex items-center gap-1.5 rounded-[16px] bg-[var(--accent)] px-3 py-2 text-xs font-medium text-white"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    添加分类
-                  </button>
-                </div>
-              </div>
-              <div className="p-5">
-                {config.categories.length === 0 ? (
-                  <div className="rounded-[20px] border border-dashed py-12 text-center text-[var(--muted)]" style={{ borderColor: 'var(--panel-border)' }}>
-                    <FolderOpen className="mx-auto mb-3 h-8 w-8 opacity-40" />
-                    <p className="text-sm">暂无分类</p>
-                    <p className="mt-1 text-xs">点击上方按钮添加第一个分类</p>
-                  </div>
-                ) : (
-                  <Accordion.Root
-                    type="multiple"
-                    value={openCategoryIds}
-                    onValueChange={handleCategoryOpenChange}
-                    className="space-y-4"
-                  >
-                    {config.categories.map((category: Config['categories'][number], catIdx: number) => (
-                      <CategoryEditor
-                        key={category.id}
-                        category={category}
-                        collapsed={collapsedCategories.has(category.id)}
-                        onUpdate={(field, value) => updateCategory(catIdx, field, value)}
-                        onDelete={() => deleteCategory(catIdx)}
-                        onUpdateLink={(linkIdx, field, value) => updateLink(catIdx, linkIdx, field, value)}
-                        onAddLink={() => addLink(catIdx)}
-                        onDeleteLink={(linkIdx) => deleteLink(catIdx, linkIdx)}
-                        onMoveLinkUp={(linkIdx) => moveLinkUp(catIdx, linkIdx)}
-                        onMoveLinkDown={(linkIdx) => moveLinkDown(catIdx, linkIdx)}
-                        onMoveUp={() => moveCategoryUp(catIdx)}
-                        onMoveDown={() => moveCategoryDown(catIdx)}
-                        canMoveUp={catIdx > 0}
-                        canMoveDown={catIdx < config.categories.length - 1}
-                      />
-                    ))}
-                  </Accordion.Root>
-                )}
-              </div>
-            </section>
-          </Tabs.Content>
+        {activeSection === 'categories' && (
+          <div className="outline-none">
+            <CategoriesEditorSection
+              categories={config.categories}
+              collapsedCategories={collapsedCategories}
+              openCategoryIds={openCategoryIds}
+              onOpenChange={handleCategoryOpenChange}
+              onToggleAll={toggleAllCategories}
+              onAddCategory={addCategory}
+              onUpdateCategory={updateCategory}
+              onDeleteCategory={deleteCategory}
+              onUpdateLink={updateLink}
+              onAddLink={addLink}
+              onDeleteLink={deleteLink}
+              onMoveLinkUp={moveLinkUp}
+              onMoveLinkDown={moveLinkDown}
+              onMoveCategoryUp={moveCategoryUp}
+              onMoveCategoryDown={moveCategoryDown}
+            />
+          </div>
+        )}
 
-          <Tabs.Content value="yaml" className="outline-none">
+        {activeSection === 'yaml' && (
+          <div className="outline-none">
             <section className="rounded-[24px] border bg-[var(--panel-strong)]" style={{ borderColor: 'var(--panel-border)' }}>
               <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: 'var(--panel-border)' }}>
                 <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--foreground)]">
@@ -430,9 +398,17 @@ export default function EditClient({ initialConfig }: EditClientProps) {
                 </p>
               </div>
             </section>
-          </Tabs.Content>
-        </Tabs.Root>
+          </div>
+        )}
       </div>
+    </div>
+  );
+}
+
+function SectionLoading() {
+  return (
+    <div className="rounded-[24px] border bg-[var(--panel-strong)] px-5 py-10 text-center text-sm text-[var(--muted)]" style={{ borderColor: 'var(--panel-border)' }}>
+      正在加载编辑器...
     </div>
   );
 }

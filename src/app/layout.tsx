@@ -1,24 +1,10 @@
 import type { Metadata } from 'next';
-import fs from 'fs';
-import path from 'path';
-import { load as yamlLoad } from 'js-yaml';
-import type { Config } from './types';
 import './globals.css';
 import { SettingsProvider } from './contexts/SettingsContext';
-import { defaultThemeId, getThemePreset, getThemeStyleVariables, isThemeId, themePresets } from './themes';
+import { getThemePreset, getThemeStyleVariables, themePresets } from './themes';
+import { loadConfig, loadInitialTheme } from './load-config';
 
 const THEME_STORAGE_KEY = 'compass-settings';
-const THEME_SWITCH_CLASS = 'theme-switching';
-
-function loadInitialConfigTheme() {
-  const configPath = path.join(process.cwd(), 'src', 'config.yaml');
-  const fileContents = fs.readFileSync(configPath, 'utf8');
-  const config = yamlLoad(fileContents) as Config;
-  const theme = config.settings?.theme;
-
-  return typeof theme === 'string' && isThemeId(theme) ? theme : defaultThemeId;
-}
-
 function getThemeBootScript(initialTheme: string) {
   return `(() => {
   const root = document.documentElement;
@@ -42,9 +28,6 @@ function getThemeBootScript(initialTheme: string) {
     panelStrong: '--panel-strong',
     panelBorder: '--panel-border',
     muted: '--muted',
-    gridLine: '--grid-line',
-    glowA: '--glow-a',
-    glowB: '--glow-b',
     textPrimary: '--text-primary',
     textSecondary: '--text-secondary',
     bgSecondary: '--bg-secondary',
@@ -58,19 +41,12 @@ function getThemeBootScript(initialTheme: string) {
   const applyTheme = (themeId) => {
     const theme = Object.prototype.hasOwnProperty.call(themeMap, themeId) ? themeId : fallbackTheme;
     const themeConfig = themeMap[theme];
-    root.classList.add('${THEME_SWITCH_CLASS}');
 
     root.dataset.theme = theme;
     root.classList.toggle('dark', themeConfig.isDark);
     root.style.colorScheme = themeConfig.isDark ? 'dark' : 'light';
     Object.keys(cssVariableMap).forEach((key) => {
       root.style.setProperty(cssVariableMap[key], themeConfig.colors[key]);
-    });
-
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        root.classList.remove('${THEME_SWITCH_CLASS}');
-      });
     });
   };
 
@@ -83,12 +59,6 @@ function getThemeBootScript(initialTheme: string) {
   } catch {
     applyTheme(fallbackTheme);
   }
-
-  // 滚动到顶部
-  if ('scrollRestoration' in history) {
-    history.scrollRestoration = 'manual';
-  }
-  window.scrollTo(0, 0);
 
   root.setAttribute('data-theme-ready', 'true');
   root.classList.remove('theme-preload');
@@ -109,7 +79,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const initialTheme = loadInitialConfigTheme();
+  const initialSettings = loadConfig().settings;
+  const initialTheme = loadInitialTheme();
   const initialThemePreset = getThemePreset(initialTheme);
   const themeBootScript = getThemeBootScript(initialTheme);
 
@@ -125,7 +96,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
       </head>
       <body>
-        <SettingsProvider initialSettings={{ theme: initialTheme }}>
+        <SettingsProvider initialSettings={initialSettings}>
           <div className="app-shell">
             {children}
           </div>

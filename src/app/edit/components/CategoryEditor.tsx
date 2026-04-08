@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { ChevronDown, Plus, ChevronUp, ChevronDown as ChevronDownIcon } from 'lucide-react';
 import type { Category } from '../../types';
 import LinkEditor from './LinkEditor';
-import IconPicker from './IconPicker';
+import LazyIconPicker from './LazyIconPicker';
 import DynamicIcon from './DynamicIcon';
 import ColorPicker from './ColorPicker';
 import DeleteConfirmButton from './DeleteConfirmButton';
@@ -151,7 +151,7 @@ export default function CategoryEditor({
       </Accordion.Item>
 
       {showIconPicker && (
-        <IconPicker
+        <LazyIconPicker
           value={category.icon}
           onChange={(icon) => onUpdate('icon', icon)}
           onClose={() => setShowIconPicker(false)}

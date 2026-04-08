@@ -26,9 +26,6 @@ const THEME_CSS_VARIABLES = {
   panelStrong: '--panel-strong',
   panelBorder: '--panel-border',
   muted: '--muted',
-  gridLine: '--grid-line',
-  glowA: '--glow-a',
-  glowB: '--glow-b',
   textPrimary: '--text-primary',
   textSecondary: '--text-secondary',
   bgSecondary: '--bg-secondary',
@@ -168,10 +165,8 @@ export function SettingsProvider({
   }, [isHydrated, initialSettings]);
 
   useEffect(() => {
-    if (
-      lastAppliedThemeRef.current === settings.theme &&
-      document.documentElement.dataset.theme === settings.theme
-    ) {
+    if (document.documentElement.dataset.theme === settings.theme) {
+      lastAppliedThemeRef.current = settings.theme;
       return;
     }
 

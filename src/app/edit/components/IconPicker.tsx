@@ -11,7 +11,7 @@ interface BrandIcon {
   hex: string;
 }
 
-interface IconPickerProps {
+export interface IconPickerProps {
   value: string;
   onChange: (icon: string) => void;
   onClose: () => void;

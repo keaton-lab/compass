@@ -3,7 +3,7 @@ profile:
   avatar: icon:navigation
   description: Navigate Your Digital World
   bio: 快速访问常用网站和工具
-  repo: https://github.com/imzhoukunqiang/compass
+  repo: https://github.com/keaton-lab/compass
 settings:
   theme: dark
   showSearch: true
