@@ -24,22 +24,22 @@ const DEFAULT_COLORS: ColorOption[] = [
 
 export default function ColorPicker({ value, onChange, colors = DEFAULT_COLORS }: ColorPickerProps) {
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="flex items-center gap-2">
       {colors.map((color) => (
         <button
           key={color.value}
+          type="button"
           onClick={() => onChange(color.value)}
-          className={`w-6 h-6 rounded-md transition-all ${
+          className={`h-7 w-7 rounded-[999px] border transition-transform ${
             value === color.value
-              ? 'ring-2 ring-[var(--accent)] ring-offset-2 ring-offset-[var(--background)] scale-110'
-              : 'hover:scale-110'
+              ? 'scale-110 ring-2 ring-[var(--accent)] ring-offset-2 ring-offset-[var(--background)]'
+              : 'hover:scale-105'
           }`}
-          style={{ backgroundColor: color.value }}
+          style={{ backgroundColor: color.value, borderColor: 'rgba(255,255,255,0.28)' }}
           title={color.name}
         />
       ))}
-      {/* Custom color input */}
-      <label className="relative w-6 h-6 rounded-md overflow-hidden cursor-pointer hover:scale-110 transition-transform border border-[var(--panel-border)]">
+      <label className="relative h-7 w-7 cursor-pointer overflow-hidden rounded-full border transition-transform hover:scale-105" style={{ borderColor: 'var(--panel-border)' }}>
         <input
           type="color"
           value={value}

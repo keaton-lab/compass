@@ -2,358 +2,172 @@
 @tailwind components;
 @tailwind utilities;
 
-@property --background {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #06111f;
-}
-
-@property --foreground {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #eff6ff;
-}
-
-@property --panel {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: rgba(7, 19, 34, 0.76);
-}
-
-@property --panel-strong {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: rgba(8, 24, 42, 0.88);
-}
-
-@property --panel-border {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: rgba(148, 163, 184, 0.16);
-}
-
-@property --muted {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #93a6bf;
-}
-
-@property --grid-line {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: rgba(129, 160, 201, 0.08);
-}
-
-@property --glow-a {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: rgba(34, 211, 238, 0.1);
-}
-
-@property --glow-b {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: rgba(37, 99, 235, 0.12);
-}
-
-@property --text-primary {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #eff6ff;
-}
-
-@property --text-secondary {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #cbd5e1;
-}
-
-@property --bg-secondary {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: rgba(7, 19, 34, 0.76);
-}
-
-@property --accent {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #0ea5e9;
-}
-
-@property --accent-alpha {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: rgba(14, 165, 233, 0.15);
-}
-
-@property --accent-border {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: rgba(14, 165, 233, 0.4);
-}
-
 :root {
-  --background: #06111f;
-  --foreground: #eff6ff;
-  --panel: rgba(7, 19, 34, 0.76);
-  --panel-strong: rgba(8, 24, 42, 0.88);
-  --panel-border: rgba(148, 163, 184, 0.16);
-  --muted: #93a6bf;
-  --grid-line: rgba(129, 160, 201, 0.08);
-  --glow-a: rgba(34, 211, 238, 0.1);
-  --glow-b: rgba(37, 99, 235, 0.12);
-  --text-primary: #eff6ff;
-  --text-secondary: #94a3c8;
-  --bg-secondary: rgba(30, 41, 59, 0.5);
-  --accent: #0ea5e9;
-  --accent-alpha: rgba(14, 165, 233, 0.15);
-  --accent-border: rgba(14, 165, 233, 0.4);
-}
+  --theme-transition-duration: 200ms;
+  --theme-transition-easing: ease-out;
 
-html {
-  background-color: var(--background);
-  transition:
-    --background 0.35s ease,
-    --foreground 0.35s ease,
-    --panel 0.35s ease,
-    --panel-strong 0.35s ease,
-    --panel-border 0.35s ease,
-    --muted 0.35s ease,
-    --grid-line 0.35s ease,
-    --glow-a 0.35s ease,
-    --glow-b 0.35s ease,
-    --text-primary 0.35s ease,
-    --text-secondary 0.35s ease,
-    --bg-secondary 0.35s ease,
-    --accent 0.35s ease,
-    --accent-alpha 0.35s ease,
-    --accent-border 0.35s ease;
-}
-
-html.theme-preload {
-  transition: none;
+  /* 深色主题 - 石墨灰 + 琥珀铜 */
+  --background: #0f1113;
+  --foreground: #f0f0f0;
+  --panel: #181a1d;
+  --panel-strong: #1e2024;
+  --panel-border: #2a2d32;
+  --muted: #6b7280;
+  --text-primary: #f0f0f0;
+  --text-secondary: #9ca3af;
+  --bg-secondary: #25282d;
+  --accent: #c9a45c;
+  --accent-alpha: rgba(201, 164, 92, 0.12);
+  --accent-border: rgba(201, 164, 92, 0.25);
 }
 
 [data-theme='light'] {
-  --background: #edf1f7;
-  --foreground: #08111f;
-  --panel: rgba(255, 255, 255, 0.78);
-  --panel-strong: rgba(255, 255, 255, 0.9);
-  --panel-border: rgba(15, 23, 42, 0.08);
-  --muted: #516076;
-  --grid-line: rgba(58, 76, 103, 0.06);
-  --glow-a: transparent;
-  --glow-b: transparent;
-  --text-primary: #08111f;
-  --text-secondary: #475569;
-  --bg-secondary: rgba(241, 245, 249, 0.6);
-  --accent: #f59e0b;
-  --accent-alpha: rgba(245, 158, 11, 0.15);
-  --accent-border: rgba(245, 158, 11, 0.4);
+  /* 浅色主题 - 纯净白 + 深炭灰 */
+  --background: #fafafa;
+  --foreground: #1f2937;
+  --panel: #ffffff;
+  --panel-strong: #f5f5f5;
+  --panel-border: #e5e7eb;
+  --muted: #6b7280;
+  --text-primary: #1f2937;
+  --text-secondary: #4b5563;
+  --bg-secondary: #f3f4f6;
+  --accent: #b8954e;
+  --accent-alpha: rgba(184, 149, 78, 0.1);
+  --accent-border: rgba(184, 149, 78, 0.2);
 }
 
 [data-theme='dark'] {
-  --background: #06111f;
-  --foreground: #eff6ff;
-  --panel: rgba(7, 19, 34, 0.76);
-  --panel-strong: rgba(8, 24, 42, 0.88);
-  --panel-border: rgba(148, 163, 184, 0.16);
-  --muted: #93a6bf;
-  --grid-line: rgba(129, 160, 201, 0.08);
-  --glow-a: rgba(34, 211, 238, 0.1);
-  --glow-b: rgba(37, 99, 235, 0.12);
-  --text-primary: #eff6ff;
-  --text-secondary: #94a3c8;
-  --bg-secondary: rgba(30, 41, 59, 0.5);
-  --accent: #0ea5e9;
-  --accent-alpha: rgba(14, 165, 233, 0.15);
-  --accent-border: rgba(14, 165, 233, 0.4);
+  --background: #0f1113;
+  --foreground: #f0f0f0;
+  --panel: #181a1d;
+  --panel-strong: #1e2024;
+  --panel-border: #2a2d32;
+  --muted: #6b7280;
+  --text-primary: #f0f0f0;
+  --text-secondary: #9ca3af;
+  --bg-secondary: #25282d;
+  --accent: #c9a45c;
+  --accent-alpha: rgba(201, 164, 92, 0.12);
+  --accent-border: rgba(201, 164, 92, 0.25);
 }
 
 [data-theme='ocean'] {
-  --background: #edf6ff;
-  --foreground: #0b1f33;
-  --panel: rgba(255, 255, 255, 0.74);
-  --panel-strong: rgba(255, 255, 255, 0.88);
-  --panel-border: rgba(56, 104, 168, 0.14);
-  --muted: #4a6a8a;
-  --grid-line: rgba(74, 118, 171, 0.08);
-  --glow-a: rgba(56, 189, 248, 0.14);
-  --glow-b: rgba(59, 130, 246, 0.1);
-  --text-primary: #0b1f33;
-  --text-secondary: #3d5a80;
-  --bg-secondary: rgba(186, 215, 235, 0.5);
-  --accent: #0284c7;
-  --accent-alpha: rgba(2, 132, 199, 0.15);
-  --accent-border: rgba(2, 132, 199, 0.4);
+  /* 海洋主题 - 玻璃海盐感 */
+  --background: #f8fdff;
+  --foreground: #17384a;
+  --panel: rgba(255, 255, 255, 0.82);
+  --panel-strong: rgba(240, 249, 252, 0.92);
+  --panel-border: rgba(165, 206, 223, 0.45);
+  --muted: #6e8b99;
+  --text-primary: #17384a;
+  --text-secondary: #547181;
+  --bg-secondary: #eef8fb;
+  --accent: #4aa6c8;
+  --accent-alpha: rgba(74, 166, 200, 0.10);
+  --accent-border: rgba(74, 166, 200, 0.20);
 }
 
 html {
-  scroll-behavior: smooth;
+  background-color: var(--background);
+  scroll-behavior: auto;
 }
 
 body {
+  position: relative;
+  min-height: 100vh;
   background-color: var(--background);
   color: var(--foreground);
-  font-family: "Geist", "Segoe UI", sans-serif;
-  min-height: 100vh;
-  background-image:
-    radial-gradient(circle at 18% 18%, var(--glow-a), transparent 24%),
-    radial-gradient(circle at 82% 12%, var(--glow-b), transparent 22%),
-    linear-gradient(var(--grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-  background-size:
-    auto,
-    auto,
-    72px 72px,
-    72px 72px;
-  background-attachment: fixed;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
 }
 
+/* 细微网格背景 */
 body::before {
-  content: "";
+  content: '';
+  pointer-events: none;
   position: fixed;
   inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(120deg, rgba(255, 255, 255, 0.015), transparent 35%),
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.04), transparent 42%);
-  mix-blend-mode: screen;
-  opacity: 0.45;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(201, 164, 92, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201, 164, 92, 0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: center center;
+}
+
+[data-theme='light'] body::before {
+  background-image:
+    linear-gradient(rgba(184, 149, 78, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(184, 149, 78, 0.04) 1px, transparent 1px);
+}
+
+[data-theme='ocean'] body::before {
+  background-image:
+    linear-gradient(rgba(74, 166, 200, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74, 166, 200, 0.035) 1px, transparent 1px);
+}
+
+html.theme-preload body,
+html.theme-preload *,
+html.theme-preload *::before,
+html.theme-preload *::after {
+  transition: none !important;
+  animation: none !important;
+}
+
+html.theme-switching body,
+html.theme-switching body::before,
+html.theme-switching .glass-panel,
+html.theme-switching .glass-panel-strong,
+html.theme-switching header,
+html.theme-switching main,
+html.theme-switching footer,
+html.theme-switching [class*="rounded"],
+html.theme-switching [class*="border"],
+html.theme-switching [class*="bg-"],
+html.theme-switching [class*="text-"] {
+  transition-property: background-color, border-color, color;
+  transition-duration: var(--theme-transition-duration);
+  transition-timing-function: var(--theme-transition-easing);
 }
 
 ::selection {
   background: var(--accent-alpha);
-  color: var(--foreground);
+  color: var(--accent);
 }
 
 @layer components {
   .glass-panel {
     background-color: var(--panel);
     border: 1px solid var(--panel-border);
-    box-shadow:
-      0 16px 40px rgba(2, 8, 23, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(18px);
   }
 
   .glass-panel-strong {
     background-color: var(--panel-strong);
     border: 1px solid var(--panel-border);
-    box-shadow:
-      0 18px 48px rgba(2, 8, 23, 0.14),
-      inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px);
-  }
-}
-
-@media (max-width: 768px) {
-  body {
-    background-size: auto, auto, 42px 42px, 42px 42px;
-  }
-}
-
-/* 流体玻璃效果 - 支持圆角的渐变边框 */
-@layer components {
-  .liquid-glass {
-    position: relative;
-    background-color: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(0.2px);
-    -webkit-backdrop-filter: blur(0.2px);
-    box-shadow: 
-      0 2px 8px rgba(0, 0, 0, 0.04),
-      0 8px 32px rgba(0, 0, 0, 0.06),
-      inset 0 0.5px 0 0 rgba(255, 255, 255, 0.15);
-    overflow: hidden;
-  }
-
-  /* 渐变边框 - 使用伪元素 + mask 实现圆角 */
-  .liquid-glass::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1.5px;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.4) 0%,
-      rgba(255, 255, 255, 0.12) 30%,
-      rgba(255, 255, 255, 0.05) 50%,
-      rgba(255, 255, 255, 0.12) 70%,
-      rgba(255, 255, 255, 0.35) 100%
-    );
-    -webkit-mask: 
-      linear-gradient(#fff 0 0) content-box, 
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  /* 浅色主题边框 */
-  [data-theme='light'] .liquid-glass::before,
-  [data-theme='ocean'] .liquid-glass::before {
-    background: linear-gradient(
-      135deg,
-      rgba(0, 0, 0, 0.08) 0%,
-      rgba(0, 0, 0, 0.06) 30%,
-      rgba(0, 0, 0, 0.03) 50%,
-      rgba(0, 0, 0, 0.06) 70%,
-      rgba(0, 0, 0, 0.05) 100%
-    );
-  }
-
-  /* 顶部高光 */
-  .liquid-glass::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 40%;
-    background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.08) 0%,
-      transparent 100%
-    );
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  /* 内容层 */
-  .liquid-glass > * {
-    position: relative;
-    z-index: 2;
-  }
-
-  /* 悬停效果 */
-  .liquid-glass:hover::before {
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.05) 0%,
-      rgba(255, 255, 255, 0.18) 30%,
-      rgba(255, 255, 255, 0.08) 50%,
-      rgba(255, 255, 255, 0.18) 70%,
-      rgba(255, 255, 255, 0.18) 100%
-    );
-  }
-
-  [data-theme='light'] .liquid-glass:hover::before,
-  [data-theme='ocean'] .liquid-glass:hover::before {
-    background: linear-gradient(
-      135deg,
-      rgba(0, 0, 0, 0.08) 0%,
-      rgba(0, 0, 0, 0.1) 30%,
-      rgba(0, 0, 0, 0.05) 50%,
-      rgba(0, 0, 0, 0.1) 70%,
-      rgba(0, 0, 0, 0.08) 100%
-    );
   }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .content-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 520px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    scroll-behavior: auto !important;
+    transition: none !important;
   }
 }

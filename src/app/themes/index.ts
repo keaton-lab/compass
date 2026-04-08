@@ -15,9 +15,9 @@ export interface ThemePreset {
     panelStrong: string;
     panelBorder: string;
     muted: string;
-    gridLine: string;
-    glowA: string;
-    glowB: string;
+    textPrimary: string;
+    textSecondary: string;
+    bgSecondary: string;
     accent: string;
     accentAlpha: string;
     accentBorder: string;
@@ -30,74 +30,74 @@ export type ThemeId = ThemePreset['id'];
 export const themePresets: ThemePreset[] = [
   {
     id: 'light',
-    label: 'Light',
+    label: '浅色',
     isDark: false,
     colors: {
-      background: '#dbe2ea',
-      foreground: '#08111f',
-      panel: 'rgba(255, 255, 255, 0.78)',
-      panelStrong: 'rgba(255, 255, 255, 0.9)',
-      panelBorder: 'rgba(15, 23, 42, 0.08)',
-      muted: '#516076',
-      gridLine: 'rgba(58, 76, 103, 0.06)',
-      glowA: 'transparent',
-      glowB: 'transparent',
-      accent: '#f59e0b',
-      accentAlpha: 'rgba(245, 158, 11, 0.15)',
-      accentBorder: 'rgba(245, 158, 11, 0.4)',
+      background: '#fafafa',
+      foreground: '#1f2937',
+      panel: '#ffffff',
+      panelStrong: '#f5f5f5',
+      panelBorder: '#e5e7eb',
+      muted: '#6b7280',
+      textPrimary: '#1f2937',
+      textSecondary: '#4b5563',
+      bgSecondary: '#f3f4f6',
+      accent: '#b8954e',
+      accentAlpha: 'rgba(184, 149, 78, 0.1)',
+      accentBorder: 'rgba(184, 149, 78, 0.2)',
     },
     iconColors: {
       light: { bg: '#fef3c7', text: '#d97706', darkBg: 'rgba(217, 119, 6, 0.2)', darkText: '#fbbf24' },
-      dark: { bg: '#f1f5f9', text: '#475569', darkBg: '#1e293b', darkText: '#cbd5e1' },
-      ocean: { bg: '#e0f2fe', text: '#0369a1', darkBg: 'rgba(3, 105, 161, 0.2)', darkText: '#38bdf8' },
+      dark: { bg: '#f3f4f6', text: '#4b5563', darkBg: '#1f2937', darkText: '#9ca3af' },
+      ocean: { bg: '#dbeafe', text: '#2563eb', darkBg: 'rgba(37, 99, 235, 0.2)', darkText: '#60a5fa' },
     },
   },
   {
     id: 'dark',
-    label: 'Dark',
+    label: '深色',
     isDark: true,
     colors: {
-      background: '#06111f',
-      foreground: '#eff6ff',
-      panel: 'rgba(7, 19, 34, 0.76)',
-      panelStrong: 'rgba(8, 24, 42, 0.88)',
-      panelBorder: 'rgba(148, 163, 184, 0.16)',
-      muted: '#93a6bf',
-      gridLine: 'rgba(129, 160, 201, 0.08)',
-      glowA: 'rgba(34, 211, 238, 0.1)',
-      glowB: 'rgba(37, 99, 235, 0.12)',
-      accent: '#0ea5e9',
-      accentAlpha: 'rgba(14, 165, 233, 0.15)',
-      accentBorder: 'rgba(14, 165, 233, 0.4)',
+      background: '#0f1113',
+      foreground: '#f0f0f0',
+      panel: '#181a1d',
+      panelStrong: '#1e2024',
+      panelBorder: '#2a2d32',
+      muted: '#6b7280',
+      textPrimary: '#f0f0f0',
+      textSecondary: '#9ca3af',
+      bgSecondary: '#25282d',
+      accent: '#c9a45c',
+      accentAlpha: 'rgba(201, 164, 92, 0.12)',
+      accentBorder: 'rgba(201, 164, 92, 0.25)',
     },
     iconColors: {
       light: { bg: '#fef3c7', text: '#d97706', darkBg: 'rgba(217, 119, 6, 0.2)', darkText: '#fbbf24' },
-      dark: { bg: '#f1f5f9', text: '#475569', darkBg: '#1e293b', darkText: '#cbd5e1' },
-      ocean: { bg: '#e0f2fe', text: '#0369a1', darkBg: 'rgba(3, 105, 161, 0.2)', darkText: '#38bdf8' },
+      dark: { bg: '#f3f4f6', text: '#4b5563', darkBg: '#1f2937', darkText: '#9ca3af' },
+      ocean: { bg: '#dbeafe', text: '#2563eb', darkBg: 'rgba(37, 99, 235, 0.2)', darkText: '#60a5fa' },
     },
   },
   {
     id: 'ocean',
-    label: 'Ocean',
+    label: '海洋蓝',
     isDark: false,
     colors: {
-      background: '#edf6ff',
-      foreground: '#0b1f33',
-      panel: 'rgba(255, 255, 255, 0.74)',
-      panelStrong: 'rgba(255, 255, 255, 0.88)',
-      panelBorder: 'rgba(56, 104, 168, 0.14)',
-      muted: '#4a6a8a',
-      gridLine: 'rgba(74, 118, 171, 0.08)',
-      glowA: 'rgba(56, 189, 248, 0.14)',
-      glowB: 'rgba(59, 130, 246, 0.1)',
-      accent: '#0284c7',
-      accentAlpha: 'rgba(2, 132, 199, 0.15)',
-      accentBorder: 'rgba(2, 132, 199, 0.4)',
+      background: '#f8fdff',
+      foreground: '#17384a',
+      panel: 'rgba(255, 255, 255, 0.82)',
+      panelStrong: 'rgba(240, 249, 252, 0.92)',
+      panelBorder: 'rgba(165, 206, 223, 0.45)',
+      muted: '#6e8b99',
+      textPrimary: '#17384a',
+      textSecondary: '#547181',
+      bgSecondary: '#eef8fb',
+      accent: '#4aa6c8',
+      accentAlpha: 'rgba(74, 166, 200, 0.10)',
+      accentBorder: 'rgba(74, 166, 200, 0.20)',
     },
     iconColors: {
       light: { bg: '#fef3c7', text: '#d97706', darkBg: 'rgba(217, 119, 6, 0.2)', darkText: '#fbbf24' },
-      dark: { bg: '#f1f5f9', text: '#475569', darkBg: '#1e293b', darkText: '#cbd5e1' },
-      ocean: { bg: '#e0f2fe', text: '#0369a1', darkBg: 'rgba(3, 105, 161, 0.2)', darkText: '#38bdf8' },
+      dark: { bg: '#f3f4f6', text: '#4b5563', darkBg: '#1f2937', darkText: '#9ca3af' },
+      ocean: { bg: '#dbeafe', text: '#2563eb', darkBg: 'rgba(37, 99, 235, 0.2)', darkText: '#60a5fa' },
     },
   },
 ];
@@ -110,4 +110,24 @@ export function isThemeId(value: string): value is ThemeId {
 
 export function getThemePreset(themeId: ThemeId): ThemePreset {
   return themePresets.find((theme) => theme.id === themeId) ?? themePresets[0];
+}
+
+export function getThemeStyleVariables(themeId: ThemeId): Record<string, string> {
+  const themePreset = getThemePreset(themeId);
+
+  return {
+    '--background': themePreset.colors.background,
+    '--foreground': themePreset.colors.foreground,
+    '--panel': themePreset.colors.panel,
+    '--panel-strong': themePreset.colors.panelStrong,
+    '--panel-border': themePreset.colors.panelBorder,
+    '--muted': themePreset.colors.muted,
+    '--text-primary': themePreset.colors.textPrimary,
+    '--text-secondary': themePreset.colors.textSecondary,
+    '--bg-secondary': themePreset.colors.bgSecondary,
+    '--accent': themePreset.colors.accent,
+    '--accent-alpha': themePreset.colors.accentAlpha,
+    '--accent-border': themePreset.colors.accentBorder,
+    colorScheme: themePreset.isDark ? 'dark' : 'light',
+  };
 }

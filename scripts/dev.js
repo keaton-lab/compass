@@ -72,7 +72,7 @@ async function main() {
   await runGenerateOnce();
 
   const closeGeneratorWatcher = createGeneratorWatcher();
-  const nextDev = runCommand('next', ['dev']);
+  const nextDev = runCommand('next', ['dev', '-H', '0.0.0.0']);
 
   const cleanup = () => {
     closeGeneratorWatcher();

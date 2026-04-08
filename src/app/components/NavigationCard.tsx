@@ -1,113 +1,65 @@
-'use client';
-
-import { useRef, useCallback } from 'react';
-import { motion } from 'framer-motion';
 import Icon from './Icon';
 import type { Link as LinkType } from '../types';
 
 interface NavigationCardProps {
   link: LinkType;
   color: string;
+  animations: boolean;
 }
 
-export default function NavigationCard({ link, color }: NavigationCardProps) {
-  const cardRef = useRef<HTMLAnchorElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
-
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
-    const card = cardRef.current;
-    const glow = glowRef.current;
-    if (!card) return;
-
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-
-    const rotateX = ((y - centerY) / centerY) * -6;
-    const rotateY = ((x - centerX) / centerX) * 6;
-
-    card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-
-    if (glow) {
-      glow.style.background = `radial-gradient(circle at ${x}px ${y}px, ${color}33 0%, transparent 56%)`;
-      glow.style.opacity = '1';
-    }
-  }, [color]);
-
-  const handleMouseLeave = useCallback(() => {
-    const card = cardRef.current;
-    const glow = glowRef.current;
-    if (!card) return;
-    card.style.transition = 'transform 0.4s ease';
-    card.style.transform = 'perspective(800px) rotateX(0) rotateY(0)';
-    setTimeout(() => {
-      if (card) card.style.transition = '';
-    }, 400);
-    if (glow) {
-      glow.style.opacity = '0';
-    }
-  }, []);
+export default function NavigationCard({ link, color, animations }: NavigationCardProps) {
+  const cardClassName = animations
+    ? 'transition-all duration-200 hover:border-[color:var(--accent-border)] hover:bg-[var(--panel-strong)] active:scale-[0.99]'
+    : '';
+  const iconClassName = animations
+    ? 'transition-transform duration-200 group-hover:scale-105'
+    : '';
+  const titleClassName = animations
+    ? 'transition-colors duration-200 group-hover:text-[var(--accent)]'
+    : '';
+  const arrowClassName = animations
+    ? 'opacity-0 transition-all duration-200 group-hover:opacity-100 md:opacity-60'
+    : 'opacity-60';
 
   return (
-    <motion.a
-      ref={cardRef}
+    <a
       href={link.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="liquid-glass group relative flex min-h-[88px] flex-col overflow-hidden rounded-[16px] p-3 cursor-pointer md:min-h-[80px] md:flex-row md:items-center md:gap-2.5 md:rounded-[18px] md:p-3.5"
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      whileTap={{ scale: 0.98 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-    >      {/* Glow effect */}
+      className={`group relative flex min-h-[72px] cursor-pointer flex-col overflow-hidden rounded-lg border bg-[var(--panel)] p-3 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-border)] md:min-h-[68px] md:flex-row md:items-center md:gap-3 ${cardClassName}`}
+      style={{ borderColor: 'var(--panel-border)' }}
+    >
+      {/* 左侧图标 */}
       <div
-        ref={glowRef}
-        className="absolute inset-0 opacity-0 transition-opacity duration-300 pointer-events-none"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border"
         style={{
-          background: `radial-gradient(circle at top right, ${color}26 0%, transparent 56%)`
+          backgroundColor: `${color}15`,
+          borderColor: `${color}30`,
         }}
-      />
-
-      {/* Icon */}
-      <div className="relative z-10 flex items-start justify-between gap-2 md:flex-none">
-        <div
-          className="flex h-10 w-10 items-center justify-center rounded-lg border md:h-11 md:w-11"
-          style={{
-            backgroundColor: `${color}18`,
-            borderColor: `${color}40`
-          }}
-        >
-          <Icon
-            name={link.icon}
-            size={20}
-            color={color}
-            className="transition-transform group-hover:scale-110"
-          />
-        </div>
+      >
+        <Icon
+          name={link.icon}
+          size={18}
+          color={color}
+          className={iconClassName}
+        />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 mt-2 min-w-0 flex-1 md:mt-0">
-        <h3 className="truncate text-[15px] font-medium text-[var(--text-primary)] group-hover:opacity-80 md:text-[15px]">
+      {/* 中间内容 */}
+      <div className="mt-2 min-w-0 flex-1 md:mt-0">
+        <h3 className={`truncate text-sm font-medium text-[var(--text-primary)] ${titleClassName}`}>
           {link.name}
         </h3>
-        <p className="mt-0.5 max-w-[24ch] truncate text-xs leading-4 text-[var(--muted)]">
+        <p className="mt-0.5 max-w-[24ch] truncate text-xs text-[var(--muted)]">
           {link.description}
         </p>
       </div>
 
-      {/* Arrow */}
-      <motion.div
-        className="absolute right-2 top-2 z-10 text-[var(--muted)] group-hover:opacity-80 md:static md:ml-auto md:flex-none"
-        initial={{ x: 0, opacity: 0.55 }}
-        whileHover={{ x: 2, opacity: 1 }}
-      >
+      {/* 右侧箭头 */}
+      <div className={`absolute right-2.5 top-2.5 text-[var(--muted)] md:static md:ml-auto md:flex-none ${arrowClassName}`}>
         <svg
-          width="11"
-          height="11"
+          width="12"
+          height="12"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -118,7 +70,7 @@ export default function NavigationCard({ link, color }: NavigationCardProps) {
           <path d="M7 17L17 7" />
           <path d="M7 7h10v10" />
         </svg>
-      </motion.div>
-    </motion.a>
+      </div>
+    </a>
   );
 }

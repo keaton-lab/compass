@@ -1,12 +1,14 @@
 'use client';
 
+import { Accordion } from 'radix-ui';
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, Plus, Trash2, ChevronUp, ChevronDown as ChevronDownIcon } from 'lucide-react';
+import { ChevronDown, Plus, ChevronUp, ChevronDown as ChevronDownIcon } from 'lucide-react';
 import type { Category } from '../../types';
 import LinkEditor from './LinkEditor';
-import IconPicker from './IconPicker';
+import LazyIconPicker from './LazyIconPicker';
 import DynamicIcon from './DynamicIcon';
 import ColorPicker from './ColorPicker';
+import DeleteConfirmButton from './DeleteConfirmButton';
 import { validateCategoryName } from '../utils/validators';
 
 interface CategoryEditorProps {
@@ -23,7 +25,6 @@ interface CategoryEditorProps {
   onMoveDown?: () => void;
   canMoveUp?: boolean;
   canMoveDown?: boolean;
-  onToggleCollapse: () => void;
 }
 
 export default function CategoryEditor({
@@ -40,86 +41,88 @@ export default function CategoryEditor({
   onMoveDown,
   canMoveUp,
   canMoveDown,
-  onToggleCollapse,
 }: CategoryEditorProps) {
   const [showIconPicker, setShowIconPicker] = useState(false);
   const nameError = validateCategoryName(category.name);
 
   return (
     <>
-      <div className="rounded-xl border border-[var(--panel-border)] overflow-hidden transition-colors bg-[var(--panel)]/20">
-        {/* Category header bar */}
+      <Accordion.Item value={category.id} className="overflow-hidden rounded-[20px] border bg-[var(--panel-strong)]" style={{ borderColor: 'var(--panel-border)' }}>
         <div className="h-1.5 w-full" style={{ backgroundColor: category.color }} />
 
         <div className="p-4">
-          {/* Title row */}
-          <div className="flex items-center gap-2 mb-3">
-            {/* Order buttons */}
+          <div className="mb-3 flex items-start gap-2">
             <div className="flex flex-col gap-0.5">
               <button
+                type="button"
                 onClick={onMoveUp}
                 disabled={!canMoveUp}
-                className="p-1 rounded text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="rounded-[10px] p-1 text-[var(--muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-30"
                 title="上移分类"
               >
-                <ChevronUp className="w-4 h-4" />
+                <ChevronUp className="h-4 w-4" />
               </button>
               <button
+                type="button"
                 onClick={onMoveDown}
                 disabled={!canMoveDown}
-                className="p-1 rounded text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="rounded-[10px] p-1 text-[var(--muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-30"
                 title="下移分类"
               >
-                <ChevronDownIcon className="w-4 h-4" />
+                <ChevronDownIcon className="h-4 w-4" />
               </button>
             </div>
 
-            <button
-              onClick={onToggleCollapse}
-              className="p-1 rounded hover:bg-[var(--muted)]/10 transition-colors text-[var(--muted)]"
-            >
-              {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            </button>
+            <Accordion.Header className="shrink-0">
+              <Accordion.Trigger className="accordion-trigger flex h-10 w-10 items-center justify-center rounded-[14px] border bg-[var(--background)] text-[var(--muted)] outline-none transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--foreground)]" style={{ borderColor: 'var(--panel-border)' }}>
+                <ChevronDown className="accordion-chevron h-4 w-4 transition-transform duration-200" />
+              </Accordion.Trigger>
+            </Accordion.Header>
 
             <div className="flex-1">
               <input
                 type="text"
                 value={category.name}
                 onChange={(e) => onUpdate('name', e.target.value)}
-                className={`w-full px-3 py-2 text-sm font-medium rounded-lg bg-[var(--background)] border focus:outline-none focus:ring-2 transition-colors text-[var(--foreground)] ${
-                  nameError ? 'border-red-500/50 focus:ring-red-500/30' : 'border-[var(--panel-border)] focus:ring-[var(--accent)]/30'
+                className={`w-full rounded-[18px] border bg-[var(--background)] px-4 py-3 text-sm font-medium text-[var(--foreground)] outline-none transition-colors ${
+                  nameError ? 'border-red-500/50' : ''
                 }`}
+                style={{ borderColor: nameError ? undefined : 'var(--panel-border)' }}
                 placeholder="分类名称"
               />
-              {nameError && <p className="mt-0.5 text-xs text-red-400">{nameError}</p>}
+              {nameError && <p className="mt-1 text-xs text-red-400">{nameError}</p>}
             </div>
 
-            {/* Icon button */}
             <button
+              type="button"
               onClick={() => setShowIconPicker(true)}
-              className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg bg-[var(--muted)]/10 hover:bg-[var(--muted)]/20 border border-[var(--panel-border)] transition-colors text-[var(--foreground)]"
+              className="flex items-center gap-2 rounded-[16px] border bg-[var(--background)] px-3 py-3 text-sm text-[var(--foreground)] transition-colors hover:bg-[var(--bg-secondary)]"
+              style={{ borderColor: 'var(--panel-border)' }}
               title="点击更换图标"
             >
               <DynamicIcon name={category.icon} size={18} />
               <span className="max-w-[80px] truncate text-xs">{category.icon}</span>
             </button>
 
-            {/* Color picker */}
             <ColorPicker value={category.color} onChange={(color) => onUpdate('color', color)} />
 
-            {/* Delete */}
-            <button
-              onClick={onDelete}
-              className="p-2 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
-              title="删除分类"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+            <DeleteConfirmButton
+              title="删除这个分类？"
+              description={`“${category.name || '未命名分类'}” 下的 ${category.links.length} 个链接也会一起删除。这个操作不能撤销。`}
+              confirmLabel="删除分类"
+              triggerTitle="删除分类"
+              onConfirm={onDelete}
+            />
           </div>
 
-          {/* Links list */}
-          {!collapsed && (
-            <div className="space-y-2 pl-6 border-l-2 border-[var(--panel-border)]/50 ml-2">
+          {collapsed && (
+            <p className="pl-6 text-xs text-[var(--muted)]">
+              {category.links.length} 个链接
+            </p>
+          )}
+
+          <Accordion.Content className="overflow-hidden">
+            <div className="ml-2 space-y-3 border-l border-[var(--panel-border)]/70 pl-6 pt-1">
               {category.links.map((link, linkIndex) => (
                 <LinkEditor
                   key={link.id}
@@ -133,28 +136,22 @@ export default function CategoryEditor({
                 />
               ))}
 
-              {/* Add link button */}
               <button
+                type="button"
                 onClick={onAddLink}
-                className="w-full py-3 rounded-lg border border-dashed border-[var(--panel-border)] hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--accent)]/5 transition-all text-sm flex items-center justify-center gap-2 text-[var(--muted)]"
+                className="flex w-full items-center justify-center gap-2 rounded-[18px] border border-dashed px-4 py-3 text-sm text-[var(--muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--foreground)]"
+                style={{ borderColor: 'var(--panel-border)' }}
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="h-4 w-4" />
                 添加链接
               </button>
             </div>
-          )}
-
-          {/* Link count when collapsed */}
-          {collapsed && (
-            <p className="text-xs text-[var(--muted)] pl-6">
-              {category.links.length} 个链接
-            </p>
-          )}
+          </Accordion.Content>
         </div>
-      </div>
+      </Accordion.Item>
 
       {showIconPicker && (
-        <IconPicker
+        <LazyIconPicker
           value={category.icon}
           onChange={(icon) => onUpdate('icon', icon)}
           onClose={() => setShowIconPicker(false)}

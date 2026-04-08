@@ -1,15 +1,13 @@
-"use client";
+'use client';
 
-import { useMemo, useRef, useCallback } from "react";
-import { motion } from "framer-motion";
-import CategorySection from "./CategorySection";
-import ProfileHeader from "./ProfileHeader";
-import SearchBar from "./SearchBar";
-import ThemeToggle from "./ThemeToggle";
-import { ProfileHeaderDesktopLeft } from "./ProfileHeader";
-import type { Profile, Settings, Category } from "../types";
-import { useSettings } from "../contexts/SettingsContext";
-import Icon from "./Icon";
+import { useDeferredValue, useMemo, useState } from 'react';
+import CategorySection from './CategorySection';
+import ProfileHeader from './ProfileHeader';
+import SearchBar from './SearchBar';
+import DeferredThemeToggle from './DeferredThemeToggle';
+import { ProfileHeaderDesktopLeft } from './ProfileHeader';
+import type { Profile, Settings, Category } from '../types';
+import Icon from './Icon';
 
 interface ClientLayoutProps {
   profile: Profile;
@@ -17,223 +15,140 @@ interface ClientLayoutProps {
   categories: Category[];
 }
 
-// 3D悬浮效果Hook
-function useTilt3D() {
-  const ref = useRef<HTMLDivElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
-
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const element = ref.current;
-    const glow = glowRef.current;
-    if (!element) return;
-
-    const rect = element.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-
-    const rotateX = ((y - centerY) / centerY) * -4;
-    const rotateY = ((x - centerX) / centerX) * 4;
-
-    element.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-
-    if (glow) {
-      glow.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(56, 189, 248, 0.12) 0%, transparent 50%)`;
-      glow.style.opacity = '1';
-    }
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    const element = ref.current;
-    const glow = glowRef.current;
-    if (!element) return;
-
-    element.style.transition = 'transform 0.5s ease';
-    element.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
-    setTimeout(() => {
-      if (element) element.style.transition = '';
-    }, 500);
-
-    if (glow) {
-      glow.style.opacity = '0';
-    }
-  }, []);
-
-  return { ref, glowRef, handleMouseMove, handleMouseLeave };
-}
-
 export default function ClientLayout({
   profile,
   settings,
   categories,
 }: ClientLayoutProps) {
-  const { searchQuery, setSearchQuery } = useSettings();
-  const query = searchQuery ?? "";
-
-  const { ref: headerRef, glowRef: headerGlowRef, handleMouseMove, handleMouseLeave } = useTilt3D();
-  const mobileHeaderRef = useRef<HTMLDivElement>(null);
-  const mobileHeaderGlowRef = useRef<HTMLDivElement>(null);
-
-  const handleMobileMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const element = mobileHeaderRef.current;
-    const glow = mobileHeaderGlowRef.current;
-    if (!element) return;
-
-    const rect = element.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    if (glow) {
-      glow.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(56, 189, 248, 0.12) 0%, transparent 50%)`;
-      glow.style.opacity = '1';
-    }
-  }, []);
-
-  const handleMobileMouseLeave = useCallback(() => {
-    const glow = mobileHeaderGlowRef.current;
-    if (glow) {
-      glow.style.opacity = '0';
-    }
-  }, []);
+  const [query, setQuery] = useState('');
+  const deferredQuery = useDeferredValue(query);
+  const normalizedQuery = deferredQuery.trim().toLowerCase();
 
   const filteredCategories = useMemo(() => {
-    if (!query.trim()) {
+    if (!normalizedQuery) {
       return categories;
     }
 
-    const lowerQuery = query.toLowerCase();
     return categories
       .map((category) => ({
         ...category,
         links: category.links.filter(
           (link) =>
-            link.name.toLowerCase().includes(lowerQuery) ||
-            (link.description ?? "").toLowerCase().includes(lowerQuery),
+            link.name.toLowerCase().includes(normalizedQuery) ||
+            (link.description ?? '').toLowerCase().includes(normalizedQuery),
         ),
       }))
       .filter((category) => category.links.length > 0);
-  }, [categories, query]);
+  }, [categories, normalizedQuery]);
 
   const totalResults = filteredCategories.reduce(
     (acc, cat) => acc + cat.links.length,
     0,
   );
+  const totalLinks = categories.reduce((acc, cat) => acc + cat.links.length, 0);
   const shouldShowSearch = settings.showSearch;
+  const animationsEnabled = settings.animations;
+  const footerLinkClass = animationsEnabled
+    ? 'transition-colors duration-200 hover:text-[var(--text-primary)]'
+    : '';
 
   return (
-    <>
-      <div className="min-h-screen text-foreground">
-        <div className="mx-auto max-w-[1440px] px-4 pb-12 pt-6 md:px-6 md:pb-12 lg:px-8">
-          <header className="space-y-4 md:space-y-0 md:flex md:items-center md:justify-between md:gap-6">
-            {/* 移动端布局 */}
-            <div className="md:hidden space-y-3">
-              <motion.div
-                ref={mobileHeaderRef}
-                className="relative"
-                onMouseMove={handleMobileMouseMove}
-                onMouseLeave={handleMobileMouseLeave}
-              >
-                {/* Glow effect */}
-                <div
-                  ref={mobileHeaderGlowRef}
-                  className="absolute inset-0 opacity-0 transition-opacity duration-300 pointer-events-none rounded-2xl"
+    <div className="flex min-h-screen flex-col text-foreground">
+      <div className="mx-auto w-full max-w-[1400px] flex-1 px-4 pt-4 pb-10 md:px-6 md:pt-5 md:pb-12 lg:px-8">
+        {/* 头部区域 */}
+        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          {/* 移动端头部 */}
+          <div className="md:hidden">
+            <ProfileHeader profile={profile} />
+            {shouldShowSearch && (
+              <div className="mt-4">
+                <SearchBar
+                  onSearch={setQuery}
+                  value={query}
+                  placeholder="搜索链接..."
+                  showResultCount
+                  resultCount={totalResults}
                 />
-                <ProfileHeader profile={profile} />
-              </motion.div>
+              </div>
+            )}
+          </div>
+
+          {/* 桌面端头部 */}
+          <div className="hidden w-full items-center justify-between md:flex">
+            <div className="rounded-lg border bg-[var(--panel)] px-5 py-3" style={{ borderColor: 'var(--panel-border)' }}>
+              <ProfileHeaderDesktopLeft profile={profile} />
+            </div>
+            <div className="flex items-center gap-3">
               {shouldShowSearch && (
                 <SearchBar
-                  onSearch={setSearchQuery}
+                  compact
+                  onSearch={setQuery}
                   value={query}
-                  placeholder="搜索链接、描述或工作入口..."
-                  showResultCount={true}
+                  placeholder="搜索链接..."
+                  showResultCount
                   resultCount={totalResults}
                 />
               )}
+              <DeferredThemeToggle compact />
             </div>
+          </div>
+        </header>
 
-            {/* 桌面端布局 - 只包裹左侧头像区 */}
-            <div className="hidden md:flex w-full items-center justify-between">
-              <div ref={headerRef} className="relative" style={{ transformStyle: 'preserve-3d' }}>
-                {/* Glow effect */}
-                <div
-                  ref={headerGlowRef}
-                  className="absolute inset-0 opacity-0 transition-opacity duration-300 pointer-events-none rounded-2xl"
-                />
-                <motion.div
-                  className="liquid-glass rounded-2xl px-5 py-3 w-[400px]"
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                  onMouseMove={handleMouseMove}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <ProfileHeaderDesktopLeft profile={profile} />
-                </motion.div>
-              </div>
-              <div className="flex items-center gap-3">
-                {shouldShowSearch && (
-                  <SearchBar
-                    compact
-                    onSearch={setSearchQuery}
-                    value={query}
-                    placeholder="搜索链接、描述或工作入口..."
-                    showResultCount={true}
-                    resultCount={totalResults}
-                  />
-                )}
-                <ThemeToggle compact />
-              </div>
+        {/* 主体内容 */}
+        <main className="mt-6 space-y-8 md:mt-8">
+          {filteredCategories.map((category) => (
+            <div key={category.id}>
+              <CategorySection
+                category={category}
+                layout={settings.layout}
+                animations={animationsEnabled}
+              />
             </div>
-          </header>
+          ))}
 
-          <main className="mt-8 md:mt-10">
-            {filteredCategories.map((category, index) => (
-              <motion.div
-                key={category.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05, type: 'spring', stiffness: 400, damping: 25 }}
-              >
-                <CategorySection
-                  category={category}
-                />
-              </motion.div>
-            ))}
+          {normalizedQuery && filteredCategories.length === 0 && (
+            <div
+              className="rounded-lg border bg-[var(--panel)] py-12 text-center"
+              style={{ borderColor: 'var(--panel-border)' }}
+            >
+              <h2 className="text-base font-medium text-[var(--text-primary)]">未找到结果</h2>
+              <p className="mt-1 text-sm text-[var(--muted)]">尝试其他关键词</p>
+            </div>
+          )}
+        </main>
+      </div>
 
-            {query && filteredCategories.length === 0 && (
-              <motion.div
-                className="liquid-glass py-12 text-center rounded-2xl"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                <h2 className="text-lg font-semibold text-[var(--text-primary)]">未找到结果</h2>
-                <p className="mt-2 text-sm text-[var(--muted)]">尝试其他关键词，或者检查链接描述中的命名方式。</p>
-              </motion.div>
-            )}
-          </main>
-
-          <footer className="mt-6 hidden border-t border-white/10 px-2 py-4 md:block">
-            <div className="flex flex-col items-center gap-2">
+      {/* 页脚 - 贴近底部，无框 */}
+      <footer className="mt-auto py-5">
+        <div className="mx-auto h-px w-full max-w-[180px] bg-gradient-to-r from-transparent via-[var(--panel-border)] to-transparent opacity-40 md:max-w-sm" />
+        <div className="mx-auto mt-5 flex max-w-[1400px] flex-col items-center gap-2 px-4 text-center md:px-6 lg:px-8">
+          <div className="flex items-center justify-center">
+            {profile.repo ? (
               <a
-                href={profile.repo || ""}
+                href={profile.repo}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-[var(--muted)] hover:opacity-80"
+                className={`flex items-center gap-1.5 text-sm text-[var(--muted)] ${footerLinkClass}`}
               >
-                <Icon name="github" size={16} />
-                <span className="text-sm">{profile.name}</span>
+                <Icon name="github" size={14} />
+                <span>{profile.name}</span>
               </a>
-              <p className="text-sm text-[var(--muted)]">
-                {categories.length} Categories •{" "}
-                {categories.reduce((acc, cat) => acc + cat.links.length, 0)} Links •{" "}
-                <a href="/edit" className="text-sm text-[var(--muted)] hover:opacity-80">Edit</a>
-              </p>
-            </div>
-          </footer>
+            ) : (
+              <div className="flex items-center gap-1.5 text-sm text-[var(--muted)]">
+                <Icon name="github" size={14} />
+                <span>{profile.name}</span>
+              </div>
+            )}
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm text-[var(--muted)]">
+            <span>{categories.length} categories</span>
+            <span>{totalLinks} links</span>
+            <a href="/edit" className={footerLinkClass}>
+              edit
+            </a>
+          </div>
         </div>
-      </div>
-    </>
+      </footer>
+    </div>
   );
 }

@@ -31,11 +31,10 @@ export default function ProfileEditor({ profile, onChange }: ProfileEditorProps)
             type={type}
             value={value}
             onChange={(e) => onChange(key, e.target.value)}
-            className={`w-full px-3 py-2 text-sm rounded-lg bg-[var(--background)] border focus:outline-none focus:ring-2 transition-colors text-[var(--foreground)] ${
-              error
-                ? 'border-red-500/50 focus:ring-red-500/30'
-                : 'border-[var(--panel-border)] focus:ring-[var(--accent)]/30'
+            className={`w-full rounded-[18px] border bg-[var(--background)] px-4 py-3 text-sm text-[var(--foreground)] outline-none transition-colors ${
+              error ? 'border-red-500/50' : ''
             }`}
+            style={{ borderColor: error ? undefined : 'var(--panel-border)' }}
             placeholder={label}
           />
           {error && (

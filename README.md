@@ -50,13 +50,13 @@
 
 ## 部署
 
-构建产物输出到 `.vercel/output/static`（Next.js Standalone 模式），可直接部署到任何静态托管平台。
+构建产物输出到 `out/`（Next.js 静态导出），可直接部署到任何静态托管平台。
 
 | 平台 | 说明 |
 |------|------|
-| **Cloudflare Pages** | 已内置 `wrangler.toml`，连接仓库即可自动识别 |
+| **Cloudflare Pages** | 构建命令 `npm run build`，输出目录 `out` |
 | **Vercel** | Next.js 原生支持，零配置 |
-| **Netlify** | 构建命令 `npm run build`，发布目录 `.vercel/output/static` |
+| **Netlify** | 构建命令 `npm run build`，发布目录 `out` |
 
 ## 本地开发
 

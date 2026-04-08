@@ -1,53 +1,72 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { SettingsProvider } from './contexts/SettingsContext';
-import { defaultThemeId, themePresets } from './themes';
+import { getThemePreset, getThemeStyleVariables, themePresets } from './themes';
+import { loadConfig, loadInitialTheme } from './load-config';
 
 const THEME_STORAGE_KEY = 'compass-settings';
+const VALID_THEMES = ['light', 'dark', 'ocean'];
 
-const themeBootScript = `(() => {
+function getThemeBootScript(initialTheme: string) {
+  return `(() => {
   const root = document.documentElement;
-  const fallbackTheme = '${defaultThemeId}';
+  const fallbackTheme = '${initialTheme}';
   const storageKey = '${THEME_STORAGE_KEY}';
+  const validThemes = ${JSON.stringify(VALID_THEMES)};
   const themeMap = ${JSON.stringify(
     Object.fromEntries(
       themePresets.map((theme) => [
         theme.id,
         {
-          background: theme.colors.background,
+          colors: theme.colors,
           isDark: theme.isDark,
         },
       ]),
     ),
   )};
+  const cssVariableMap = {
+    background: '--background',
+    foreground: '--foreground',
+    panel: '--panel',
+    panelStrong: '--panel-strong',
+    panelBorder: '--panel-border',
+    muted: '--muted',
+    textPrimary: '--text-primary',
+    textSecondary: '--text-secondary',
+    bgSecondary: '--bg-secondary',
+    accent: '--accent',
+    accentAlpha: '--accent-alpha',
+    accentBorder: '--accent-border'
+  };
 
   root.classList.add('theme-preload');
 
   const applyTheme = (themeId) => {
-    const theme = Object.prototype.hasOwnProperty.call(themeMap, themeId) ? themeId : fallbackTheme;
+    const theme = validThemes.includes(themeId) ? themeId : fallbackTheme;
     const themeConfig = themeMap[theme];
 
     root.dataset.theme = theme;
     root.classList.toggle('dark', themeConfig.isDark);
     root.style.colorScheme = themeConfig.isDark ? 'dark' : 'light';
-    root.style.backgroundColor = themeConfig.background;
+    Object.keys(cssVariableMap).forEach((key) => {
+      root.style.setProperty(cssVariableMap[key], themeConfig.colors[key]);
+    });
   };
 
   try {
     const stored = window.localStorage.getItem(storageKey);
     const parsed = stored ? JSON.parse(stored) : null;
-    const themeId = parsed && typeof parsed.theme === 'string' ? parsed.theme : fallbackTheme;
+    const themeId = parsed && typeof parsed.theme === 'string' && validThemes.includes(parsed.theme) ? parsed.theme : fallbackTheme;
 
     applyTheme(themeId);
   } catch {
     applyTheme(fallbackTheme);
   }
 
-  window.requestAnimationFrame(() => {
-    root.style.removeProperty('background-color');
-    root.classList.remove('theme-preload');
-  });
+  root.setAttribute('data-theme-ready', 'true');
+  root.classList.remove('theme-preload');
 })();`;
+}
 
 export const metadata: Metadata = {
   title: "Compass - 导航中心",
@@ -63,14 +82,27 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const initialSettings = loadConfig().settings;
+  const initialTheme = loadInitialTheme();
+  const initialThemePreset = getThemePreset(initialTheme);
+  const themeBootScript = getThemeBootScript(initialTheme);
+
   return (
-    <html lang="en" suppressHydrationWarning data-theme={defaultThemeId}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      data-theme={initialTheme}
+      style={getThemeStyleVariables(initialTheme)}
+      className={initialThemePreset.isDark ? 'dark' : undefined}
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
       </head>
       <body>
-        <SettingsProvider>
-          {children}
+        <SettingsProvider initialSettings={initialSettings}>
+          <div className="app-shell">
+            {children}
+          </div>
         </SettingsProvider>
       </body>
     </html>
