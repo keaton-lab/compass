@@ -18,6 +18,9 @@ export interface ThemePreset {
     gridLine: string;
     glowA: string;
     glowB: string;
+    textPrimary: string;
+    textSecondary: string;
+    bgSecondary: string;
     accent: string;
     accentAlpha: string;
     accentBorder: string;
@@ -33,18 +36,21 @@ export const themePresets: ThemePreset[] = [
     label: 'Light',
     isDark: false,
     colors: {
-      background: '#dbe2ea',
-      foreground: '#08111f',
-      panel: 'rgba(255, 255, 255, 0.78)',
-      panelStrong: 'rgba(255, 255, 255, 0.9)',
-      panelBorder: 'rgba(15, 23, 42, 0.08)',
-      muted: '#516076',
-      gridLine: 'rgba(58, 76, 103, 0.06)',
-      glowA: 'transparent',
-      glowB: 'transparent',
-      accent: '#f59e0b',
-      accentAlpha: 'rgba(245, 158, 11, 0.15)',
-      accentBorder: 'rgba(245, 158, 11, 0.4)',
+      background: '#f7f4ee',
+      foreground: '#1d262b',
+      panel: '#fcf8f2',
+      panelStrong: '#fffdfa',
+      panelBorder: '#d8d0c4',
+      muted: '#6f655b',
+      gridLine: 'rgba(127, 113, 96, 0.05)',
+      glowA: 'rgba(231, 207, 174, 0.2)',
+      glowB: 'rgba(248, 236, 217, 0.28)',
+      textPrimary: '#1d262b',
+      textSecondary: '#62584d',
+      bgSecondary: '#f1ebe2',
+      accent: '#b56d3c',
+      accentAlpha: 'rgba(181, 109, 60, 0.12)',
+      accentBorder: 'rgba(181, 109, 60, 0.24)',
     },
     iconColors: {
       light: { bg: '#fef3c7', text: '#d97706', darkBg: 'rgba(217, 119, 6, 0.2)', darkText: '#fbbf24' },
@@ -57,18 +63,21 @@ export const themePresets: ThemePreset[] = [
     label: 'Dark',
     isDark: true,
     colors: {
-      background: '#06111f',
-      foreground: '#eff6ff',
-      panel: 'rgba(7, 19, 34, 0.76)',
-      panelStrong: 'rgba(8, 24, 42, 0.88)',
-      panelBorder: 'rgba(148, 163, 184, 0.16)',
-      muted: '#93a6bf',
-      gridLine: 'rgba(129, 160, 201, 0.08)',
-      glowA: 'rgba(34, 211, 238, 0.1)',
-      glowB: 'rgba(37, 99, 235, 0.12)',
-      accent: '#0ea5e9',
-      accentAlpha: 'rgba(14, 165, 233, 0.15)',
-      accentBorder: 'rgba(14, 165, 233, 0.4)',
+      background: '#0d1519',
+      foreground: '#ecf2f2',
+      panel: '#121d22',
+      panelStrong: '#17242a',
+      panelBorder: '#27363d',
+      muted: '#8ea2a8',
+      gridLine: 'rgba(78, 125, 138, 0.08)',
+      glowA: 'transparent',
+      glowB: 'transparent',
+      textPrimary: '#ecf2f2',
+      textSecondary: '#b3c5ca',
+      bgSecondary: '#203138',
+      accent: '#18b6a4',
+      accentAlpha: 'rgba(24, 182, 164, 0.14)',
+      accentBorder: 'rgba(24, 182, 164, 0.3)',
     },
     iconColors: {
       light: { bg: '#fef3c7', text: '#d97706', darkBg: 'rgba(217, 119, 6, 0.2)', darkText: '#fbbf24' },
@@ -81,18 +90,21 @@ export const themePresets: ThemePreset[] = [
     label: 'Ocean',
     isDark: false,
     colors: {
-      background: '#edf6ff',
-      foreground: '#0b1f33',
-      panel: 'rgba(255, 255, 255, 0.74)',
-      panelStrong: 'rgba(255, 255, 255, 0.88)',
-      panelBorder: 'rgba(56, 104, 168, 0.14)',
-      muted: '#4a6a8a',
-      gridLine: 'rgba(74, 118, 171, 0.08)',
-      glowA: 'rgba(56, 189, 248, 0.14)',
-      glowB: 'rgba(59, 130, 246, 0.1)',
-      accent: '#0284c7',
-      accentAlpha: 'rgba(2, 132, 199, 0.15)',
-      accentBorder: 'rgba(2, 132, 199, 0.4)',
+      background: '#edf6f8',
+      foreground: '#173247',
+      panel: '#f7fbfc',
+      panelStrong: '#ffffff',
+      panelBorder: '#c7d8df',
+      muted: '#627886',
+      gridLine: 'rgba(86, 143, 176, 0.06)',
+      glowA: 'rgba(109, 188, 214, 0.2)',
+      glowB: 'rgba(180, 225, 234, 0.3)',
+      textPrimary: '#173247',
+      textSecondary: '#5a7483',
+      bgSecondary: '#e0eef2',
+      accent: '#18766a',
+      accentAlpha: 'rgba(24, 118, 106, 0.12)',
+      accentBorder: 'rgba(24, 118, 106, 0.28)',
     },
     iconColors: {
       light: { bg: '#fef3c7', text: '#d97706', darkBg: 'rgba(217, 119, 6, 0.2)', darkText: '#fbbf24' },
@@ -110,4 +122,27 @@ export function isThemeId(value: string): value is ThemeId {
 
 export function getThemePreset(themeId: ThemeId): ThemePreset {
   return themePresets.find((theme) => theme.id === themeId) ?? themePresets[0];
+}
+
+export function getThemeStyleVariables(themeId: ThemeId): Record<string, string> {
+  const themePreset = getThemePreset(themeId);
+
+  return {
+    '--background': themePreset.colors.background,
+    '--foreground': themePreset.colors.foreground,
+    '--panel': themePreset.colors.panel,
+    '--panel-strong': themePreset.colors.panelStrong,
+    '--panel-border': themePreset.colors.panelBorder,
+    '--muted': themePreset.colors.muted,
+    '--grid-line': themePreset.colors.gridLine,
+    '--glow-a': themePreset.colors.glowA,
+    '--glow-b': themePreset.colors.glowB,
+    '--text-primary': themePreset.colors.textPrimary,
+    '--text-secondary': themePreset.colors.textSecondary,
+    '--bg-secondary': themePreset.colors.bgSecondary,
+    '--accent': themePreset.colors.accent,
+    '--accent-alpha': themePreset.colors.accentAlpha,
+    '--accent-border': themePreset.colors.accentBorder,
+    colorScheme: themePreset.isDark ? 'dark' : 'light',
+  };
 }

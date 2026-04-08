@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { Accordion, Tabs } from 'radix-ui';
+import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { dump as yamlDump, load as yamlLoad } from 'js-yaml';
 import { Plus, User, Settings, FolderOpen, Code2, AlertCircle, Check, Minus } from 'lucide-react';
 import type { Config } from '../types';
@@ -22,29 +23,61 @@ export default function EditClient({ initialConfig }: EditClientProps) {
   const [yamlError, setYamlError] = useState<string | null>(null);
   const [yamlInput, setYamlInput] = useState<string>('');
   const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
+  const yamlParseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const yamlContent = useMemo(() => {
     return yamlDump(config, { indent: 2, lineWidth: -1, noRefs: true, sortKeys: false });
   }, [config]);
 
-  useMemo(() => {
+  const openCategoryIds = useMemo(
+    () => config.categories.map((category) => category.id).filter((id) => !collapsedCategories.has(id)),
+    [collapsedCategories, config.categories]
+  );
+
+  useEffect(() => {
     if (activeSection !== 'yaml') {
       setYamlInput(yamlContent);
     }
   }, [yamlContent, activeSection]);
 
+  useEffect(() => {
+    return () => {
+      if (yamlParseTimerRef.current) {
+        clearTimeout(yamlParseTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    setCollapsedCategories((prev) => {
+      const currentIds = new Set(config.categories.map((category) => category.id));
+      const next = new Set(Array.from(prev).filter((id) => currentIds.has(id)));
+
+      return next.size === prev.size ? prev : next;
+    });
+  }, [config.categories]);
+
   const handleYamlChange = useCallback((value: string) => {
     setYamlInput(value);
-    try {
-      const parsed = yamlLoad(value) as Config;
-      if (!parsed.profile || !parsed.settings || !parsed.categories) {
-        throw new Error('配置结构不完整');
-      }
-      setConfig(parsed);
-      setYamlError(null);
-    } catch (err) {
-      setYamlError(err instanceof Error ? err.message : 'YAML 格式错误');
+
+    if (yamlParseTimerRef.current) {
+      clearTimeout(yamlParseTimerRef.current);
     }
+
+    yamlParseTimerRef.current = setTimeout(() => {
+      try {
+        const parsed = yamlLoad(value) as Config;
+        if (!parsed.profile || !parsed.settings || !parsed.categories) {
+          throw new Error('配置结构不完整');
+        }
+        startTransition(() => {
+          setConfig(parsed);
+          setYamlError(null);
+        });
+      } catch (err) {
+        setYamlError(err instanceof Error ? err.message : 'YAML 格式错误');
+      }
+    }, 180);
   }, [setConfig]);
 
   const updateProfile = useCallback(
@@ -194,17 +227,10 @@ export default function EditClient({ initialConfig }: EditClientProps) {
     });
   }, [setConfig]);
 
-  const toggleCategoryCollapse = useCallback((categoryId: string) => {
-    setCollapsedCategories((prev) => {
-      const next = new Set(prev);
-      if (next.has(categoryId)) {
-        next.delete(categoryId);
-      } else {
-        next.add(categoryId);
-      }
-      return next;
-    });
-  }, []);
+  const handleCategoryOpenChange = useCallback((openIds: string[]) => {
+    const openIdSet = new Set(openIds);
+    setCollapsedCategories(new Set(config.categories.map((category) => category.id).filter((id) => !openIdSet.has(id))));
+  }, [config.categories]);
 
   const toggleAllCategories = useCallback(() => {
     if (collapsedCategories.size === config.categories.length) {
@@ -224,7 +250,6 @@ export default function EditClient({ initialConfig }: EditClientProps) {
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
-        {/* Header */}
         <EditHeader
           onUndo={undo}
           onRedo={redo}
@@ -233,43 +258,40 @@ export default function EditClient({ initialConfig }: EditClientProps) {
           yamlContent={yamlContent}
         />
 
-        {/* Tab navigation */}
-        <div className="flex items-center gap-1 mb-6 overflow-x-auto pb-1">
-          {sections.map(({ key, label, icon, count }) => (
-            <button
-              key={key}
-              onClick={() => {
-                if (key === 'yaml') {
-                  setYamlInput(yamlContent);
-                  setYamlError(null);
-                }
-                setActiveSection(key);
-              }}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
-                activeSection === key
-                  ? 'bg-[var(--accent)]/15 text-[var(--accent)]'
-                  : 'text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/10'
-              }`}
-            >
-              {icon}
-              <span>{label}</span>
-              {count !== undefined && (
-                <span className="text-xs opacity-60">({count})</span>
-              )}
-            </button>
-          ))}
+        <Tabs.Root
+          value={activeSection}
+          onValueChange={(value) => {
+            const nextSection = value as EditSection;
+            if (nextSection === 'yaml') {
+              setYamlInput(yamlContent);
+              setYamlError(null);
+            }
+            setActiveSection(nextSection);
+          }}
+          className="min-w-0"
+        >
+          <div className="mb-6 overflow-x-auto pb-1">
+            <Tabs.List className="inline-flex rounded-[22px] border bg-[var(--panel-strong)] p-1" style={{ borderColor: 'var(--panel-border)' }}>
+              {sections.map(({ key, label, icon, count }) => (
+                <Tabs.Trigger
+                  key={key}
+                  value={key}
+                  className="flex items-center gap-2 rounded-[18px] px-4 py-2.5 text-sm font-medium whitespace-nowrap text-[var(--muted)] outline-none transition-colors data-[state=active]:bg-[var(--accent-alpha)] data-[state=active]:text-[var(--foreground)]"
+                >
+                  {icon}
+                  <span>{label}</span>
+                  {count !== undefined && (
+                    <span className="text-xs opacity-60">({count})</span>
+                  )}
+                </Tabs.Trigger>
+              ))}
+            </Tabs.List>
+          </div>
 
-          <div className="flex-1" />
-
-        </div>
-
-        {/* Main content */}
-        <div className="min-w-0">
-          {/* Profile section */}
-          {activeSection === 'profile' && (
-            <section className="rounded-xl border border-[var(--panel-border)] bg-[var(--panel)]/20">
-              <div className="px-5 py-4 border-b border-[var(--panel-border)]">
-                <h2 className="text-base font-semibold text-[var(--foreground)] flex items-center gap-2">
+          <Tabs.Content value="profile" className="outline-none">
+            <section className="rounded-[24px] border bg-[var(--panel-strong)]" style={{ borderColor: 'var(--panel-border)' }}>
+              <div className="border-b px-5 py-4" style={{ borderColor: 'var(--panel-border)' }}>
+                <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--foreground)]">
                   <User className="w-4 h-4 text-[var(--accent)]" />
                   个人资料
                 </h2>
@@ -278,13 +300,12 @@ export default function EditClient({ initialConfig }: EditClientProps) {
                 <ProfileEditor profile={config.profile} onChange={updateProfile} />
               </div>
             </section>
-          )}
+          </Tabs.Content>
 
-          {/* Settings section */}
-          {activeSection === 'settings' && (
-            <section className="rounded-xl border border-[var(--panel-border)] bg-[var(--panel)]/20">
-              <div className="px-5 py-4 border-b border-[var(--panel-border)]">
-                <h2 className="text-base font-semibold text-[var(--foreground)] flex items-center gap-2">
+          <Tabs.Content value="settings" className="outline-none">
+            <section className="rounded-[24px] border bg-[var(--panel-strong)]" style={{ borderColor: 'var(--panel-border)' }}>
+              <div className="border-b px-5 py-4" style={{ borderColor: 'var(--panel-border)' }}>
+                <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--foreground)]">
                   <Settings className="w-4 h-4 text-[var(--accent)]" />
                   设置
                 </h2>
@@ -293,21 +314,22 @@ export default function EditClient({ initialConfig }: EditClientProps) {
                 <SettingsEditor settings={config.settings} onChange={updateSettings} />
               </div>
             </section>
-          )}
+          </Tabs.Content>
 
-          {/* Categories section */}
-          {activeSection === 'categories' && (
-            <section className="rounded-xl border border-[var(--panel-border)] bg-[var(--panel)]/20">
-              <div className="px-5 py-4 border-b border-[var(--panel-border)] flex items-center justify-between">
-                <h2 className="text-base font-semibold text-[var(--foreground)] flex items-center gap-2">
+          <Tabs.Content value="categories" className="outline-none">
+            <section className="rounded-[24px] border bg-[var(--panel-strong)]" style={{ borderColor: 'var(--panel-border)' }}>
+              <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: 'var(--panel-border)' }}>
+                <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--foreground)]">
                   <FolderOpen className="w-4 h-4 text-[var(--accent)]" />
                   分类和链接
                 </h2>
                 <div className="flex items-center gap-2">
                   {config.categories.length > 0 && (
                     <button
+                      type="button"
                       onClick={toggleAllCategories}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--panel-border)] text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/10 transition-colors"
+                      className="flex items-center gap-1.5 rounded-[16px] border px-3 py-2 text-xs font-medium text-[var(--muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--foreground)]"
+                      style={{ borderColor: 'var(--panel-border)' }}
                     >
                       {collapsedCategories.size === config.categories.length ? (
                         <Plus className="w-3.5 h-3.5" />
@@ -318,8 +340,9 @@ export default function EditClient({ initialConfig }: EditClientProps) {
                     </button>
                   )}
                   <button
+                    type="button"
                     onClick={addCategory}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--accent)] text-white hover:bg-[var(--accent)]/90 transition-colors"
+                    className="flex items-center gap-1.5 rounded-[16px] bg-[var(--accent)] px-3 py-2 text-xs font-medium text-white"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     添加分类
@@ -328,19 +351,23 @@ export default function EditClient({ initialConfig }: EditClientProps) {
               </div>
               <div className="p-5">
                 {config.categories.length === 0 ? (
-                  <div className="text-center py-12 text-[var(--muted)] border border-dashed border-[var(--panel-border)] rounded-lg">
-                    <FolderOpen className="w-8 h-8 mx-auto mb-3 opacity-40" />
+                  <div className="rounded-[20px] border border-dashed py-12 text-center text-[var(--muted)]" style={{ borderColor: 'var(--panel-border)' }}>
+                    <FolderOpen className="mx-auto mb-3 h-8 w-8 opacity-40" />
                     <p className="text-sm">暂无分类</p>
-                    <p className="text-xs mt-1">点击上方按钮添加第一个分类</p>
+                    <p className="mt-1 text-xs">点击上方按钮添加第一个分类</p>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <Accordion.Root
+                    type="multiple"
+                    value={openCategoryIds}
+                    onValueChange={handleCategoryOpenChange}
+                    className="space-y-4"
+                  >
                     {config.categories.map((category: Config['categories'][number], catIdx: number) => (
                       <CategoryEditor
                         key={category.id}
                         category={category}
                         collapsed={collapsedCategories.has(category.id)}
-                        onToggleCollapse={() => toggleCategoryCollapse(category.id)}
                         onUpdate={(field, value) => updateCategory(catIdx, field, value)}
                         onDelete={() => deleteCategory(catIdx)}
                         onUpdateLink={(linkIdx, field, value) => updateLink(catIdx, linkIdx, field, value)}
@@ -354,17 +381,16 @@ export default function EditClient({ initialConfig }: EditClientProps) {
                         canMoveDown={catIdx < config.categories.length - 1}
                       />
                     ))}
-                  </div>
+                  </Accordion.Root>
                 )}
               </div>
             </section>
-          )}
+          </Tabs.Content>
 
-          {/* YAML Editor section */}
-          {activeSection === 'yaml' && (
-            <section className="rounded-xl border border-[var(--panel-border)] bg-[var(--panel)]/20">
-              <div className="px-5 py-4 border-b border-[var(--panel-border)] flex items-center justify-between">
-                <h2 className="text-base font-semibold text-[var(--foreground)] flex items-center gap-2">
+          <Tabs.Content value="yaml" className="outline-none">
+            <section className="rounded-[24px] border bg-[var(--panel-strong)]" style={{ borderColor: 'var(--panel-border)' }}>
+              <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: 'var(--panel-border)' }}>
+                <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--foreground)]">
                   <Code2 className="w-4 h-4 text-[var(--accent)]" />
                   YAML 编辑器
                 </h2>
@@ -375,7 +401,7 @@ export default function EditClient({ initialConfig }: EditClientProps) {
                       格式错误
                     </span>
                   ) : (
-                    <span className="flex items-center gap-1.5 text-xs text-emerald-400">
+                    <span className="flex items-center gap-1.5 text-xs text-emerald-500">
                       <Check className="w-3.5 h-3.5" />
                       格式正确
                     </span>
@@ -386,17 +412,16 @@ export default function EditClient({ initialConfig }: EditClientProps) {
                 <textarea
                   value={yamlInput}
                   onChange={(e) => handleYamlChange(e.target.value)}
-                  className={`w-full h-[calc(100vh-280px)] min-h-[400px] p-4 text-sm font-mono bg-[var(--background)] border rounded-lg focus:outline-none focus:ring-2 transition-colors text-[var(--foreground)] resize-y ${
-                    yamlError
-                      ? 'border-red-500/50 focus:ring-red-500/30'
-                      : 'border-[var(--panel-border)] focus:ring-[var(--accent)]/30'
+                  className={`h-[calc(100vh-280px)] min-h-[400px] w-full resize-y rounded-[20px] border bg-[var(--background)] p-4 font-mono text-sm text-[var(--foreground)] outline-none transition-colors ${
+                    yamlError ? 'border-red-500/50' : ''
                   }`}
+                  style={{ borderColor: yamlError ? undefined : 'var(--panel-border)' }}
                   placeholder="在此编辑 YAML 配置..."
                   spellCheck={false}
                 />
                 {yamlError && (
-                  <p className="mt-2 text-sm text-red-400 flex items-start gap-2">
-                    <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                  <p className="mt-2 flex items-start gap-2 text-sm text-red-400">
+                    <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                     <span>{yamlError}</span>
                   </p>
                 )}
@@ -405,8 +430,8 @@ export default function EditClient({ initialConfig }: EditClientProps) {
                 </p>
               </div>
             </section>
-          )}
-        </div>
+          </Tabs.Content>
+        </Tabs.Root>
       </div>
     </div>
   );

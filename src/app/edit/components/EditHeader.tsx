@@ -25,7 +25,7 @@ export default function EditHeader({ onUndo, onRedo, canUndo, canRedo, yamlConte
   };
 
   return (
-    <div className="flex items-center justify-between mb-8 pb-4 border-b border-[var(--panel-border)]">
+    <div className="mb-8 flex items-center justify-between rounded-[22px] border bg-[var(--panel-strong)] px-5 py-4" style={{ borderColor: 'var(--panel-border)' }}>
       <div>
         <h1 className="text-2xl font-bold text-[var(--foreground)]">
           编辑配置
@@ -39,17 +39,19 @@ export default function EditHeader({ onUndo, onRedo, canUndo, canRedo, yamlConte
         {/* Undo / Redo */}
         <div className="flex items-center gap-1 mr-2">
           <button
+            type="button"
             onClick={onUndo}
             disabled={!canUndo}
-            className="p-2 rounded-lg text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="rounded-[14px] p-2 text-[var(--muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-30"
             title="撤销"
           >
             <Undo2 className="w-4 h-4" />
           </button>
           <button
+            type="button"
             onClick={onRedo}
             disabled={!canRedo}
-            className="p-2 rounded-lg text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="rounded-[14px] p-2 text-[var(--muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-30"
             title="重做"
           >
             <Redo2 className="w-4 h-4" />
@@ -58,11 +60,12 @@ export default function EditHeader({ onUndo, onRedo, canUndo, canRedo, yamlConte
 
         {/* Copy button */}
         <button
+          type="button"
           onClick={handleCopy}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+          className={`flex items-center gap-2 rounded-[16px] px-4 py-2.5 text-sm font-medium transition-colors ${
             copied
-              ? 'bg-emerald-500/20 text-emerald-400'
-              : 'bg-[var(--accent)] text-white hover:bg-[var(--accent)]/90'
+              ? 'bg-emerald-500/16 text-emerald-500'
+              : 'bg-[var(--accent)] text-white'
           }`}
         >
           {copied ? (
@@ -81,7 +84,7 @@ export default function EditHeader({ onUndo, onRedo, canUndo, canRedo, yamlConte
         {/* Back link */}
         <a
           href="/"
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]/10 transition-colors"
+          className="flex items-center gap-1.5 rounded-[16px] px-3 py-2 text-sm text-[var(--muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--foreground)]"
         >
           返回
         </a>

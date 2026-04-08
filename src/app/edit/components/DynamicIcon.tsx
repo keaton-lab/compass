@@ -1,9 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Icon, { AVAILABLE_ICONS } from '../../components/Icon';
 
 let brandIconsCache: Record<string, { path: string; hex: string }> | null = null;
 const lucideCache: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {};
+const availableLucideIcons = new Set(AVAILABLE_ICONS.lucide);
+const availableBrandIcons = new Set(AVAILABLE_ICONS.brands);
+
+function toKebabCase(value: string): string {
+  return value
+    .replace(/([a-z])([A-Z])/g, '$1-$2')
+    .replace(/\s+/g, '-')
+    .toLowerCase();
+}
 
 async function loadLucideIcon(name: string) {
   if (lucideCache[name]) return lucideCache[name];
@@ -77,8 +87,15 @@ function DynamicLucideIcon({ name, size = 20, className = '' }: DynamicIconProps
 }
 
 export default function DynamicIcon({ name, size = 20, className = '' }: DynamicIconProps) {
+  const normalizedName = toKebabCase(name);
   const name0 = name[0];
-  if (name0 && name0 === name0.toUpperCase() && name0 !== name0.toLowerCase()) {
+  const isLikelyLucide = Boolean(name0 && name0 === name0.toUpperCase() && name0 !== name0.toLowerCase());
+
+  if (availableLucideIcons.has(normalizedName) || availableBrandIcons.has(normalizedName)) {
+    return <Icon name={name} size={size} className={className} />;
+  }
+
+  if (isLikelyLucide) {
     return <DynamicLucideIcon name={name} size={size} className={className} />;
   }
   return <DynamicBrandIcon name={name} size={size} className={className} />;

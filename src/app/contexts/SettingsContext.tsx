@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
 import type { Settings } from '../types';
 import { defaultThemeId, getThemePreset, isThemeId, themePresets } from '../themes';
 
@@ -17,6 +17,25 @@ interface SettingsContextType extends Settings {
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'compass-settings';
+const THEME_SWITCH_CLASS = 'theme-switching';
+const THEME_TRANSITION_MS = 280;
+const THEME_CSS_VARIABLES = {
+  background: '--background',
+  foreground: '--foreground',
+  panel: '--panel',
+  panelStrong: '--panel-strong',
+  panelBorder: '--panel-border',
+  muted: '--muted',
+  gridLine: '--grid-line',
+  glowA: '--glow-a',
+  glowB: '--glow-b',
+  textPrimary: '--text-primary',
+  textSecondary: '--text-secondary',
+  bgSecondary: '--bg-secondary',
+  accent: '--accent',
+  accentAlpha: '--accent-alpha',
+  accentBorder: '--accent-border',
+} as const;
 
 // Default settings - matching config.yaml defaults
 const DEFAULT_SETTINGS: Settings = {
@@ -27,8 +46,8 @@ const DEFAULT_SETTINGS: Settings = {
   searchQuery: '',
 };
 
-function normalizeSettings(partialSettings: Partial<Settings>): Settings {
-  const defaults = getDefaultSettings();
+function normalizeSettings(partialSettings: Partial<Settings>, initialSettings?: Partial<Settings>): Settings {
+  const defaults = getDefaultSettings(initialSettings);
   const theme = partialSettings.theme;
 
   return {
@@ -45,59 +64,129 @@ function applyTheme(theme: Settings['theme']) {
 
   const root = document.documentElement;
   const themePreset = getThemePreset(theme);
+  const shouldAnimate =
+    typeof window !== 'undefined' &&
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  root.dataset.theme = themePreset.id;
-  root.classList.toggle('dark', themePreset.isDark);
-  root.style.colorScheme = themePreset.isDark ? 'dark' : 'light';
-}
+  function updateTheme() {
+    root.classList.add(THEME_SWITCH_CLASS);
 
-function getDefaultSettings(): Settings {
-  return { ...DEFAULT_SETTINGS };
-}
-
-function getInitialSettings(): Settings {
-  if (typeof window === 'undefined') {
-    return getDefaultSettings();
-  }
-  
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const parsed = JSON.parse(stored) as Partial<Settings>;
-      return normalizeSettings(parsed);
+    root.dataset.theme = themePreset.id;
+    root.classList.toggle('dark', themePreset.isDark);
+    root.style.colorScheme = themePreset.isDark ? 'dark' : 'light';
+    for (const [key, cssVariable] of Object.entries(THEME_CSS_VARIABLES)) {
+      const colorKey = key as keyof typeof themePreset.colors;
+      root.style.setProperty(cssVariable, themePreset.colors[colorKey]);
     }
-  } catch {
-    // Ignore parse errors
   }
-  
-  return getDefaultSettings();
+
+  updateTheme();
+
+  const clearSwitchClass = () => {
+    root.classList.remove(THEME_SWITCH_CLASS);
+  };
+
+  if (!shouldAnimate) {
+    clearSwitchClass();
+    return;
+  }
+
+  window.setTimeout(clearSwitchClass, THEME_TRANSITION_MS);
 }
 
-export function SettingsProvider({ children }: { children: ReactNode }) {
-  const [settings, setSettings] = useState<Settings>(getDefaultSettings);
-  const [isHydrated, setIsHydrated] = useState(false);
+function getDefaultSettings(initialSettings?: Partial<Settings>): Settings {
+  return {
+    ...DEFAULT_SETTINGS,
+    ...initialSettings,
+    theme:
+      typeof initialSettings?.theme === 'string' && isThemeId(initialSettings.theme)
+        ? initialSettings.theme
+        : DEFAULT_SETTINGS.theme,
+  };
+}
 
-  // Hydrate from localStorage on mount
+function getMergedDefaultSettings(initialSettings?: Partial<Settings>): Settings {
+  return normalizeSettings(initialSettings ?? {}, initialSettings);
+}
+
+function getInitialSettings(initialSettings?: Partial<Settings>): Settings {
+  return getMergedDefaultSettings(initialSettings);
+}
+
+export function SettingsProvider({
+  children,
+  initialSettings,
+}: {
+  children: ReactNode;
+  initialSettings?: Partial<Settings>;
+}) {
+  const [settings, setSettings] = useState<Settings>(() => ({
+    ...getInitialSettings(initialSettings),
+    searchQuery: '',
+  }));
+  const [isHydrated, setIsHydrated] = useState(false);
+  const lastAppliedThemeRef = useRef<Settings['theme'] | null>(null);
+
+  // 标记客户端水合完成
   useEffect(() => {
-    const initial = getInitialSettings();
-    setSettings({ ...initial, searchQuery: '' });
     setIsHydrated(true);
   }, []);
 
+  // 水合完成后从 localStorage 读取设置
   useEffect(() => {
+    if (!isHydrated) return;
+    
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (!stored) {
+        return;
+      }
+
+      const parsed = JSON.parse(stored) as Partial<Settings>;
+      const normalized = normalizeSettings(parsed, initialSettings);
+
+      setSettings((prev) => {
+        const next = {
+          ...normalized,
+          searchQuery: prev.searchQuery,
+        };
+
+        if (
+          prev.theme === next.theme &&
+          prev.layout === next.layout &&
+          prev.animations === next.animations &&
+          prev.showSearch === next.showSearch
+        ) {
+          return prev;
+        }
+
+        return next;
+      });
+    } catch {
+      // Ignore parse errors
+    }
+  }, [isHydrated, initialSettings]);
+
+  useEffect(() => {
+    if (
+      lastAppliedThemeRef.current === settings.theme &&
+      document.documentElement.dataset.theme === settings.theme
+    ) {
+      return;
+    }
+
     applyTheme(settings.theme);
+    lastAppliedThemeRef.current = settings.theme;
   }, [settings.theme]);
 
   // Persist to localStorage on changes
   useEffect(() => {
-    if (!isHydrated) return;
-    
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
     } catch {
       // Ignore storage errors
     }
-  }, [settings, isHydrated]);
+  }, [settings]);
 
   // Cross-tab synchronization
   useEffect(() => {
@@ -107,7 +196,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       try {
         if (e.newValue) {
           const newSettings = JSON.parse(e.newValue) as Partial<Settings>;
-          setSettings(normalizeSettings(newSettings));
+          setSettings((prev) => ({
+            ...normalizeSettings(newSettings, initialSettings),
+            searchQuery: prev.searchQuery,
+          }));
         }
       } catch {
         // Ignore parse errors
@@ -116,10 +208,12 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  }, [initialSettings]);
 
   const setTheme = useCallback((theme: Settings['theme']) => {
-    setSettings(prev => ({ ...prev, theme }));
+    lastAppliedThemeRef.current = theme;
+    applyTheme(theme);
+    setSettings(prev => (prev.theme === theme ? prev : { ...prev, theme }));
   }, []);
 
   const setLayout = useCallback((layout: 'grid' | 'list') => {

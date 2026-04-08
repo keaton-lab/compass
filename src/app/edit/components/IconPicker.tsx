@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { Dialog, ScrollArea, Tabs } from 'radix-ui';
 import { Search, X } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface BrandIcon {
   name: string;
@@ -52,174 +53,241 @@ export default function IconPicker({ value, onChange, onClose }: IconPickerProps
   const [tab, setTab] = useState<'lucide' | 'brand'>('lucide');
   const [lucideIconNames, setLucideIconNames] = useState<string[]>([]);
   const [brandIcons, setBrandIcons] = useState<BrandIcon[]>([]);
-  const [visibleCount, setVisibleCount] = useState(100);
+  const [visibleCount, setVisibleCount] = useState(120);
   const [loading, setLoading] = useState(true);
   const loadedRef = useRef<{ lucide: boolean; brand: boolean }>({ lucide: false, brand: false });
 
   useEffect(() => {
+    let cancelled = false;
+
+    setLoading(true);
     loadLucideIconNames().then((names) => {
+      if (cancelled) return;
       setLucideIconNames(names);
       loadedRef.current.lucide = true;
+      setLoading(false);
     });
-    loadBrandIcons().then((icons) => {
-      setBrandIcons(icons);
-      loadedRef.current.brand = true;
-    });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
-    if (tab === 'lucide' && !loadedRef.current.lucide) {
-      setLoading(true);
-      loadLucideIconNames().then((names) => {
-        setLucideIconNames(names);
-        loadedRef.current.lucide = true;
-        setLoading(false);
-      });
-    } else if (tab === 'brand' && !loadedRef.current.brand) {
+    let cancelled = false;
+
+    if (tab === 'brand' && !loadedRef.current.brand) {
       setLoading(true);
       loadBrandIcons().then((icons) => {
+        if (cancelled) return;
         setBrandIcons(icons);
         loadedRef.current.brand = true;
         setLoading(false);
       });
+    } else {
+      setLoading(false);
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, [tab]);
 
   const filteredLucideIcons = useMemo(() => {
     if (!search.trim()) return lucideIconNames;
-    const s = search.toLowerCase();
-    return lucideIconNames.filter((name) => name.toLowerCase().includes(s));
-  }, [search, lucideIconNames]);
+    const normalizedSearch = search.toLowerCase();
+    return lucideIconNames.filter((name) => name.toLowerCase().includes(normalizedSearch));
+  }, [lucideIconNames, search]);
 
   const filteredBrandIcons = useMemo(() => {
     if (!brandIcons.length) return [];
     if (!search.trim()) return brandIcons;
-    const s = search.toLowerCase();
+    const normalizedSearch = search.toLowerCase();
     return brandIcons.filter(
-      (icon) => icon.name.toLowerCase().includes(s) || icon.slug.toLowerCase().includes(s)
+      (icon) => icon.name.toLowerCase().includes(normalizedSearch) || icon.slug.toLowerCase().includes(normalizedSearch)
     );
-  }, [search, brandIcons]);
+  }, [brandIcons, search]);
 
   useEffect(() => {
-    setVisibleCount(100);
+    setVisibleCount(120);
   }, [search, tab]);
 
-  const handleSelect = (name: string) => {
-    onChange(name);
-    onClose();
-  };
-
-  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-    if (scrollHeight - scrollTop - clientHeight < 200) {
-      const currentList = tab === 'lucide' ? filteredLucideIcons : filteredBrandIcons;
-      if (visibleCount < currentList.length) {
-        setVisibleCount((prev) => Math.min(prev + 100, currentList.length));
+  const handleScroll = useCallback((event: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
+    if (scrollHeight - scrollTop - clientHeight < 220) {
+      const currentLength = tab === 'lucide' ? filteredLucideIcons.length : filteredBrandIcons.length;
+      if (visibleCount < currentLength) {
+        setVisibleCount((previous) => Math.min(previous + 120, currentLength));
       }
     }
-  }, [tab, filteredLucideIcons, filteredBrandIcons, visibleCount]);
+  }, [filteredBrandIcons.length, filteredLucideIcons.length, tab, visibleCount]);
 
   const visibleLucideIcons = filteredLucideIcons.slice(0, visibleCount);
   const visibleBrandIcons = filteredBrandIcons.slice(0, visibleCount);
 
+  function handleSelect(icon: string) {
+    onChange(icon);
+    onClose();
+  }
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
-      <div
-        className="w-full max-w-4xl bg-[var(--panel-strong)] border border-[var(--panel-border)] rounded-2xl overflow-hidden shadow-2xl max-h-[85vh] flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between p-5 border-b border-[var(--panel-border)] shrink-0">
-          <h3 className="text-lg font-semibold text-[var(--foreground)]">选择图标</h3>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-[var(--muted)]/20 transition-colors">
-            <X className="w-5 h-5 text-[var(--muted)]" />
-          </button>
-        </div>
-
-        <div className="p-4 shrink-0">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--muted)]" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="搜索图标名称..."
-              autoFocus
-              className="w-full pl-11 pr-4 py-3 text-sm rounded-xl bg-[var(--background)] border border-[var(--panel-border)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-[var(--foreground)] placeholder:text-[var(--muted)]"
-            />
-          </div>
-        </div>
-
-        <div className="flex gap-2 px-4 shrink-0">
-          <button
-            onClick={() => setTab('lucide')}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-              tab === 'lucide' ? 'bg-[var(--accent)]/20 text-[var(--accent)]' : 'text-[var(--muted)] hover:text-[var(--foreground)]'
-            }`}
-          >
-            Lucide ({filteredLucideIcons.length})
-          </button>
-          <button
-            onClick={() => setTab('brand')}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-              tab === 'brand' ? 'bg-[var(--accent)]/20 text-[var(--accent)]' : 'text-[var(--muted)] hover:text-[var(--foreground)]'
-            }`}
-          >
-            品牌 ({filteredBrandIcons.length})
-          </button>
-        </div>
-
-        <div className="flex-1 min-h-0 overflow-y-auto p-4" onScroll={handleScroll}>
-          {tab === 'lucide' ? (
-            loading && lucideIconNames.length === 0 ? (
-              <p className="text-center text-sm text-[var(--muted)] py-12">加载图标中...</p>
-            ) : filteredLucideIcons.length === 0 ? (
-              <p className="text-center text-sm text-[var(--muted)] py-12">未找到匹配的图标</p>
-            ) : (
-              <LucideIconGrid icons={visibleLucideIcons} value={value} onSelect={handleSelect} />
-            )
-          ) : loading && brandIcons.length === 0 ? (
-            <p className="text-center text-sm text-[var(--muted)] py-12">加载品牌图标中...</p>
-          ) : filteredBrandIcons.length === 0 ? (
-            <p className="text-center text-sm text-[var(--muted)] py-12">未找到匹配的图标</p>
-          ) : (
-            <BrandIconGrid icons={visibleBrandIcons} value={value} onSelect={handleSelect} />
-          )}
-          {(tab === 'lucide' && visibleLucideIcons.length < filteredLucideIcons.length) ||
-           (tab === 'brand' && visibleBrandIcons.length < filteredBrandIcons.length) ? (
-            <div className="col-span-full text-center py-4 text-sm text-[var(--muted)]">
-              加载更多...
+    <Dialog.Root open onOpenChange={(open) => {
+      if (!open) {
+        onClose();
+      }
+    }}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--background)]/72" />
+        <Dialog.Content className="fixed inset-x-4 top-[6vh] z-[51] mx-auto flex max-h-[88vh] w-auto max-w-5xl flex-col overflow-hidden rounded-[24px] border bg-[var(--panel-strong)] outline-none" style={{ borderColor: 'var(--panel-border)' }}>
+          <div className="flex items-center justify-between border-b px-6 py-5" style={{ borderColor: 'var(--panel-border)' }}>
+            <div>
+              <Dialog.Title className="text-xl font-semibold text-[var(--text-primary)]">选择图标</Dialog.Title>
+              <Dialog.Description className="mt-1 text-sm text-[var(--muted)]">
+                扁平化图标选择器，支持 Lucide 和品牌图标。
+              </Dialog.Description>
             </div>
-          ) : null}
-        </div>
+            <Dialog.Close asChild>
+              <button
+                type="button"
+                className="flex h-10 w-10 items-center justify-center rounded-[14px] border bg-[var(--background)] text-[var(--muted)] transition-colors hover:bg-[var(--bg-secondary)]"
+                style={{ borderColor: 'var(--panel-border)' }}
+              >
+                <X size={18} />
+              </button>
+            </Dialog.Close>
+          </div>
 
-        <div className="px-4 pb-4 shrink-0 border-t border-[var(--panel-border)] pt-3">
-          <p className="text-sm text-[var(--muted)]">
-            当前选中: <code className="bg-[var(--muted)]/20 px-2 py-1 rounded">{value}</code>
-          </p>
-        </div>
-      </div>
-    </div>
+          <Tabs.Root value={tab} onValueChange={(nextTab) => setTab(nextTab as 'lucide' | 'brand')} className="flex min-h-0 flex-1 flex-col">
+            <div className="border-b px-6 py-4" style={{ borderColor: 'var(--panel-border)' }}>
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="搜索图标名称..."
+                  autoFocus
+                  className="w-full rounded-[18px] border bg-[var(--background)] px-11 py-3 text-sm text-[var(--foreground)] outline-none transition-colors placeholder:text-[var(--muted)] focus:border-[var(--accent-border)]"
+                  style={{ borderColor: 'var(--panel-border)' }}
+                />
+              </div>
+
+              <Tabs.List className="mt-4 inline-flex rounded-[18px] border bg-[var(--background)] p-1" style={{ borderColor: 'var(--panel-border)' }}>
+                <Tabs.Trigger
+                  value="lucide"
+                  className="rounded-[14px] px-4 py-2 text-sm font-medium text-[var(--muted)] outline-none transition-colors data-[state=active]:bg-[var(--accent-alpha)] data-[state=active]:text-[var(--foreground)]"
+                >
+                  Lucide ({filteredLucideIcons.length})
+                </Tabs.Trigger>
+                <Tabs.Trigger
+                  value="brand"
+                  className="rounded-[14px] px-4 py-2 text-sm font-medium text-[var(--muted)] outline-none transition-colors data-[state=active]:bg-[var(--accent-alpha)] data-[state=active]:text-[var(--foreground)]"
+                >
+                  品牌 ({filteredBrandIcons.length})
+                </Tabs.Trigger>
+              </Tabs.List>
+            </div>
+
+            <Tabs.Content value="lucide" className="min-h-0 flex-1 outline-none">
+              <PickerPanel
+                loading={loading && lucideIconNames.length === 0}
+                empty={filteredLucideIcons.length === 0}
+                emptyLabel="未找到匹配的图标"
+                onScroll={handleScroll}
+              >
+                <LucideIconGrid icons={visibleLucideIcons} value={value} onSelect={handleSelect} />
+                {visibleLucideIcons.length < filteredLucideIcons.length && (
+                  <FooterHint label="继续滚动以加载更多 Lucide 图标" />
+                )}
+              </PickerPanel>
+            </Tabs.Content>
+
+            <Tabs.Content value="brand" className="min-h-0 flex-1 outline-none">
+              <PickerPanel
+                loading={loading && brandIcons.length === 0}
+                empty={filteredBrandIcons.length === 0}
+                emptyLabel="未找到匹配的品牌图标"
+                onScroll={handleScroll}
+              >
+                <BrandIconGrid icons={visibleBrandIcons} value={value} onSelect={handleSelect} />
+                {visibleBrandIcons.length < filteredBrandIcons.length && (
+                  <FooterHint label="继续滚动以加载更多品牌图标" />
+                )}
+              </PickerPanel>
+            </Tabs.Content>
+          </Tabs.Root>
+
+          <div className="border-t px-6 py-4 text-sm text-[var(--muted)]" style={{ borderColor: 'var(--panel-border)' }}>
+            当前选中: <code className="rounded-[10px] bg-[var(--background)] px-2 py-1 text-[var(--text-primary)]">{value}</code>
+          </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
+}
+
+function PickerPanel({
+  loading,
+  empty,
+  emptyLabel,
+  onScroll,
+  children,
+}: {
+  loading: boolean;
+  empty: boolean;
+  emptyLabel: string;
+  onScroll: (event: React.UIEvent<HTMLDivElement>) => void;
+  children: React.ReactNode;
+}) {
+  if (loading) {
+    return <p className="p-10 text-center text-sm text-[var(--muted)]">加载中...</p>;
+  }
+
+  if (empty) {
+    return <p className="p-10 text-center text-sm text-[var(--muted)]">{emptyLabel}</p>;
+  }
+
+  return (
+    <ScrollArea.Root className="min-h-0 flex-1">
+      <ScrollArea.Viewport className="h-full w-full px-6 py-5" onScroll={onScroll}>
+        {children}
+      </ScrollArea.Viewport>
+      <ScrollArea.Scrollbar orientation="vertical" className="flex w-3 touch-none p-0.5">
+        <ScrollArea.Thumb className="relative flex-1 rounded-full bg-[var(--panel-border)]" />
+      </ScrollArea.Scrollbar>
+    </ScrollArea.Root>
+  );
+}
+
+function FooterHint({ label }: { label: string }) {
+  return <div className="pt-4 text-center text-sm text-[var(--muted)]">{label}</div>;
 }
 
 function LucideIconGrid({ icons, value, onSelect }: { icons: string[]; value: string; onSelect: (name: string) => void }) {
   return (
-    <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2">
+    <div className="grid grid-cols-5 gap-3 sm:grid-cols-7 md:grid-cols-9 lg:grid-cols-10">
       {icons.map((iconName) => {
         const isSelected = value === iconName;
+
         return (
           <button
             key={iconName}
+            type="button"
             onClick={() => onSelect(iconName)}
-            className={`flex flex-col items-center justify-center gap-1 p-2 rounded-lg text-xs transition-all ${
-              isSelected ? 'bg-[var(--accent)]/20 ring-2 ring-[var(--accent)]' : 'hover:bg-[var(--muted)]/10'
+            className={`rounded-[16px] border px-2 py-3 text-xs transition-colors ${
+              isSelected
+                ? 'bg-[var(--accent-alpha)] text-[var(--foreground)]'
+                : 'bg-[var(--background)] text-[var(--muted)] hover:bg-[var(--bg-secondary)]'
             }`}
+            style={{ borderColor: isSelected ? 'var(--accent-border)' : 'var(--panel-border)' }}
             title={iconName}
           >
-            <LucideIcon name={iconName} size={22} />
-            <span className="text-[var(--muted)] truncate w-full text-center" style={{ fontSize: '9px' }}>
-              {iconName.length > 10 ? iconName.slice(0, 9) + '…' : iconName}
-            </span>
+            <div className="mb-2 flex justify-center">
+              <LucideIcon name={iconName} size={20} />
+            </div>
+            <div className="truncate text-center">
+              {iconName.length > 10 ? `${iconName.slice(0, 9)}…` : iconName}
+            </div>
           </button>
         );
       })}
@@ -229,24 +297,31 @@ function LucideIconGrid({ icons, value, onSelect }: { icons: string[]; value: st
 
 function BrandIconGrid({ icons, value, onSelect }: { icons: BrandIcon[]; value: string; onSelect: (name: string) => void }) {
   return (
-    <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2">
+    <div className="grid grid-cols-5 gap-3 sm:grid-cols-7 md:grid-cols-9 lg:grid-cols-10">
       {icons.map((icon) => {
         const isSelected = value === icon.slug;
+
         return (
           <button
             key={icon.slug}
+            type="button"
             onClick={() => onSelect(icon.slug)}
-            className={`flex flex-col items-center justify-center gap-1 p-2 rounded-lg text-xs transition-all ${
-              isSelected ? 'bg-[var(--accent)]/20 ring-2 ring-[var(--accent)]' : 'hover:bg-[var(--muted)]/10'
+            className={`rounded-[16px] border px-2 py-3 text-xs transition-colors ${
+              isSelected
+                ? 'bg-[var(--accent-alpha)] text-[var(--foreground)]'
+                : 'bg-[var(--background)] text-[var(--muted)] hover:bg-[var(--bg-secondary)]'
             }`}
+            style={{ borderColor: isSelected ? 'var(--accent-border)' : 'var(--panel-border)' }}
             title={icon.name}
           >
-            <svg viewBox="0 0 24 24" width="22" height="22" style={{ fill: '#000' }}>
-              <path d={icon.path} />
-            </svg>
-            <span className="text-[var(--muted)] truncate w-full text-center" style={{ fontSize: '9px' }}>
-              {icon.name.length > 10 ? icon.name.slice(0, 9) + '…' : icon.name}
-            </span>
+            <div className="mb-2 flex justify-center">
+              <svg viewBox="0 0 24 24" width="20" height="20" style={{ fill: 'currentColor' }}>
+                <path d={icon.path} />
+              </svg>
+            </div>
+            <div className="truncate text-center">
+              {icon.name.length > 10 ? `${icon.name.slice(0, 9)}…` : icon.name}
+            </div>
           </button>
         );
       })}
@@ -267,5 +342,6 @@ function LucideIcon({ name, size }: { name: string; size: number }) {
   if (!IconComponent) {
     return <span className="text-xs text-[var(--muted)]">{name.charAt(0)}</span>;
   }
+
   return <IconComponent size={size} />;
 }
