@@ -10,8 +10,31 @@ function ThemeIcon({ id, size = 18, className = '' }: { id: string; size?: numbe
   return <Palette size={size} className={className} />;
 }
 
-function getThemeIconStyles(themeId: string) {
-  switch (themeId) {
+function CurrentThemeIcon({ size = 18 }: { size?: number }) {
+  return (
+    <span
+      className="relative block shrink-0"
+      style={{ width: size, height: size }}
+      aria-hidden="true"
+    >
+      <Sun
+        size={size}
+        className="theme-toggle-current-icon theme-toggle-current-icon-light absolute inset-0 text-[#d97706]"
+      />
+      <Moon
+        size={size}
+        className="theme-toggle-current-icon theme-toggle-current-icon-dark absolute inset-0 text-[#c9a45c]"
+      />
+      <Palette
+        size={size}
+        className="theme-toggle-current-icon theme-toggle-current-icon-ocean absolute inset-0 text-[#4aa6c8]"
+      />
+    </span>
+  );
+}
+
+function getThemeIconStyles(domThemeId: string) {
+  switch (domThemeId) {
     case 'light':
       return {
         wrapper: 'bg-[#f3f4f6]',
@@ -41,7 +64,7 @@ interface ThemeToggleProps {
 }
 
 export default function ThemeToggle({ compact = false, mobileOnly = false }: ThemeToggleProps) {
-  const { theme, availableThemes, setTheme } = useSettings();
+  const { availableThemes, setTheme, theme } = useSettings();
 
   function renderThemeOption(optionId: string, label: string, iconSize: number) {
     const isActive = optionId === theme;
@@ -68,7 +91,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border bg-[var(--panel-strong)] text-[var(--muted)] transition-colors duration-200 hover:border-[var(--accent-border)] md:hidden"
             style={{ borderColor: 'var(--panel-border)' }}
           >
-            <ThemeIcon id={theme} size={18} className={getThemeIconStyles(theme).icon} />
+            <CurrentThemeIcon size={18} />
           </button>
         </Dialog.Trigger>
 
@@ -127,7 +150,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
             className="flex h-9 w-9 items-center justify-center rounded-lg border bg-[var(--panel-strong)] text-[var(--muted)] transition-colors duration-200 hover:border-[var(--accent-border)]"
             style={{ borderColor: 'var(--panel-border)' }}
           >
-            <ThemeIcon id={theme} size={18} className={getThemeIconStyles(theme).icon} />
+            <CurrentThemeIcon size={18} />
           </button>
         </DropdownMenu.Trigger>
 
@@ -141,7 +164,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
             <div className="px-2 pb-2 pt-1 text-xs font-medium text-[var(--muted)]">
               选择主题
             </div>
-            <DropdownMenu.RadioGroup value={theme} onValueChange={(value) => setTheme(value as typeof theme)}>
+            <DropdownMenu.RadioGroup value={theme} onValueChange={(value) => setTheme(value as 'dark' | 'light' | 'ocean')}>
               {availableThemes.map((option) => {
                 const isActive = option.id === theme;
 

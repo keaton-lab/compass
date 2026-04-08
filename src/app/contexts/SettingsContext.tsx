@@ -106,10 +106,6 @@ function getMergedDefaultSettings(initialSettings?: Partial<Settings>): Settings
   return normalizeSettings(initialSettings ?? {}, initialSettings);
 }
 
-function getInitialSettings(initialSettings?: Partial<Settings>): Settings {
-  return getMergedDefaultSettings(initialSettings);
-}
-
 export function SettingsProvider({
   children,
   initialSettings,
@@ -118,7 +114,7 @@ export function SettingsProvider({
   initialSettings?: Partial<Settings>;
 }) {
   const [settings, setSettings] = useState<Settings>(() => ({
-    ...getInitialSettings(initialSettings),
+    ...getMergedDefaultSettings(initialSettings),
     searchQuery: '',
   }));
   const [isHydrated, setIsHydrated] = useState(false);
@@ -148,9 +144,13 @@ export function SettingsProvider({
     return () => observer.disconnect();
   }, []);
 
-  // 标记客户端水合完成
+  // 标记客户端水合完成，并从 DOM 同步主题
   useEffect(() => {
     setIsHydrated(true);
+    const domTheme = document.documentElement.dataset.theme;
+    if (domTheme && isThemeId(domTheme)) {
+      setSettings(prev => prev.theme === domTheme ? prev : { ...prev, theme: domTheme });
+    }
   }, []);
 
   // 水合完成后从 localStorage 读取设置
@@ -160,11 +160,11 @@ export function SettingsProvider({
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (!stored) {
+        setHasRestoredSettings(true);
         return;
       }
 
       const parsed = JSON.parse(stored) as Partial<Settings>;
-      // 直接使用存储的设置，只验证 theme 是否有效
       const validTheme = typeof parsed.theme === 'string' && isThemeId(parsed.theme) 
         ? parsed.theme 
         : defaultThemeId;
