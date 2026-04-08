@@ -121,7 +121,14 @@ html.theme-preload *::after {
 html.theme-switching body,
 html.theme-switching body::before,
 html.theme-switching .glass-panel,
-html.theme-switching .glass-panel-strong {
+html.theme-switching .glass-panel-strong,
+html.theme-switching header,
+html.theme-switching main,
+html.theme-switching footer,
+html.theme-switching [class*="rounded"],
+html.theme-switching [class*="border"],
+html.theme-switching [class*="bg-"],
+html.theme-switching [class*="text-"] {
   transition-property: background-color, border-color, color;
   transition-duration: var(--theme-transition-duration);
   transition-timing-function: var(--theme-transition-easing);

@@ -12,6 +12,16 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        panel: "var(--panel)",
+        "panel-strong": "var(--panel-strong)",
+        "panel-border": "var(--panel-border)",
+        muted: "var(--muted)",
+        "text-primary": "var(--text-primary)",
+        "text-secondary": "var(--text-secondary)",
+        "bg-secondary": "var(--bg-secondary)",
+        accent: "var(--accent)",
+        "accent-alpha": "var(--accent-alpha)",
+        "accent-border": "var(--accent-border)",
       },
       screens: {
         'xsm': '390px',
