@@ -10,9 +10,9 @@ interface CategorySectionProps {
 
 export default function CategorySection({ category, layout, animations }: CategorySectionProps) {
   const gridColumnsClass = layout === 'grid'
-    ? 'grid-cols-2 xsm:grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
+    ? 'grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
     : 'grid-cols-1';
-  const gapClass = layout === 'list' ? 'gap-3' : 'gap-3';
+  const gapClass = layout === 'list' ? 'gap-3' : 'gap-2.5 xsm:gap-3';
 
   return (
     <section className="content-auto">

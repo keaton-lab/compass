@@ -1,6 +1,6 @@
 'use client';
 
-import { Dialog, ScrollArea, Tabs } from 'radix-ui';
+import { Dialog, Tabs } from 'radix-ui';
 import { Search, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -61,10 +61,16 @@ export default function IconPicker({ value, onChange, onClose }: IconPickerProps
     let cancelled = false;
 
     setLoading(true);
-    loadLucideIconNames().then((names) => {
+    
+    Promise.all([
+      loadLucideIconNames(),
+      loadBrandIcons(),
+    ]).then(([names, icons]) => {
       if (cancelled) return;
       setLucideIconNames(names);
+      setBrandIcons(icons);
       loadedRef.current.lucide = true;
+      loadedRef.current.brand = true;
       setLoading(false);
     });
 
@@ -72,26 +78,6 @@ export default function IconPicker({ value, onChange, onClose }: IconPickerProps
       cancelled = true;
     };
   }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    if (tab === 'brand' && !loadedRef.current.brand) {
-      setLoading(true);
-      loadBrandIcons().then((icons) => {
-        if (cancelled) return;
-        setBrandIcons(icons);
-        loadedRef.current.brand = true;
-        setLoading(false);
-      });
-    } else {
-      setLoading(false);
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [tab]);
 
   const filteredLucideIcons = useMemo(() => {
     if (!search.trim()) return lucideIconNames;
@@ -137,8 +123,8 @@ export default function IconPicker({ value, onChange, onClose }: IconPickerProps
       }
     }}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--background)]/72" />
-        <Dialog.Content className="fixed inset-x-4 top-[6vh] z-[51] mx-auto flex max-h-[88vh] w-auto max-w-5xl flex-col overflow-hidden rounded-[24px] border bg-[var(--panel-strong)] outline-none" style={{ borderColor: 'var(--panel-border)' }}>
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--background)]/72 backdrop-blur-sm" />
+        <Dialog.Content className="fixed inset-x-4 top-[6vh] bottom-[6vh] z-[51] mx-auto flex max-w-5xl flex-col overflow-hidden rounded-[24px] border bg-[var(--panel-strong)] outline-none" style={{ borderColor: 'var(--panel-border)' }}>
           <div className="flex items-center justify-between border-b px-6 py-5" style={{ borderColor: 'var(--panel-border)' }}>
             <div>
               <Dialog.Title className="text-xl font-semibold text-[var(--text-primary)]">选择图标</Dialog.Title>
@@ -177,18 +163,21 @@ export default function IconPicker({ value, onChange, onClose }: IconPickerProps
                   value="lucide"
                   className="rounded-[14px] px-4 py-2 text-sm font-medium text-[var(--muted)] outline-none transition-colors data-[state=active]:bg-[var(--accent-alpha)] data-[state=active]:text-[var(--foreground)]"
                 >
-                  Lucide ({filteredLucideIcons.length})
+                  通用图标 ({filteredLucideIcons.length})
                 </Tabs.Trigger>
                 <Tabs.Trigger
                   value="brand"
                   className="rounded-[14px] px-4 py-2 text-sm font-medium text-[var(--muted)] outline-none transition-colors data-[state=active]:bg-[var(--accent-alpha)] data-[state=active]:text-[var(--foreground)]"
                 >
-                  品牌 ({filteredBrandIcons.length})
+                  品牌图标 ({filteredBrandIcons.length})
                 </Tabs.Trigger>
               </Tabs.List>
             </div>
 
-            <Tabs.Content value="lucide" className="min-h-0 flex-1 outline-none">
+            <Tabs.Content
+              value="lucide"
+              className="flex min-h-0 flex-1 flex-col overflow-hidden outline-none data-[state=inactive]:hidden"
+            >
               <PickerPanel
                 loading={loading && lucideIconNames.length === 0}
                 empty={filteredLucideIcons.length === 0}
@@ -202,7 +191,10 @@ export default function IconPicker({ value, onChange, onClose }: IconPickerProps
               </PickerPanel>
             </Tabs.Content>
 
-            <Tabs.Content value="brand" className="min-h-0 flex-1 outline-none">
+            <Tabs.Content
+              value="brand"
+              className="flex min-h-0 flex-1 flex-col overflow-hidden outline-none data-[state=inactive]:hidden"
+            >
               <PickerPanel
                 loading={loading && brandIcons.length === 0}
                 empty={filteredBrandIcons.length === 0}
@@ -248,14 +240,12 @@ function PickerPanel({
   }
 
   return (
-    <ScrollArea.Root className="min-h-0 flex-1">
-      <ScrollArea.Viewport className="h-full w-full px-6 py-5" onScroll={onScroll}>
-        {children}
-      </ScrollArea.Viewport>
-      <ScrollArea.Scrollbar orientation="vertical" className="flex w-3 touch-none p-0.5">
-        <ScrollArea.Thumb className="relative flex-1 rounded-full bg-[var(--panel-border)]" />
-      </ScrollArea.Scrollbar>
-    </ScrollArea.Root>
+    <div
+      className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-5 [scrollbar-gutter:stable] [-webkit-overflow-scrolling:touch]"
+      onScroll={onScroll}
+    >
+      {children}
+    </div>
   );
 }
 

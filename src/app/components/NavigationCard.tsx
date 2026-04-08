@@ -26,12 +26,12 @@ export default function NavigationCard({ link, color, animations }: NavigationCa
       href={link.url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group relative flex min-h-[72px] cursor-pointer flex-col overflow-hidden rounded-lg border bg-[var(--panel)] p-3 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-border)] md:min-h-[68px] md:flex-row md:items-center md:gap-3 ${cardClassName}`}
+      className={`group relative flex min-h-[64px] cursor-pointer flex-col overflow-hidden rounded-lg border bg-[var(--panel)] p-2.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-border)] xsm:min-h-[72px] xsm:p-3 md:min-h-[68px] md:flex-row md:items-center md:gap-3 ${cardClassName}`}
       style={{ borderColor: 'var(--panel-border)' }}
     >
       {/* 左侧图标 */}
       <div
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border xsm:h-9 xsm:w-9"
         style={{
           backgroundColor: `${color}15`,
           borderColor: `${color}30`,
@@ -46,17 +46,17 @@ export default function NavigationCard({ link, color, animations }: NavigationCa
       </div>
 
       {/* 中间内容 */}
-      <div className="mt-2 min-w-0 flex-1 md:mt-0">
-        <h3 className={`truncate text-sm font-medium text-[var(--text-primary)] ${titleClassName}`}>
+      <div className="mt-1.5 min-w-0 flex-1 xsm:mt-2 md:mt-0">
+        <h3 className={`truncate text-[13px] font-medium leading-4 text-[var(--text-primary)] xsm:text-sm ${titleClassName}`}>
           {link.name}
         </h3>
-        <p className="mt-0.5 max-w-[24ch] truncate text-xs text-[var(--muted)]">
+        <p className="mt-0.5 max-w-full truncate text-[11px] leading-4 text-[var(--muted)] xsm:max-w-[24ch] xsm:text-xs">
           {link.description}
         </p>
       </div>
 
       {/* 右侧箭头 */}
-      <div className={`absolute right-2.5 top-2.5 text-[var(--muted)] md:static md:ml-auto md:flex-none ${arrowClassName}`}>
+      <div className={`absolute right-2 top-2 text-[var(--muted)] xsm:right-2.5 xsm:top-2.5 md:static md:ml-auto md:flex-none ${arrowClassName}`}>
         <svg
           width="12"
           height="12"

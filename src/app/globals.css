@@ -134,6 +134,17 @@ html.theme-switching [class*="text-"] {
   transition-timing-function: var(--theme-transition-easing);
 }
 
+.theme-toggle-current-icon {
+  opacity: 0;
+  transition: opacity 120ms ease-out;
+}
+
+html[data-theme='light'] .theme-toggle-current-icon-light,
+html[data-theme='dark'] .theme-toggle-current-icon-dark,
+html[data-theme='ocean'] .theme-toggle-current-icon-ocean {
+  opacity: 1;
+}
+
 ::selection {
   background: var(--accent-alpha);
   color: var(--accent);
