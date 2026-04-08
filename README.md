@@ -31,7 +31,7 @@
 <p>
   <a href="https://vercel.com/new/clone?repository-url=https://github.com/imzhoukunqiang/compass"><img src="https://vercel.com/button" alt="Deploy with Vercel"></a>
 
-  <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/imzhoukunqiang/compass"><img src="https://deploy.workers.cloudflare.com/button.svg" alt="Deploy to Cloudflare Pages"></a>
+  <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/imzhoukunqiang/compass"><img src="https://deploy.workers.cloudflare.com/button.svg" alt="Deploy to Cloudflare"></a>
   
   <a href="https://app.netlify.com/start/deploy?repository=https://github.com/imzhoukunqiang/compass"><img src="https://www.netlify.com/img/deploy/button.svg" alt="Deploy to Netlify"></a>
 </p>
@@ -54,7 +54,7 @@
 
 | 平台 | 说明 |
 |------|------|
-| **Cloudflare Pages** | 构建命令 `npm run build`，输出目录 `out` |
+| **Cloudflare Pages** | 使用 `pages_build_output_dir = "out"`，不要在 `wrangler.toml` 中添加 Workers 专用的 `[assets]` |
 | **Vercel** | Next.js 原生支持，零配置 |
 | **Netlify** | 构建命令 `npm run build`，发布目录 `out` |
 

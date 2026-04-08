@@ -68,12 +68,12 @@ export function ProfileHeaderDesktopLeft({ profile }: { profile: Profile }) {
   const { name, avatar, description, bio } = profile;
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-4">
       <div className="shrink-0">
-        <ProfileAvatar name={name} avatar={avatar} sizeClass="h-12 w-12" iconSize={24} textSizeClass="text-lg" />
+        <ProfileAvatar name={name} avatar={avatar} sizeClass="h-14 w-14" iconSize={28} textSizeClass="text-xl" />
       </div>
       <div className="min-w-0 flex-1">
-        <h1 className="truncate text-lg font-semibold text-[var(--text-primary)]">{name}</h1>
+        <h1 className="truncate text-xl font-semibold text-[var(--text-primary)]">{name}</h1>
         <p className="truncate text-sm text-[var(--text-secondary)]">{description}</p>
         {bio && <p className="truncate text-xs text-[var(--muted)]">{bio}</p>}
       </div>

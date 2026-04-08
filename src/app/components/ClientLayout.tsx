@@ -75,7 +75,7 @@ export default function ClientLayout({
 
           {/* 桌面端头部 */}
           <div className="hidden w-full items-center justify-between md:flex">
-            <div className="rounded-lg border bg-[var(--panel)] px-5 py-3" style={{ borderColor: 'var(--panel-border)' }}>
+            <div className="rounded-xl border bg-[var(--panel)] px-6 py-4 shadow-sm" style={{ borderColor: 'var(--panel-border)' }}>
               <ProfileHeaderDesktopLeft profile={profile} />
             </div>
             <div className="flex items-center gap-3">
