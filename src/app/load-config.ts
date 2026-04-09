@@ -1,20 +1,41 @@
 import 'server-only';
 
-import fs from 'fs';
-import path from 'path';
-import { cache } from 'react';
-import { load as yamlLoad } from 'js-yaml';
+import { unstable_noStore as noStore } from 'next/cache';
 import type { Config } from './types';
 import { defaultThemeId, isThemeId } from './themes';
+import configStore from '../server/config-store';
+import runtime from '../server/runtime';
 
-const CONFIG_PATH = path.join(process.cwd(), 'src', 'config.yaml');
+const { loadConfigFile, resolveConfigPath } = configStore as {
+  loadConfigFile: () => Config;
+  resolveConfigPath: () => string;
+};
+const { canSaveToServer, isServerBuild } = runtime as {
+  canSaveToServer: () => boolean;
+  isServerBuild: () => boolean;
+};
 
-export const loadConfig = cache(function loadConfig(): Config {
-  const fileContents = fs.readFileSync(CONFIG_PATH, 'utf8');
-  return yamlLoad(fileContents) as Config;
-});
+export interface EditCapabilities {
+  canSaveToServer: boolean;
+  configPath: string;
+}
 
-export const loadInitialTheme = cache(function loadInitialTheme() {
+export function loadConfig(): Config {
+  if (isServerBuild()) {
+    noStore();
+  }
+
+  return loadConfigFile();
+}
+
+export function loadInitialTheme() {
   const theme = loadConfig().settings?.theme;
   return typeof theme === 'string' && isThemeId(theme) ? theme : defaultThemeId;
-});
+}
+
+export function loadEditCapabilities(): EditCapabilities {
+  return {
+    canSaveToServer: canSaveToServer(),
+    configPath: resolveConfigPath(),
+  };
+}

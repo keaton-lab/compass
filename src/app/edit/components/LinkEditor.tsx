@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import type { Link as LinkType } from '../../types';
 import LazyIconPicker from './LazyIconPicker';
-import DynamicIcon from './DynamicIcon';
+import Icon from '../../components/Icon';
 import DeleteConfirmButton from './DeleteConfirmButton';
 import { validateLinkName, validateLinkUrl } from '../utils/validators';
 
@@ -93,7 +93,7 @@ export default function LinkEditor({
               style={{ borderColor: 'var(--panel-border)' }}
               title="点击更换图标"
             >
-              <DynamicIcon name={link.icon} size={18} />
+              <Icon name={link.icon} size={18} />
               <span className="max-w-[100px] truncate text-xs">{link.icon}</span>
             </button>
             <input

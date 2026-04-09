@@ -20,8 +20,8 @@
 ## 特性
 
 - **YAML 配置** — 所有内容集中在 `src/config.yaml`，改完即生效
-- **零数据库** — 纯静态站点，不依赖任何后端服务
-- **3000+ 图标** — Lucide + Simple Icons 自动按需生成，无需手动管理
+- **零数据库** — 纯静态站点，不依赖任何后端服务；server 模式直接读写挂载文件
+- **运行时图标** — Lucide + Simple Icons 运行时解析，新增图标不用改代码
 - **三套主题** — Light / Dark / Ocean，玻璃拟态 UI
 - **内置编辑器** — 访问 `/edit` 直接在浏览器中修改配置
 - **搜索** — 实时过滤
@@ -66,7 +66,9 @@ cd compass && npm install
 npm run dev
 ```
 
-打开 `http://localhost:3000`，开发服务器会监听 `config.yaml` 变更并自动重新生成图标。
+打开 `http://localhost:3000`。
+
+详细说明见 [DEV.md](docs/DEV.md)，构建说明见 [BUILD.md](docs/BUILD.md)。
 
 ## 配置
 
@@ -101,9 +103,9 @@ categories:
 | 类型 | 来源 | 命名 | 示例 |
 |------|------|------|------|
 | 通用 | [Lucide](https://lucide.dev) | PascalCase | `Calendar`, `Mail`, `Wrench` |
-| 品牌 | [Simple Icons](https://simpleicons.org) | 小写 | `github`, `vercel`, `youtube` |
+| 品牌 | [Simple Icons](https://simpleicons.org) | 小写或 kebab-case | `github`, `vercel`, `google-gemini` |
 
-图标从 `config.yaml` 自动提取生成到 `icons-manifest.ts`，无需手动维护。
+图标在运行时解析，无需手动维护。
 
 ## 项目结构
 
@@ -118,8 +120,6 @@ src/
 │   ├── types/               # 类型定义
 │   ├── globals.css          # 全局样式
 │   └── edit/                # 可视化编辑
-└── data/
-    └── icons-manifest.ts    # 自动生成（勿手动编辑）
 ```
 
 ## 工作流

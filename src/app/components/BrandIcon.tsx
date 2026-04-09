@@ -1,33 +1,25 @@
-'use client';
-
-import { brandIconsMap } from '../../data/icons-manifest';
-
 interface BrandIconProps {
   name: string;
+  svg?: string | null;
   size?: number;
   className?: string;
   color?: string;
 }
 
-export default function BrandIcon({ name, size = 24, className = '', color }: BrandIconProps) {
-  const iconData = brandIconsMap[name];
-  
-  if (!iconData) {
+export default function BrandIcon({ name, svg, size = 24, className = '', color }: BrandIconProps) {
+  if (!svg) {
     return <span className={className} style={{ fontSize: size * 0.5 }}>{name.slice(0, 2)}</span>;
   }
-  
+
   const fillColor = color || 'currentColor';
-  
+
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill={fillColor}
-      xmlns="http://www.w3.org/2000/svg"
+    <span
       className={className}
-    >
-      <path d={iconData.path} />
-    </svg>
+      style={{ width: size, height: size, display: 'inline-flex' }}
+      dangerouslySetInnerHTML={{
+        __html: svg.replace(/fill="[^"]*"/g, `fill="${fillColor}"`),
+      }}
+    />
   );
 }
