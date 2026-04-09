@@ -60,6 +60,11 @@ categories:
         url: https://www.gemini.com
         icon: googlegemini
         description: Gemini 助手
+      - id: link-1775728649670-rs3tknc5f
+        name: Claude
+        url: https://claude.ai/
+        icon: claude
+        description: Claude AI
   - id: dev
     name: Development
     icon: Code2
