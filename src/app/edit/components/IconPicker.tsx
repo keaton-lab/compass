@@ -3,13 +3,9 @@
 import { Dialog, Tabs } from 'radix-ui';
 import { Search, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { loadBrandIcons } from '../../components/brand-icons';
 
-interface BrandIcon {
-  name: string;
-  slug: string;
-  path: string;
-  hex: string;
-}
+type BrandIcon = Awaited<ReturnType<typeof loadBrandIcons>>[number];
 
 export interface IconPickerProps {
   value: string;
@@ -18,7 +14,6 @@ export interface IconPickerProps {
 }
 
 let lucideIconNamesCache: string[] | null = null;
-let brandIconsCache: BrandIcon[] | null = null;
 
 async function loadLucideIconNames(): Promise<string[]> {
   if (lucideIconNamesCache) return lucideIconNamesCache;
@@ -27,25 +22,6 @@ async function loadLucideIconNames(): Promise<string[]> {
     (key) => key[0] === key[0].toUpperCase() && key !== 'Icon' && key !== 'default' && !key.endsWith('Icon')
   );
   return lucideIconNamesCache;
-}
-
-async function loadBrandIcons(): Promise<BrandIcon[]> {
-  if (brandIconsCache) return brandIconsCache;
-  const si = await import('simple-icons');
-  const siRecord = si as unknown as Record<string, { slug: string; path: string; hex: string }>;
-  brandIconsCache = Object.keys(siRecord)
-    .filter((key) => key.startsWith('si') && key.length > 2)
-    .map((key) => {
-      const iconData = siRecord[key];
-      return {
-        name: key.slice(2),
-        slug: iconData.slug,
-        path: iconData.path,
-        hex: iconData.hex,
-      };
-    })
-    .sort((a, b) => a.name.localeCompare(b.name));
-  return brandIconsCache;
 }
 
 export default function IconPicker({ value, onChange, onClose }: IconPickerProps) {

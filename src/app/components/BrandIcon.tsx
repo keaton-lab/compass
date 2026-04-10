@@ -1,25 +1,28 @@
 interface BrandIconProps {
   name: string;
-  svg?: string | null;
+  path?: string | null;
   size?: number;
   className?: string;
   color?: string;
 }
 
-export default function BrandIcon({ name, svg, size = 24, className = '', color }: BrandIconProps) {
-  if (!svg) {
+export default function BrandIcon({ name, path, size = 24, className = '', color }: BrandIconProps) {
+  if (!path) {
     return <span className={className} style={{ fontSize: size * 0.5 }}>{name.slice(0, 2)}</span>;
   }
 
   const fillColor = color || 'currentColor';
 
   return (
-    <span
+    <svg
       className={className}
-      style={{ width: size, height: size, display: 'inline-flex' }}
-      dangerouslySetInnerHTML={{
-        __html: svg.replace(/fill="[^"]*"/g, `fill="${fillColor}"`),
-      }}
-    />
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill={fillColor}
+      aria-hidden="true"
+    >
+      <path d={path} />
+    </svg>
   );
 }

@@ -15,14 +15,12 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV COMPASS_BUILD_TARGET=server
 
-COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
-
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/next.config.mjs ./next.config.mjs
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/src/config.yaml ./src/config.yaml
-COPY --from=builder /app/scripts/start.js ./scripts/start.js
+COPY --from=builder /app/src/server/env.js ./src/server/env.js
+COPY --from=builder /app/scripts/server-entry.js ./scripts/server-entry.js
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["node", "scripts/server-entry.js"]

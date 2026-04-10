@@ -2,9 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import runtime from '@/server/runtime';
 import auth from '@/server/auth';
 import configStore from '@/server/config-store';
+import env from '@/server/env';
 
 const { canSaveToServer } = runtime as {
   canSaveToServer: () => boolean;
+};
+const { getSessionSecret } = env as {
+  getSessionSecret: () => string;
 };
 const { SESSION_COOKIE_NAME, isAuthenticatedCookie } = auth as {
   SESSION_COOKIE_NAME: string;
@@ -22,7 +26,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: '当前模式未启用在线保存' }, { status: 404 });
   }
 
-  const secret = process.env.COMPASS_SESSION_SECRET;
+  const secret = getSessionSecret();
   const cookieValue = request.cookies.get(SESSION_COOKIE_NAME)?.value;
 
   if (!isAuthenticatedCookie(cookieValue, secret)) {

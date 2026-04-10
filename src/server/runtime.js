@@ -1,5 +1,9 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const BUILD_TARGET_STATIC = 'static';
 const BUILD_TARGET_SERVER = 'server';
+const env = require('./env');
+
+const { getSessionSecret, hasAdminToken } = env;
 
 function getBuildTarget() {
   return process.env.COMPASS_BUILD_TARGET === BUILD_TARGET_SERVER
@@ -11,13 +15,7 @@ function isServerBuild() {
   return getBuildTarget() === BUILD_TARGET_SERVER;
 }
 function canSaveToServer() {
-  return (
-    isServerBuild() &&
-    typeof process.env.COMPASS_ADMIN_TOKEN === 'string' &&
-    process.env.COMPASS_ADMIN_TOKEN.length > 0 &&
-    typeof process.env.COMPASS_SESSION_SECRET === 'string' &&
-    process.env.COMPASS_SESSION_SECRET.length > 0
-  );
+  return isServerBuild() && hasAdminToken() && getSessionSecret().length > 0;
 }
 
 module.exports = {

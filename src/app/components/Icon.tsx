@@ -3,6 +3,7 @@
 import type { LucideIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import BrandIcon from './BrandIcon';
+import { resolveBrandIcon } from './brand-icons';
 
 interface IconProps {
   name: string;
@@ -13,11 +14,9 @@ interface IconProps {
 
 type ResolvedIcon =
   | { kind: 'lucide'; component: LucideIcon }
-  | { kind: 'brand'; svg: string | null };
+  | { kind: 'brand'; path: string | null };
 
 let lucideResolverPromise: Promise<(name: string) => LucideIcon | null> | null = null;
-const brandSvgCache: Record<string, string> = {};
-const brandSvgPromiseCache: Record<string, Promise<string | null>> = {};
 const resolvedIconCache = new Map<string, ResolvedIcon>();
 
 function toKebabCase(value: string): string {
@@ -27,10 +26,6 @@ function toKebabCase(value: string): string {
     .replace(/[_\s]+/g, '-')
     .replace(/-+/g, '-')
     .toLowerCase();
-}
-
-function toSlug(value: string): string {
-  return toKebabCase(value).replace(/^icon:/, '');
 }
 
 async function getLucideResolver() {
@@ -72,46 +67,10 @@ async function getLucideResolver() {
   return lucideResolverPromise;
 }
 
-async function fetchBrandSvg(slug: string): Promise<string | null> {
-  if (brandSvgCache[slug]) {
-    return brandSvgCache[slug];
-  }
-
-  if (slug in brandSvgPromiseCache) {
-    return brandSvgPromiseCache[slug];
-  }
-
-  const promise = (async () => {
-    try {
-      const response = await fetch(`https://cdn.simpleicons.org/${slug}`);
-      if (!response.ok) {
-        return null;
-      }
-      const svg = await response.text();
-      brandSvgCache[slug] = svg;
-      return svg;
-    } catch {
-      return null;
-    }
-  })();
-
-  brandSvgPromiseCache[slug] = promise;
-  return promise;
-}
-
 async function getBrandResolver() {
   return async (name: string) => {
-    const slug = toSlug(name);
-    if (!slug) {
-      return null;
-    }
-
-    const svg = await fetchBrandSvg(slug);
-    if (svg) {
-      return svg;
-    }
-
-    return null;
+    const icon = await resolveBrandIcon(name);
+    return icon?.path ?? null;
   };
 }
 
@@ -146,10 +105,10 @@ export default function Icon({ name, size = 24, className = '', color }: IconPro
       }
 
       const brandResolver = await getBrandResolver();
-      const brandSvg = await brandResolver(name);
+      const brandPath = await brandResolver(name);
       const result: ResolvedIcon = {
         kind: 'brand',
-        svg: brandSvg,
+        path: brandPath,
       };
 
       resolvedIconCache.set(name, result);
@@ -173,7 +132,7 @@ export default function Icon({ name, size = 24, className = '', color }: IconPro
   return (
     <BrandIcon
       name={name}
-      svg={resolvedIcon?.kind === 'brand' ? resolvedIcon.svg : null}
+      path={resolvedIcon?.kind === 'brand' ? resolvedIcon.path : null}
       size={size}
       className={className}
       color={color}

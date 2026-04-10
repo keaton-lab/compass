@@ -3,7 +3,7 @@ const isStaticBuild = buildTarget === 'static';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: isStaticBuild ? 'export' : undefined,
+  output: isStaticBuild ? 'export' : 'standalone',
   trailingSlash: isStaticBuild,
 };
 

@@ -2,14 +2,13 @@
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
+const env = require('./env');
+
+const { resolveConfigPath } = env;
 
 const DEFAULT_THEME = 'dark';
 const VALID_THEMES = new Set(['light', 'dark', 'ocean']);
 const VALID_LAYOUTS = new Set(['grid', 'list']);
-const DEFAULT_CONFIG_CANDIDATES = [
-  path.join(process.cwd(), 'src', 'config.yaml'),
-  path.join(process.cwd(), 'src', 'config.yml'),
-];
 
 function isPlainObject(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -159,19 +158,6 @@ function normalizeConfig(input) {
   };
 }
 
-function resolveConfigPath() {
-  const configuredPath = process.env.COMPASS_CONFIG_PATH;
-
-  if (configuredPath && configuredPath.trim() !== '') {
-    return path.isAbsolute(configuredPath)
-      ? configuredPath
-      : path.join(process.cwd(), configuredPath);
-  }
-
-  const existingDefault = DEFAULT_CONFIG_CANDIDATES.find((candidate) => fs.existsSync(candidate));
-  return existingDefault ?? DEFAULT_CONFIG_CANDIDATES[0];
-}
-
 function readConfigSource() {
   const configPath = resolveConfigPath();
 
@@ -208,14 +194,9 @@ function saveConfigYaml(fileContents) {
   const normalizedConfig = parseConfigYaml(fileContents);
   const configPath = resolveConfigPath();
   const directoryPath = path.dirname(configPath);
-  const tempPath = path.join(
-    directoryPath,
-    `.${path.basename(configPath)}.${process.pid}.${Date.now()}.tmp`,
-  );
 
   fs.mkdirSync(directoryPath, { recursive: true });
-  fs.writeFileSync(tempPath, serializeConfig(normalizedConfig), 'utf8');
-  fs.renameSync(tempPath, configPath);
+  fs.writeFileSync(configPath, serializeConfig(normalizedConfig), 'utf8');
 
   return normalizedConfig;
 }

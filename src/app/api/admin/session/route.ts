@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import runtime from '@/server/runtime';
 import auth from '@/server/auth';
+import env from '@/server/env';
 
 const { canSaveToServer } = runtime as {
   canSaveToServer: () => boolean;
+};
+const { getAdminToken, getSessionSecret } = env as {
+  getAdminToken: () => string | undefined;
+  getSessionSecret: () => string;
 };
 const {
   SESSION_COOKIE_NAME,
@@ -30,7 +35,7 @@ const {
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  const secret = process.env.COMPASS_SESSION_SECRET;
+  const secret = getSessionSecret();
   const cookieValue = request.cookies.get(SESSION_COOKIE_NAME)?.value;
 
   return NextResponse.json({
@@ -46,21 +51,16 @@ export async function POST(request: NextRequest) {
 
   const body = (await request.json()) as { token?: string };
   const token = typeof body.token === 'string' ? body.token : '';
-  const expectedToken = process.env.COMPASS_ADMIN_TOKEN ?? '';
+  const expectedToken = getAdminToken() ?? '';
 
   if (!isValidAdminToken(token, expectedToken)) {
     return NextResponse.json({ error: '口令不正确' }, { status: 401 });
   }
 
-  const sessionSecret = process.env.COMPASS_SESSION_SECRET;
-  if (!sessionSecret) {
-    return NextResponse.json({ error: '服务器未配置会话密钥' }, { status: 500 });
-  }
-
   const response = NextResponse.json({ ok: true });
   response.cookies.set(
     SESSION_COOKIE_NAME,
-    createSessionCookieValue(sessionSecret),
+    createSessionCookieValue(getSessionSecret()),
     createSessionCookieOptions(SESSION_TTL_SECONDS),
   );
 

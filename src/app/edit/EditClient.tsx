@@ -122,11 +122,9 @@ function useServerEditAccess(canSaveToServer: boolean) {
         credentials: 'same-origin',
       });
     } finally {
-      setAuthStatus('unauthenticated');
-      resetSaveFeedback();
-      setLoginError(null);
+      window.location.href = '/';
     }
-  }, [resetSaveFeedback]);
+  }, []);
 
   const handleSave = useCallback(async (yamlContent: string, yamlError: string | null) => {
     if (yamlError) {

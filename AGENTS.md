@@ -34,7 +34,8 @@ npm run lint    # ESLint 检查
 所有内容来自 YAML 配置文件：
 
 - 默认路径：`src/config.yaml`
-- server 模式可通过 `COMPASS_CONFIG_PATH` 指向外挂 `config.yml`
+- server 模式可通过 `COMPASS_CONFIG_PATH` 指向外挂 `config.yaml`
+- 规范统一使用 `.yaml`
 
 ```yaml
 profile:

@@ -1,10 +1,6 @@
-const { spawn } = require('child_process');
-const { loadEnvConfig } = require('@next/env');
 const env = require('../src/server/env');
 
 const { assertServerStartupEnv } = env;
-
-loadEnvConfig(process.cwd(), false);
 
 try {
   const { generatedSessionSecret } = assertServerStartupEnv();
@@ -17,15 +13,4 @@ try {
   process.exit(1);
 }
 
-const serverProcess = spawn('next', ['start', '-H', '0.0.0.0'], {
-  stdio: 'inherit',
-  shell: process.platform === 'win32',
-  env: {
-    ...process.env,
-    COMPASS_BUILD_TARGET: 'server',
-  },
-});
-
-serverProcess.on('exit', (code) => {
-  process.exit(code ?? 0);
-});
+require('../server.js');

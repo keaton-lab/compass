@@ -8,9 +8,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      COMPASS_CONFIG_PATH: /data/config.yml
       COMPASS_ADMIN_TOKEN: change-me
       COMPASS_SESSION_SECRET: change-me-too
       PORT: 3000
     volumes:
-      - ./docker/config.yml:/data/config.yml
+      - ./docker/config.yaml:/app/src/config.yaml
