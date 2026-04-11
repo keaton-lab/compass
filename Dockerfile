@@ -1,14 +1,19 @@
+# 阶段 1: 依赖安装
 FROM node:20-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
+# 阶段 2: 构建
 FROM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+# 构建 server 模式
 RUN npm run build:server
 
+# 阶段 3: 运行
 FROM node:20-alpine AS runner
 WORKDIR /app
 
@@ -17,14 +22,15 @@ RUN rm -rf /var/cache/apk/* /tmp/*
 
 ENV NODE_ENV=production
 ENV PORT=3000
-ENV COMPASS_BUILD_TARGET=server
+ENV COMPASS_RUNTIME_MODE=server
 
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+# 复制构建产物
+COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/src/config.yaml ./src/config.yaml
-COPY --from=builder /app/src/server/env.js ./src/server/env.js
-COPY --from=builder /app/scripts/server-entry.js ./scripts/server-entry.js
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 3000
 
-CMD ["node", "scripts/server-entry.js"]
+# 启动 Hono 服务器
+CMD ["node", "dist/server/index.js"]
