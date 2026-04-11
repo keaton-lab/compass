@@ -6,41 +6,51 @@ import { resolveConfigIcons } from '@/shared/icon-resolver';
  * 获取运行时能力
  */
 export async function fetchCapabilities(): Promise<Capabilities> {
-  const response = await fetch('/api/capabilities');
-  
-  if (!response.ok) {
-    throw new Error('无法获取运行时能力');
+  try {
+    const response = await fetch('/api/capabilities');
+    if (!response.ok) {
+      throw new Error('无法获取运行时能力');
+    }
+    return response.json();
+  } catch {
+    // API 不可用，返回静态模式
+    return {
+      mode: 'static',
+      canLogin: false,
+      canSaveToFile: false,
+      canPublishToGithub: false,
+    };
   }
-  
-  return response.json();
 }
 
 /**
  * 加载运行时配置
+ * 静态模式直接从 /config.yaml 加载
+ * Server/GitHub 模式从 API 加载
  */
 export async function loadRuntimeConfig(): Promise<Config> {
-  const capabilities = await fetchCapabilities();
-  
-  if (capabilities.mode === 'static') {
-    // 静态模式：从 /config.yaml 加载
-    const response = await fetch('/config.yaml');
-    
-    if (!response.ok) {
-      throw new Error('无法加载配置文件');
+  // 首先尝试加载 config.yaml（静态模式）
+  try {
+    const configResponse = await fetch('/config.yaml');
+    if (configResponse.ok) {
+      const yamlContent = await configResponse.text();
+      return parseConfigYaml(yamlContent);
     }
-    
-    const yamlContent = await response.text();
-    return parseConfigYaml(yamlContent);
-  } else {
-    // server/github 模式：从 API 加载
-    const response = await fetch('/api/config/runtime');
-    
-    if (!response.ok) {
-      throw new Error('无法加载配置');
-    }
-    
-    return response.json();
+  } catch {
+    // config.yaml 不可用，继续尝试 API
   }
+
+  // 尝试 API 方式（server/github 模式）
+  try {
+    const response = await fetch('/api/config/runtime');
+    if (response.ok) {
+      return response.json();
+    }
+  } catch {
+    // API 也不可用
+  }
+
+  throw new Error('无法加载配置：静态模式和 API 都不可用');
 }
 
 /**
@@ -62,7 +72,7 @@ export async function saveConfigToServer(config: Config): Promise<void> {
     },
     body: JSON.stringify(config),
   });
-  
+
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.error || '保存失败');
