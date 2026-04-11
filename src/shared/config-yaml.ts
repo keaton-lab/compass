@@ -113,7 +113,6 @@ export function normalizeConfig(input: unknown): Config {
       avatar: ensureOptionalString(profile.avatar, 'profile.avatar'),
       description: ensureString(profile.description, 'profile.description'),
       bio: ensureOptionalString(profile.bio, 'profile.bio'),
-      repo: ensureOptionalString(profile.repo, 'profile.repo'),
     },
     settings: {
       theme: ensureTheme(settings.theme) as Config['settings']['theme'],

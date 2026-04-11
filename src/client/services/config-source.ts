@@ -181,6 +181,20 @@ export async function fetchGithubStatus(): Promise<GithubConnectionStatus> {
   );
 }
 
+export async function disconnectGithub(): Promise<void> {
+  const response = await fetch('/api/github/disconnect', {
+    method: 'POST',
+  });
+
+  if (!response.ok) {
+    const error = await readJsonResponse<{ error?: string }>(
+      response,
+      'GitHub 断开接口返回了非 JSON 内容',
+    ).catch(() => null);
+    throw new Error(error?.error || '无法断开 GitHub 连接');
+  }
+}
+
 export async function publishConfigToGithub(
   yamlContent: string,
   commitMessage?: string,

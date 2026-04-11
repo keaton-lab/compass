@@ -1,4 +1,5 @@
 import { useDeferredValue, useMemo, useState } from 'react';
+import { siGithub } from 'simple-icons';
 import CategorySection from './CategorySection';
 import ProfileHeader from './ProfileHeader';
 import SearchBar from './SearchBar';
@@ -8,10 +9,8 @@ import ResolvedIcon from './ResolvedIcon';
 import type { ResolvedIconData } from '@/shared/icon-types';
 import type { ResolvedProfile, Settings, ResolvedCategory } from '@/shared/types';
 
-const GITHUB_ICON: ResolvedIconData = {
-  kind: 'brand',
-  path: 'M12 .297a12 12 0 0 0-3.79 23.39c.6.11.82-.26.82-.58l-.02-2.23c-3.34.73-4.04-1.42-4.04-1.42-.55-1.38-1.34-1.75-1.34-1.75-1.09-.75.08-.74.08-.74 1.2.08 1.84 1.23 1.84 1.23 1.07 1.84 2.81 1.31 3.5 1 .11-.78.42-1.31.76-1.61-2.66-.31-5.47-1.33-5.47-5.91 0-1.31.47-2.38 1.24-3.22-.12-.31-.54-1.55.12-3.23 0 0 1.01-.32 3.3 1.23A11.5 11.5 0 0 1 12 6.8c1.02 0 2.05.14 3.01.41 2.28-1.55 3.29-1.23 3.29-1.23.66 1.68.24 2.92.12 3.23.77.84 1.24 1.91 1.24 3.22 0 4.59-2.81 5.6-5.49 5.9.43.37.82 1.1.82 2.22l-.01 3.29c0 .32.21.69.82.58A12 12 0 0 0 12 .297',
-};
+// GitHub 图标路径（从 simple-icons 直接获取）
+const GITHUB_ICON_PATH = siGithub.path;
 
 interface ClientLayoutProps {
   profile: ResolvedProfile;
@@ -27,6 +26,9 @@ export default function ClientLayout({
   const [query, setQuery] = useState('');
   const deferredQuery = useDeferredValue(query);
   const normalizedQuery = deferredQuery.trim().toLowerCase();
+
+  // GitHub 图标数据（静态）
+  const githubIcon: ResolvedIconData = { kind: 'brand', path: GITHUB_ICON_PATH };
 
   const filteredCategories = useMemo(() => {
     if (!normalizedQuery) {
@@ -127,22 +129,15 @@ export default function ClientLayout({
         <div className="mx-auto h-px w-full max-w-[180px] bg-gradient-to-r from-transparent via-[var(--panel-border)] to-transparent opacity-40 md:max-w-sm" />
         <div className="mx-auto mt-5 flex max-w-[1400px] flex-col items-center gap-2 px-4 text-center md:px-6 lg:px-8">
           <div className="flex items-center justify-center">
-            {profile.repo ? (
-              <a
-                href={profile.repo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`flex items-center gap-1.5 text-sm text-[var(--muted)] ${footerLinkClass}`}
-              >
-                <ResolvedIcon icon={GITHUB_ICON} name="github" size={14} />
-                <span>{profile.name}</span>
-              </a>
-            ) : (
-              <div className="flex items-center gap-1.5 text-sm text-[var(--muted)]">
-                <ResolvedIcon icon={GITHUB_ICON} name="github" size={14} />
-                <span>{profile.name}</span>
-              </div>
-            )}
+            <a
+              href='https://github.com/keaton-lab/compass'
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex items-center gap-1.5 text-sm text-[var(--muted)] ${footerLinkClass}`}
+            >
+              <ResolvedIcon icon={githubIcon} name="github" size={14} />
+              <span>Compass</span>
+            </a>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm text-[var(--muted)]">
             <span>{categories.length} categories</span>
