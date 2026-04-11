@@ -11,6 +11,10 @@ RUN npm run build:server
 
 FROM node:20-alpine AS runner
 WORKDIR /app
+
+# 清理 apk 缓存以减少镜像体积
+RUN rm -rf /var/cache/apk/* /tmp/*
+
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV COMPASS_BUILD_TARGET=server

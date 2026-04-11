@@ -1,0 +1,184 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --theme-transition-duration: 200ms;
+  --theme-transition-easing: ease-out;
+
+  /* 深色主题 - 石墨灰 + 琥珀铜 */
+  --background: #0f1113;
+  --foreground: #f0f0f0;
+  --panel: #181a1d;
+  --panel-strong: #1e2024;
+  --panel-border: #2a2d32;
+  --muted: #6b7280;
+  --text-primary: #f0f0f0;
+  --text-secondary: #9ca3af;
+  --bg-secondary: #25282d;
+  --accent: #c9a45c;
+  --accent-alpha: rgba(201, 164, 92, 0.12);
+  --accent-border: rgba(201, 164, 92, 0.25);
+}
+
+[data-theme='light'] {
+  /* 浅色主题 - 纯净白 + 深炭灰 */
+  --background: #fafafa;
+  --foreground: #1f2937;
+  --panel: #ffffff;
+  --panel-strong: #f5f5f5;
+  --panel-border: #e5e7eb;
+  --muted: #6b7280;
+  --text-primary: #1f2937;
+  --text-secondary: #4b5563;
+  --bg-secondary: #f3f4f6;
+  --accent: #b8954e;
+  --accent-alpha: rgba(184, 149, 78, 0.1);
+  --accent-border: rgba(184, 149, 78, 0.2);
+}
+
+[data-theme='dark'] {
+  --background: #0f1113;
+  --foreground: #f0f0f0;
+  --panel: #181a1d;
+  --panel-strong: #1e2024;
+  --panel-border: #2a2d32;
+  --muted: #6b7280;
+  --text-primary: #f0f0f0;
+  --text-secondary: #9ca3af;
+  --bg-secondary: #25282d;
+  --accent: #c9a45c;
+  --accent-alpha: rgba(201, 164, 92, 0.12);
+  --accent-border: rgba(201, 164, 92, 0.25);
+}
+
+[data-theme='ocean'] {
+  /* 海洋主题 - 玻璃海盐感 */
+  --background: #f8fdff;
+  --foreground: #17384a;
+  --panel: rgba(255, 255, 255, 0.82);
+  --panel-strong: rgba(240, 249, 252, 0.92);
+  --panel-border: rgba(165, 206, 223, 0.45);
+  --muted: #6e8b99;
+  --text-primary: #17384a;
+  --text-secondary: #547181;
+  --bg-secondary: #eef8fb;
+  --accent: #4aa6c8;
+  --accent-alpha: rgba(74, 166, 200, 0.10);
+  --accent-border: rgba(74, 166, 200, 0.20);
+}
+
+html {
+  background-color: var(--background);
+  scroll-behavior: auto;
+}
+
+body {
+  position: relative;
+  min-height: 100vh;
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 细微网格背景 */
+body::before {
+  content: '';
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(201, 164, 92, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201, 164, 92, 0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: center center;
+}
+
+[data-theme='light'] body::before {
+  background-image:
+    linear-gradient(rgba(184, 149, 78, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(184, 149, 78, 0.04) 1px, transparent 1px);
+}
+
+[data-theme='ocean'] body::before {
+  background-image:
+    linear-gradient(rgba(74, 166, 200, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74, 166, 200, 0.035) 1px, transparent 1px);
+}
+
+html.theme-preload body,
+html.theme-preload *,
+html.theme-preload *::before,
+html.theme-preload *::after {
+  transition: none !important;
+  animation: none !important;
+}
+
+html.theme-switching body,
+html.theme-switching body::before,
+html.theme-switching .glass-panel,
+html.theme-switching .glass-panel-strong,
+html.theme-switching header,
+html.theme-switching main,
+html.theme-switching footer,
+html.theme-switching [class*="rounded"],
+html.theme-switching [class*="border"],
+html.theme-switching [class*="bg-"],
+html.theme-switching [class*="text-"] {
+  transition-property: background-color, border-color, color;
+  transition-duration: var(--theme-transition-duration);
+  transition-timing-function: var(--theme-transition-easing);
+}
+
+.theme-toggle-current-icon {
+  opacity: 0;
+  transition: opacity 120ms ease-out;
+}
+
+html[data-theme='light'] .theme-toggle-current-icon-light,
+html[data-theme='dark'] .theme-toggle-current-icon-dark,
+html[data-theme='ocean'] .theme-toggle-current-icon-ocean {
+  opacity: 1;
+}
+
+::selection {
+  background: var(--accent-alpha);
+  color: var(--accent);
+}
+
+@layer components {
+  .glass-panel {
+    background-color: var(--panel);
+    border: 1px solid var(--panel-border);
+  }
+
+  .glass-panel-strong {
+    background-color: var(--panel-strong);
+    border: 1px solid var(--panel-border);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .content-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 520px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
