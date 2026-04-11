@@ -4,8 +4,9 @@
 </p>
 
 <p align="center">
-  <a href="https://nextjs.org"><img src="https://img.shields.io/badge/Next.js-14-black?logo=next.js" alt="Next.js"></a>
+  <a href="https://vitejs.dev"><img src="https://img.shields.io/badge/Vite-8-646cff?logo=vite" alt="Vite"></a>
   <a href="https://react.dev"><img src="https://img.shields.io/badge/React-18-61dafb?logo=react" alt="React"></a>
+  <a href="https://hono.dev"><img src="https://img.shields.io/badge/Hono-4-FF6900" alt="Hono"></a>
   <a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript" alt="TypeScript"></a>
   <a href="https://tailwindcss.com"><img src="https://img.shields.io/badge/Tailwind_CSS-3-06b6d4?logo=tailwindcss" alt="Tailwind CSS"></a>
   <a href="https://github.com/imzhoukunqiang/compass/blob/dev/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-green.svg" alt="License"></a>
@@ -20,7 +21,7 @@
 ## 特性
 
 - **YAML 配置** — 所有内容集中在 `src/config.yaml`，改完即生效
-- **零数据库** — 静态导出可直接部署；Docker 模式直接读写挂载 YAML
+- **三种运行模式** — 静态部署、Docker Server、GitHub App 集成
 - **运行时图标** — Lucide + Simple Icons 运行时解析，新增图标不用改代码
 - **三套主题** — Light / Dark / Ocean，玻璃拟态 UI
 - **内置编辑器** — 访问 `/edit` 直接在浏览器中修改配置
@@ -50,13 +51,24 @@
 
 ## 部署
 
-构建产物输出到 `out/`（Next.js 静态导出），可直接部署到任何静态托管平台。
+支持三种运行模式:
+
+### 静态模式 (static)
+构建产物输出到 `dist/client/`，可直接部署到任何静态托管平台。
 
 | 平台 | 说明 |
 |------|------|
-| **Cloudflare Pages** | 使用 `pages_build_output_dir = "out"`，不要在 `wrangler.toml` 中添加 Workers 专用的 `[assets]` |
-| **Vercel** | Next.js 原生支持，零配置 |
-| **Netlify** | 构建命令 `npm run build`，发布目录 `out` |
+| **Cloudflare Pages** | 构建命令 `npm run build:static`，发布目录 `dist/client` |
+| **Vercel** | 构建命令 `npm run build:static`，发布目录 `dist/client` |
+| **Netlify** | 构建命令 `npm run build:static`，发布目录 `dist/client` |
+
+### Server 模式 (Docker)
+支持运行时编辑和保存配置。
+
+### GitHub 模式
+通过 GitHub App 集成，支持在线编辑并提交到指定仓库。
+
+详细说明见 [BUILD.md](docs/BUILD.md) 和 [DEV.md](docs/DEV.md)。
 
 ## 本地开发
 
@@ -111,24 +123,24 @@ categories:
 
 ```
 src/
-├── config.yaml              # 唯一配置文件
-├── app/
-│   ├── page.tsx             # 主页（服务端读取 YAML）
-│   ├── components/          # UI 组件
-│   ├── contexts/            # 客户端状态
-│   ├── themes/              # 主题预设
-│   ├── types/               # 类型定义
-│   ├── globals.css          # 全局样式
-│   └── edit/                # 可视化编辑
+├── client/           # React 前端应用
+│   ├── components/   # UI 组件
+│   ├── pages/        # 页面路由
+│   ├── contexts/     # 客户端状态
+│   └── services/     # API 服务
+├── server/           # Hono 服务端
+│   ├── routes/       # API 路由
+│   └── index.ts      # 服务入口
+├── shared/           # 共享模块
+│   ├── types.ts      # 类型定义
+│   ├── themes.ts     # 主题预设
+│   └── config-yaml.ts # YAML 解析
+└── config.yaml       # 唯一配置文件
 ```
-
-## 工作流
-
-修改 `config.yaml` → 提交 → 平台自动构建部署。也可通过 `/edit` 页面在线编辑后导出 YAML。
 
 ## 技术栈
 
-[Next.js](https://nextjs.org) 14 · [React](https://react.dev) 18 · [TypeScript](https://www.typescriptlang.org) · [Tailwind CSS](https://tailwindcss.com) · [Framer Motion](https://www.framer.com/motion) · [Lucide](https://lucide.dev) · [Simple Icons](https://simpleicons.org)
+[Vite](https://vitejs.dev) · [React](https://react.dev) 18 · [React Router](https://reactrouter.com) · [Hono](https://hono.dev) · [TypeScript](https://www.typescriptlang.org) · [Tailwind CSS](https://tailwindcss.com) · [Framer Motion](https://www.framer.com/motion) · [Lucide](https://lucide.dev) · [Simple Icons](https://simpleicons.org)
 
 ## License
 

@@ -9,12 +9,10 @@
 # testing
 /coverage
 
-# next.js
-/.next/
-/out/
-
 # production
+/dist
 /build
+/out
 
 # misc
 .DS_Store
@@ -35,3 +33,7 @@ config.local.yaml
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDE
+.vscode/
+.idea/
