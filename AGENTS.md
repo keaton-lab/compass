@@ -7,11 +7,10 @@
 ## 关键命令
 
 ```bash
-npm run dev           # 开发服务器（默认以 server 能力启动）
+npm run dev           # 开发服务器（静态预览）
 npm run build         # 静态导出构建（默认）
 npm run build:static  # 静态导出构建
 npm run build:server  # Node 服务构建
-npm start             # 运行 server 模式
 npm run lint    # ESLint 检查
 ```
 

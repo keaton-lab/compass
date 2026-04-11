@@ -14,12 +14,13 @@ npm run build:static
 
 静态模式下首页和 `/edit` 都会预渲染，但 `/edit` 只负责编辑和导出 YAML，不提供后台保存接口。
 
-## Server 模式
+## Docker Server 构建
 
 ```bash
 npm run build:server
-npm start
 ```
+
+这个命令只负责生成 Docker 镜像所需的 `standalone` 产物，不提供本地 `npm start` 启动。
 
 页面按请求读取 YAML，修改挂载配置文件后刷新即可看到新内容。`/edit` 登录后可直保存到运行时配置文件。项目规范统一使用 `.yaml` 后缀。
 
@@ -62,7 +63,7 @@ docker compose up --build
 
 通过 `COMPASS_BUILD_TARGET` 环境变量指定：
 - `static` - 静态导出
-- `server` - Node 服务
+- `server` - Docker 用 Node 服务产物
 
 通常由 npm script 自动设置，一般无需手动指定。
 
@@ -74,7 +75,6 @@ docker compose up --build
 
 ```bash
 npm run build:static   # 静态导出
-npm run build:server    # Server 模式构建
-npm start              # 运行 server 模式
+npm run build:server   # Docker 服务构建
 npm run lint           # ESLint 检查
 ```

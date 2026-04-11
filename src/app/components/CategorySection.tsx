@@ -1,5 +1,5 @@
-import Icon from './Icon';
-import type { Category as CategoryType } from '../types';
+import ResolvedIcon from './ResolvedIcon';
+import type { ResolvedCategory as CategoryType } from '../types';
 import NavigationCard from './NavigationCard';
 
 interface CategorySectionProps {
@@ -25,7 +25,12 @@ export default function CategorySection({ category, layout, animations }: Catego
             borderColor: `${category.color}30`,
           }}
         >
-          <Icon name={category.icon} size={16} color={category.color} />
+          <ResolvedIcon
+            icon={category.resolvedIcon}
+            name={category.icon}
+            size={16}
+            color={category.color}
+          />
         </div>
         <h2 className="text-base font-semibold text-[var(--text-primary)]">
           {category.name}

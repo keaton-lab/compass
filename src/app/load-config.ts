@@ -5,6 +5,7 @@ import type { Config } from './types';
 import { defaultThemeId, isThemeId } from './themes';
 import configStore from '../server/config-store';
 import runtime from '../server/runtime';
+import { resolveConfigIcons } from './resolve-config-icons';
 
 const { loadConfigFile, resolveConfigPath } = configStore as {
   loadConfigFile: () => Config;
@@ -26,6 +27,10 @@ export function loadConfig(): Config {
   }
 
   return loadConfigFile();
+}
+
+export async function loadResolvedConfig() {
+  return resolveConfigIcons(loadConfig());
 }
 
 export function loadInitialTheme() {

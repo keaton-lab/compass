@@ -6,13 +6,19 @@ import ProfileHeader from './ProfileHeader';
 import SearchBar from './SearchBar';
 import DeferredThemeToggle from './DeferredThemeToggle';
 import { ProfileHeaderDesktopLeft } from './ProfileHeader';
-import type { Profile, Settings, Category } from '../types';
-import Icon from './Icon';
+import ResolvedIcon from './ResolvedIcon';
+import type { ResolvedIconData } from '../icon-types';
+import type { ResolvedProfile, Settings, ResolvedCategory } from '../types';
+
+const GITHUB_ICON: ResolvedIconData = {
+  kind: 'brand',
+  path: 'M12 .297a12 12 0 0 0-3.79 23.39c.6.11.82-.26.82-.58l-.02-2.23c-3.34.73-4.04-1.42-4.04-1.42-.55-1.38-1.34-1.75-1.34-1.75-1.09-.75.08-.74.08-.74 1.2.08 1.84 1.23 1.84 1.23 1.07 1.84 2.81 1.31 3.5 1 .11-.78.42-1.31.76-1.61-2.66-.31-5.47-1.33-5.47-5.91 0-1.31.47-2.38 1.24-3.22-.12-.31-.54-1.55.12-3.23 0 0 1.01-.32 3.3 1.23A11.5 11.5 0 0 1 12 6.8c1.02 0 2.05.14 3.01.41 2.28-1.55 3.29-1.23 3.29-1.23.66 1.68.24 2.92.12 3.23.77.84 1.24 1.91 1.24 3.22 0 4.59-2.81 5.6-5.49 5.9.43.37.82 1.1.82 2.22l-.01 3.29c0 .32.21.69.82.58A12 12 0 0 0 12 .297',
+};
 
 interface ClientLayoutProps {
-  profile: Profile;
+  profile: ResolvedProfile;
   settings: Settings;
-  categories: Category[];
+  categories: ResolvedCategory[];
 }
 
 export default function ClientLayout({
@@ -130,12 +136,12 @@ export default function ClientLayout({
                 rel="noopener noreferrer"
                 className={`flex items-center gap-1.5 text-sm text-[var(--muted)] ${footerLinkClass}`}
               >
-                <Icon name="github" size={14} />
+                <ResolvedIcon icon={GITHUB_ICON} name="github" size={14} />
                 <span>{profile.name}</span>
               </a>
             ) : (
               <div className="flex items-center gap-1.5 text-sm text-[var(--muted)]">
-                <Icon name="github" size={14} />
+                <ResolvedIcon icon={GITHUB_ICON} name="github" size={14} />
                 <span>{profile.name}</span>
               </div>
             )}

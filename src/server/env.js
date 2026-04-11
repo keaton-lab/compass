@@ -2,7 +2,7 @@
 const crypto = require('crypto');
 const path = require('path');
 
-const DEFAULT_CONFIG_PATH = path.join(process.cwd(), 'src', 'config.yaml');
+const DEFAULT_CONFIG_RELATIVE_PATH = path.join('src', 'config.yaml');
 
 let generatedSessionSecret;
 let sessionSecretWasGenerated = false;
@@ -27,7 +27,7 @@ function resolveConfigPath() {
       : path.join(process.cwd(), configuredPath);
   }
 
-  return DEFAULT_CONFIG_PATH;
+  return path.join(process.cwd(), DEFAULT_CONFIG_RELATIVE_PATH);
 }
 
 function getAdminToken() {
@@ -75,7 +75,7 @@ function assertServerStartupEnv() {
 }
 
 module.exports = {
-  DEFAULT_CONFIG_PATH,
+  DEFAULT_CONFIG_PATH: DEFAULT_CONFIG_RELATIVE_PATH,
   assertServerStartupEnv,
   didGenerateSessionSecret,
   getAdminToken,

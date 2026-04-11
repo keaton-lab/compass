@@ -1,6 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const { spawn } = require('child_process');
+import fs from 'fs';
+import path from 'path';
+import { spawn } from 'child_process';
 
 const target = process.argv[2] === 'server' ? 'server' : 'static';
 const apiDirectoryPath = path.join(process.cwd(), 'src', 'app', 'api');

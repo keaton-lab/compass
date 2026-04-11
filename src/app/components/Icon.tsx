@@ -16,7 +16,9 @@ type ResolvedIcon =
   | { kind: 'lucide'; component: LucideIcon }
   | { kind: 'brand'; path: string | null };
 
-let lucideResolverPromise: Promise<(name: string) => LucideIcon | null> | null = null;
+type LucideIconLoader = () => Promise<{ default: LucideIcon }>;
+
+let lucideResolverPromise: Promise<(name: string) => Promise<LucideIcon | null>> | null = null;
 const resolvedIconCache = new Map<string, ResolvedIcon>();
 
 function toKebabCase(value: string): string {
@@ -30,38 +32,41 @@ function toKebabCase(value: string): string {
 
 async function getLucideResolver() {
   if (!lucideResolverPromise) {
-    lucideResolverPromise = import('lucide-react').then((module) => {
-      const exactMap = new Map<string, LucideIcon>();
-      const normalizedMap = new Map<string, LucideIcon>();
+    lucideResolverPromise = import('lucide-react/dynamicIconImports').then(
+      (module) => {
+        const iconLoaders = (module.default ?? module) as Record<
+          string,
+          LucideIconLoader
+        >;
+        const normalizedLoaderMap = new Map<string, LucideIconLoader>();
 
-      Object.entries(module).forEach(([exportName, icon]) => {
-        if (!/^[A-Z]/.test(exportName) || exportName.endsWith('Icon')) {
-          return;
-        }
+        Object.entries(iconLoaders).forEach(([key, loader]) => {
+          normalizedLoaderMap.set(key, loader);
+          normalizedLoaderMap.set(key.replace(/-/g, ''), loader);
+        });
 
-        const typedIcon = icon as LucideIcon;
-        const kebab = toKebabCase(exportName);
+        return async (name: string) => {
+          const trimmed = name.trim();
+          if (!trimmed) {
+            return null;
+          }
 
-        exactMap.set(exportName, typedIcon);
-        normalizedMap.set(kebab, typedIcon);
-        normalizedMap.set(kebab.replace(/-/g, ''), typedIcon);
-      });
+          const kebab = toKebabCase(trimmed);
+          const compact = kebab.replace(/-/g, '');
 
-      return (name: string) => {
-        const trimmed = name.trim();
-        if (!trimmed) {
-          return null;
-        }
+          const loader =
+            normalizedLoaderMap.get(kebab) ??
+            normalizedLoaderMap.get(compact);
 
-        const kebab = toKebabCase(trimmed);
-        return (
-          exactMap.get(trimmed) ??
-          normalizedMap.get(kebab) ??
-          normalizedMap.get(kebab.replace(/-/g, '')) ??
-          null
-        );
-      };
-    });
+          if (!loader) {
+            return null;
+          }
+
+          const iconModule = await loader();
+          return iconModule.default;
+        };
+      },
+    );
   }
 
   return lucideResolverPromise;
@@ -90,7 +95,7 @@ export default function Icon({ name, size = 24, className = '', color }: IconPro
 
     async function resolveIcon() {
       const lucideResolver = await getLucideResolver();
-      const lucideIcon = lucideResolver(name);
+      const lucideIcon = await lucideResolver(name);
 
       if (lucideIcon) {
         const result: ResolvedIcon = {

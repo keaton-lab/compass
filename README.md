@@ -20,7 +20,7 @@
 ## 特性
 
 - **YAML 配置** — 所有内容集中在 `src/config.yaml`，改完即生效
-- **零数据库** — 纯静态站点，不依赖任何后端服务；server 模式直接读写挂载文件
+- **零数据库** — 静态导出可直接部署；Docker 模式直接读写挂载 YAML
 - **运行时图标** — Lucide + Simple Icons 运行时解析，新增图标不用改代码
 - **三套主题** — Light / Dark / Ocean，玻璃拟态 UI
 - **内置编辑器** — 访问 `/edit` 直接在浏览器中修改配置
@@ -66,7 +66,7 @@ cd compass && npm install
 npm run dev
 ```
 
-打开 `http://localhost:3000`。
+本地开发默认使用静态预览模式，打开 `http://localhost:3000`。
 
 详细说明见 [DEV.md](docs/DEV.md)，构建说明见 [BUILD.md](docs/BUILD.md)。
 

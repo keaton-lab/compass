@@ -1,5 +1,5 @@
-import Icon from './Icon';
-import type { Link as LinkType } from '../types';
+import ResolvedIcon from './ResolvedIcon';
+import type { ResolvedLink as LinkType } from '../types';
 
 interface NavigationCardProps {
   link: LinkType;
@@ -37,7 +37,8 @@ export default function NavigationCard({ link, color, animations }: NavigationCa
           borderColor: `${color}30`,
         }}
       >
-        <Icon
+        <ResolvedIcon
+          icon={link.resolvedIcon}
           name={link.icon}
           size={18}
           color={color}
