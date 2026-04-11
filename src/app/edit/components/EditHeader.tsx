@@ -107,7 +107,7 @@ export default function EditHeader({
         <p className="text-sm text-[var(--muted)] mt-1">
           {canSaveToServer
             ? `当前为在线编辑模式`
-            : `当前为静态导出模式，请复制 YAML 后手动保存到 src/config.yaml`}
+            : `当前为静态导出模式，请复制 YAML 后手动保存到 public/config.yaml`}
         </p>
         {(statusMessage || saveError) && (
           <p className={`mt-2 text-xs ${saveError ? 'text-red-400' : 'text-emerald-500'}`}>

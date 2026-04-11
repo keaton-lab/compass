@@ -4,6 +4,7 @@ import Image from 'next/image';
 import ResolvedIcon from './ResolvedIcon';
 import DeferredThemeToggle from './DeferredThemeToggle';
 import type { ResolvedProfile as Profile } from '../types';
+import { stripAvatarIconPrefix } from '../avatar-utils';
 
 function getInitials(name: string): string {
   return name
@@ -30,7 +31,8 @@ function ProfileAvatar({
   textSizeClass: string;
 }) {
   const avatarValue = avatar ?? '';
-  const isIconAvatar = avatarValue.startsWith('icon:');
+  const iconAvatarName = profile.resolvedAvatarIcon ? stripAvatarIconPrefix(avatarValue) : '';
+  const isIconAvatar = Boolean(iconAvatarName);
   const isImageAvatar = !isIconAvatar && avatarValue.trim() !== '';
   const initials = getInitials(name);
 
@@ -42,7 +44,7 @@ function ProfileAvatar({
       >
         <ResolvedIcon
           icon={profile.resolvedAvatarIcon}
-          name={avatarValue.slice(5)}
+          name={iconAvatarName}
           size={iconSize}
           className="text-[var(--text-primary)]"
         />

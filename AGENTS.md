@@ -23,7 +23,7 @@ npm run lint    # ESLint 检查
 
 - **Lucide 图标**：PascalCase（如 `Calendar`, `Mail`）
 - **品牌图标**：lowercase 或 kebab-case（如 `github`, `google-gemini`），来自 `simple-icons`
-- 头像格式：`avatar: "icon:navigation"`（带 `icon:` 前缀）
+- 头像格式：直接写图标名即可，如 `avatar: "navigation"`
 - 新增图标时，直接在 YAML 中写图标名即可
 
 ---
@@ -32,17 +32,16 @@ npm run lint    # ESLint 检查
 
 所有内容来自 YAML 配置文件：
 
-- 默认路径：`src/config.yaml`
+- 默认路径：`public/config.yaml`
 - server 模式可通过 `COMPASS_CONFIG_PATH` 指向外挂 `config.yaml`
 - 规范统一使用 `.yaml`
 
 ```yaml
 profile:
   name: Compass
-  avatar: "icon:navigation"
+  avatar: "navigation"
   description: ...
   bio: ...
-  repo: "https://github.com/..."
 
 settings:
   theme: dark        # light | dark | ocean
@@ -69,6 +68,8 @@ categories:
 ## 项目结构
 
 ```
+public/
+├── config.yaml              # 默认配置文件
 src/
 ├── app/
 │   ├── page.tsx             # 主页（服务端组件）
@@ -78,7 +79,6 @@ src/
 │   ├── themes/              # light/dark/ocean 主题预设
 │   ├── types/               # TypeScript 接口
 │   └── globals.css          # 全局样式 + CSS 变量
-├── config.yaml              # 默认配置文件
 ├── server/                  # 运行时模式与 YAML 读写
 ```
 

@@ -19,7 +19,7 @@
 
 ## 特性
 
-- **YAML 配置** — 所有内容集中在 `src/config.yaml`，改完即生效
+- **YAML 配置** — 所有内容集中在 `public/config.yaml`，改完即生效
 - **零数据库** — 静态导出可直接部署；Docker 模式直接读写挂载 YAML
 - **运行时图标** — Lucide + Simple Icons 运行时解析，新增图标不用改代码
 - **三套主题** — Light / Dark / Ocean，玻璃拟态 UI
@@ -41,12 +41,12 @@
 ## 使用教程
 
 1. **Fork 本项目** — 点击右上角 Fork 按钮，复制仓库到你的 GitHub 账号
-2. **修改配置** — 编辑 `src/config.yaml`，填入你的个人信息和导航链接
+2. **修改配置** — 编辑 `public/config.yaml`，填入你的个人信息和导航链接
 3. **连接部署平台** — 在 [Cloudflare Pages](https://pages.cloudflare.com/) / [Vercel](https://vercel.com) / [Netlify](https://www.netlify.com/) 中导入你的 Fork 仓库
 4. **等待自动部署** — 平台检测到代码变更会自动构建，完成后即可通过分配的域名访问
 5. **绑定自定义域名（可选）** — 在部署平台设置中添加你的域名，解析到对应 CNAME
 
-后续更新只需修改 `config.yaml` 并 Push，平台会自动重新部署。也可访问 `/edit` 路径使用内置编辑器在线修改。项目规范统一使用 `.yaml` 后缀。
+后续更新只需修改 `public/config.yaml` 并 Push，平台会自动重新部署。也可访问 `/edit` 路径使用内置编辑器在线修改。项目规范统一使用 `.yaml` 后缀。
 
 ## 部署
 
@@ -72,12 +72,12 @@ npm run dev
 
 ## 配置
 
-编辑 `src/config.yaml` 即可自定义全部内容：
+编辑 `public/config.yaml` 即可自定义全部内容：
 
 ```yaml
 profile:
   name: Compass
-  avatar: "icon:navigation"
+  avatar: "navigation"
   description: Navigate Your World
   bio: 快速访问常用网站和工具
 
@@ -110,8 +110,9 @@ categories:
 ## 项目结构
 
 ```
-src/
+public/
 ├── config.yaml              # 唯一配置文件
+src/
 ├── app/
 │   ├── page.tsx             # 主页（服务端读取 YAML）
 │   ├── components/          # UI 组件
@@ -124,7 +125,7 @@ src/
 
 ## 工作流
 
-修改 `config.yaml` → 提交 → 平台自动构建部署。也可通过 `/edit` 页面在线编辑后导出 YAML。
+修改 `public/config.yaml` → 提交 → 平台自动构建部署。也可通过 `/edit` 页面在线编辑后导出 YAML。
 
 ## 技术栈
 

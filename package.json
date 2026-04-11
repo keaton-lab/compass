@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "generate:static-icons": "node scripts/generate-static-brand-icons.mjs",
     "dev": "node scripts/dev.mjs",
     "dev:static": "node scripts/dev.mjs static",
     "dev:server": "node scripts/dev.mjs server",
@@ -12,26 +13,26 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "framer-motion": "^11.18.2",
+    "framer-motion": "^11.11.0",
     "js-yaml": "^4.1.0",
-    "lucide-react": "^1.7.0",
-    "next": "14.2.35",
+    "lucide-react": "^1.8.0",
+    "next": "16.2.3",
     "radix-ui": "^1.4.3",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
     "simple-icons": "^16.14.0"
   },
   "devDependencies": {
     "@iconify/json": "^2.2.456",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.35",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.3",
     "postcss": "^8",
     "server-only": "^0.0.1",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.7.3"
   }
 }

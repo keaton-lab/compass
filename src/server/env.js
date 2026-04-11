@@ -2,7 +2,7 @@
 const crypto = require('crypto');
 const path = require('path');
 
-const DEFAULT_CONFIG_RELATIVE_PATH = path.join('src', 'config.yaml');
+const DEFAULT_CONFIG_RELATIVE_PATH = path.join('public', 'config.yaml');
 
 let generatedSessionSecret;
 let sessionSecretWasGenerated = false;
@@ -24,10 +24,10 @@ function resolveConfigPath() {
   if (configuredPath) {
     return path.isAbsolute(configuredPath)
       ? configuredPath
-      : path.join(process.cwd(), configuredPath);
+      : path.join(/* turbopackIgnore: true */ process.cwd(), configuredPath);
   }
 
-  return path.join(process.cwd(), DEFAULT_CONFIG_RELATIVE_PATH);
+  return path.join(process.cwd(), 'public', 'config.yaml');
 }
 
 function getAdminToken() {

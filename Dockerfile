@@ -17,7 +17,7 @@ ENV COMPASS_BUILD_TARGET=server
 
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/src/config.yaml ./src/config.yaml
+COPY --from=builder /app/public ./public
 COPY --from=builder /app/src/server/env.js ./src/server/env.js
 COPY --from=builder /app/scripts/server-entry.js ./scripts/server-entry.js
 

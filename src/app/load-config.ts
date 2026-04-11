@@ -4,6 +4,7 @@ import { unstable_noStore as noStore } from 'next/cache';
 import type { Config } from './types';
 import { defaultThemeId, isThemeId } from './themes';
 import configStore from '../server/config-store';
+import buildTarget from '../server/build-target';
 import runtime from '../server/runtime';
 import { resolveConfigIcons } from './resolve-config-icons';
 
@@ -11,9 +12,11 @@ const { loadConfigFile, resolveConfigPath } = configStore as {
   loadConfigFile: () => Config;
   resolveConfigPath: () => string;
 };
-const { canSaveToServer, isServerBuild } = runtime as {
-  canSaveToServer: () => boolean;
+const { isServerBuild } = buildTarget as {
   isServerBuild: () => boolean;
+};
+const { canSaveToServer } = runtime as {
+  canSaveToServer: () => boolean;
 };
 
 export interface EditCapabilities {

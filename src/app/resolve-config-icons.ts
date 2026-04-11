@@ -2,6 +2,7 @@ import 'server-only';
 
 import type { ResolvedIconData, ResolvedSvgNode } from './icon-types';
 import type { Config, ResolvedConfig } from './types';
+import { getAvatarIconName } from './avatar-utils';
 
 interface SimpleIconModuleEntry {
   slug: string;
@@ -168,13 +169,12 @@ async function resolveIcon(name: string): Promise<ResolvedIconData | null> {
 }
 
 export async function resolveConfigIcons(config: Config): Promise<ResolvedConfig> {
+  const avatarIconName = getAvatarIconName(config.profile.avatar);
+
   return {
     profile: {
       ...config.profile,
-      resolvedAvatarIcon:
-        config.profile.avatar?.startsWith('icon:')
-          ? await resolveIcon(config.profile.avatar.slice(5))
-          : null,
+      resolvedAvatarIcon: avatarIconName ? await resolveIcon(avatarIconName) : null,
     },
     settings: config.settings,
     categories: await Promise.all(

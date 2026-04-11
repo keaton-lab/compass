@@ -115,7 +115,6 @@ function normalizeConfig(input) {
       avatar: ensureOptionalString(profile.avatar, 'profile.avatar'),
       description: ensureString(profile.description, 'profile.description'),
       bio: ensureOptionalString(profile.bio, 'profile.bio'),
-      repo: ensureOptionalString(profile.repo, 'profile.repo'),
     },
     settings: {
       theme: ensureTheme(settings.theme),

@@ -1,20 +1,20 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-const BUILD_TARGET_STATIC = 'static';
-const BUILD_TARGET_SERVER = 'server';
-const env = require('./env');
+const buildTarget = require('./build-target');
 
-const { getSessionSecret, hasAdminToken } = env;
+const { BUILD_TARGET_STATIC, BUILD_TARGET_SERVER, getBuildTarget, isServerBuild } = buildTarget;
 
-function getBuildTarget() {
-  return process.env.COMPASS_BUILD_TARGET === BUILD_TARGET_SERVER
-    ? BUILD_TARGET_SERVER
-    : BUILD_TARGET_STATIC;
+let env;
+
+function getEnv() {
+  if (!env) {
+    env = require('./env');
+  }
+
+  return env;
 }
 
-function isServerBuild() {
-  return getBuildTarget() === BUILD_TARGET_SERVER;
-}
 function canSaveToServer() {
+  const { getSessionSecret, hasAdminToken } = getEnv();
   return isServerBuild() && hasAdminToken() && getSessionSecret().length > 0;
 }
 
