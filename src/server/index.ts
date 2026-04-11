@@ -31,20 +31,19 @@ app.get('/api/health', (c) => {
 });
 
 const mode = getRuntimeMode();
+const clientDistDir = join(process.cwd(), 'dist', 'client');
 
-// 生产环境: 托管静态资源
+// 静态资源服务 (server/github 模式)
 if (mode === 'server' || mode === 'github') {
-  const clientDir = join(process.cwd(), 'dist', 'client');
-  
-  // 托管静态资源 (CSS, JS, images 等)
+  // 提供静态文件
   app.use('/*', serveStatic({
-    root: clientDir,
+    root: clientDistDir,
   }));
-  
-  // SPA 路由回退 - 所有非 API 路由返回 index.html
+
+  // SPA 路由回退
   app.get('*', (c) => {
     try {
-      const indexPath = join(clientDir, 'index.html');
+      const indexPath = join(clientDistDir, 'index.html');
       const indexHtml = readFileSync(indexPath, 'utf-8');
       return c.html(indexHtml);
     } catch (error) {
@@ -55,16 +54,14 @@ if (mode === 'server' || mode === 'github') {
 }
 
 // 启动服务器
-const port = Number(process.env.PORT) || 3001;
+const port = Number(process.env.PORT) || 3000;
 
 if (mode === 'server' || mode === 'github') {
-  // Server/GitHub 模式: 检查必需环境变量
   try {
     const env = assertServerStartupEnv();
-    console.log(`🚀 Compass server starting on port ${port}`);
-    console.log(`📋 Mode: ${mode}`);
+    console.log(`🚀 Compass ${mode} server starting on port ${port}`);
     console.log(`📁 Config path: ${env.configPath}`);
-    
+
     if (env.generatedSessionSecret) {
       console.log('⚠️  COMPASS_SESSION_SECRET 未设置,已生成临时密钥(重启后会失效)');
     }
@@ -73,9 +70,8 @@ if (mode === 'server' || mode === 'github') {
     process.exit(1);
   }
 } else {
-  console.log(`🚀 Compass development server starting on port ${port}`);
-  console.log(`📋 Mode: ${mode} (API only)`);
-  console.log(`💡 Run 'npm run dev:client' to start Vite dev server`);
+  console.log(`🚀 Compass static dev server on port ${port}`);
+  console.log(`📋 Mode: ${mode}`);
 }
 
 serve({
