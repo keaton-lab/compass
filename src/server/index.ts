@@ -7,6 +7,8 @@ import configRoutes from './routes/config';
 import sessionRoutes from './routes/session';
 import githubRoutes from './routes/github';
 import { assertServerStartupEnv, getRuntimeMode } from './env';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 const app = new Hono();
 
@@ -28,30 +30,27 @@ app.get('/api/health', (c) => {
   return c.json({ status: 'ok', mode: getRuntimeMode() });
 });
 
-// 静态资源服务 (生产环境)
 const mode = getRuntimeMode();
+
+// 生产环境: 托管静态资源
 if (mode === 'server' || mode === 'github') {
-  // 托管前端构建产物
+  const clientDir = join(process.cwd(), 'dist', 'client');
+  
+  // 托管静态资源 (CSS, JS, images 等)
   app.use('/*', serveStatic({
-    root: './dist/client',
+    root: clientDir,
   }));
   
-  // SPA 路由回退
+  // SPA 路由回退 - 所有非 API 路由返回 index.html
   app.get('*', (c) => {
-    return c.html(`
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Compass</title>
-</head>
-<body>
-  <div id="root"></div>
-  <script type="module" src="/src/client/main.tsx"></script>
-</body>
-</html>
-    `);
+    try {
+      const indexPath = join(clientDir, 'index.html');
+      const indexHtml = readFileSync(indexPath, 'utf-8');
+      return c.html(indexHtml);
+    } catch (error) {
+      console.error('Failed to read index.html:', error);
+      return c.text('index.html not found. Did you run `npm run build`?', 404);
+    }
   });
 }
 
@@ -75,7 +74,8 @@ if (mode === 'server' || mode === 'github') {
   }
 } else {
   console.log(`🚀 Compass development server starting on port ${port}`);
-  console.log(`📋 Mode: ${mode} (development)`);
+  console.log(`📋 Mode: ${mode} (API only)`);
+  console.log(`💡 Run 'npm run dev:client' to start Vite dev server`);
 }
 
 serve({

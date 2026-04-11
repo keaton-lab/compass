@@ -7,8 +7,8 @@ export default defineConfig({
     react(),
   ],
   resolve: {
-    tsconfigPaths: {
-      projects: ['./tsconfig.client.json'],
+    alias: {
+      '@': '/src',
     },
   },
   root: '.',

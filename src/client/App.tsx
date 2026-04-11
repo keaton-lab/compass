@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import LoadingSpinner from './components/LoadingSpinner';
+import { SettingsProvider } from './contexts/SettingsContext';
 
 // 懒加载页面组件
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -12,12 +13,14 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
  */
 export default function App() {
   return (
-    <Suspense fallback={<LoadingSpinner />}>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/edit" element={<EditPage />} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </Suspense>
+    <SettingsProvider>
+      <Suspense fallback={<LoadingSpinner />}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/edit" element={<EditPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </Suspense>
+    </SettingsProvider>
   );
 }
