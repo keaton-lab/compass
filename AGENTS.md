@@ -1,68 +1,70 @@
 # AGENTS.md - Compass 项目智能体编码指南
 
-**Compass** 是一个基于 Next.js 14 App Router 的个人导航仪表板，使用 YAML 配置驱动内容，支持动态图标生成和多主题。
+**Compass** 是一个基于 Astro 6 + React 19 的个人导航仪表板，YAML 配置驱动内容，支持静态导出和 SSR 两种模式。
 
 ---
 
 ## 关键命令
 
-```bash
-npm run dev           # 开发服务器（静态预览）
-npm run build         # 静态导出构建（默认）
-npm run build:static  # 静态导出构建
-npm run build:server  # Node 服务构建
-npm run lint    # ESLint 检查
-```
+| 命令 | 说明 |
+|------|------|
+| `npm run dev` | Server 模式开发（默认，SSR） |
+| `npm run dev:static` | 静态模式预览 |
+| `npm run build` | 静态构建（默认） |
+| `npm run build:static` | 静态构建 → `dist/client/` |
+| `npm run build:server` | Server 构建 → `dist/client/` + `dist/server/entry.mjs` |
+| `npm run typecheck` | `astro check` + `tsc -p tsconfig.server.json` |
+| `npm run lint` | ESLint 检查 |
+| `npm run test` | Vitest 单元测试 |
+| `npm run test:e2e` | Playwright E2E 测试 |
 
-> **注意**：无测试框架，无 typecheck 脚本。
+> **Node.js 版本要求**：`>= 22.12.0`
 
+---
 
 ## 图标系统（⚠️ 重要）
 
-图标改为**运行时解析**，不再依赖构建前生成 manifest。
+图标在**运行时解析**，无需构建步骤。
 
-- **Lucide 图标**：PascalCase（如 `Calendar`, `Mail`）
-- **品牌图标**：lowercase 或 kebab-case（如 `github`, `google-gemini`），来自 `simple-icons`
-- 头像格式：`avatar: "icon:navigation"`（带 `icon:` 前缀）
-- 新增图标时，直接在 YAML 中写图标名即可
+| 类型 | 来源 | 命名规则 | 示例 |
+|------|------|----------|------|
+| 通用图标 | Lucide | PascalCase | `Calendar`, `Mail`, `Wrench` |
+| 品牌图标 | Simple Icons | lowercase 或 kebab-case | `github`, `google-gemini`, `vercel` |
+
+头像格式：`avatar: "navigation"`（直接使用图标名称）
 
 ---
 
 ## 配置驱动架构
 
-所有内容来自 YAML 配置文件：
+所有内容来自单一 YAML 配置文件：
 
-- 默认路径：`public/config.yaml`
-- server 模式可通过 `COMPASS_CONFIG_PATH` 指向外挂 `config.yaml`
-- 规范统一使用 `.yaml`
+- **默认路径**：`public/config.yaml`
+- **运行时覆盖**：通过 `COMPASS_CONFIG_PATH` 环境变量指定
+- **本地开发**：`npm run sync:static` 同步 `public/config.local.yaml` → `public/config.yaml`
 
 ```yaml
 profile:
   name: Compass
-  avatar: "icon:navigation"
-  description: ...
-  bio: ...
-  repo: "https://github.com/..."
+  avatar: "navigation"
+  description: Navigate Your World
 
 settings:
   theme: dark        # light | dark | ocean
   showSearch: true
   layout: grid       # grid | list
-  animations: true
 
 categories:
   - id: daily
     name: Daily
-    icon: Calendar   # Lucide
+    icon: Calendar
     color: "#3b82f6"
     links:
       - id: github
         name: GitHub
         url: https://github.com
-        icon: github   # 品牌
+        icon: github
 ```
-
-**页面加载流程**：`page.tsx`（服务端）→ 读取运行时 YAML → 传给 `ClientLayout` → `SettingsContext` 管理客户端状态
 
 ---
 
@@ -70,36 +72,50 @@ categories:
 
 ```
 src/
-├── app/
-│   ├── page.tsx             # 主页（服务端组件）
-│   ├── layout.tsx           # 根布局
-│   ├── components/          # React 组件（PascalCase）
-│   ├── contexts/            # SettingsContext
-│   ├── themes/              # light/dark/ocean 主题预设
-│   ├── types/               # TypeScript 接口
-│   └── globals.css          # 全局样式 + CSS 变量
-├── server/                  # 运行时模式与 YAML 读写
+├── layouts/          # Astro 布局
+├── pages/            # 页面与 API 路由（Astro）
+├── client/           # React 组件、islands、编辑器
+│   ├── components/   # UI 组件
+│   ├── islands/      # 首页局部交互岛（Astro islands）
+│   ├── pages/        # 编辑器页面（/edit）
+│   ├── contexts/     # 客户端状态
+│   └── services/     # API 服务
+├── server/           # 运行时能力与 YAML 读写
+└── shared/           # 共享模块
+    ├── types.ts      # 类型定义
+    ├── themes.ts     # 主题预设
+    └── config-yaml.ts # YAML 解析与验证
 ```
 
 ---
 
-## 代码规范
+## 构建验证顺序
 
-- **组件文件**：PascalCase（`NavigationCard.tsx`）
-- **服务端组件**：默认无指令；客户端组件：顶部加 `"use client"`
-- **相对导入**：`./` 或 `../`
-- **类型导入**：`import type { Config } from './types'`
-- **Tailwind CSS**：`darkMode: 'class'`（通过类名切换）
-- **响应式断点**：`xsm` (390px), `sm`, `md`, `lg`, `xl`
+```bash
+npm run typecheck && npm run lint && npm run build:static && npm run build:server
+```
+
+---
+
+## 环境变量
+
+| 变量 | 说明 | 必需 |
+|------|------|------|
+| `COMPASS_RUNTIME_MODE` | `static` 或 `server` | 否（自动推断） |
+| `COMPASS_CONFIG_PATH` | 配置文件路径 | 否（默认 `public/config.yaml`） |
+| `COMPASS_ADMIN_TOKEN` | 编辑器登录口令 | server 模式开启保存能力时需要 |
+| `COMPASS_SESSION_SECRET` | 会话签名密钥 | 否（随机生成） |
+| `PORT` | 服务端口 | 否（默认 3000） |
+
+开发模式下默认注入 `COMPASS_ADMIN_TOKEN=dev-token`。
 
 ---
 
 ## 部署
 
-- **静态模式目标**：Cloudflare Pages / Netlify / 任意静态托管
-- **静态构建输出**：`out/`
-- **Docker 模式目标**：Node 服务 + 外挂 YAML
-- **server 构建命令**：`npm run build:server`
+- **静态模式**：`dist/client/` → Cloudflare Pages / Vercel / Netlify
+- **Server 模式**：`node dist/server/entry.mjs` 或 Docker
+- **Docker 外挂配置**：`-v /path/to/config.yaml:/app/public/config.yaml`
 
 ---
 
@@ -107,6 +123,8 @@ src/
 
 | 问题 | 解决 |
 |------|------|
-| 图标不显示 | 检查命名（Lucide 用 PascalCase，品牌图标用小写或 kebab-case） |
-| Docker 模式修改 YAML 不生效 | 确认 `COMPASS_CONFIG_PATH` 指向挂载文件，刷新页面重试 |
-| 主题不生效 | 检查 `settings.theme` 是否为 `light`/`dark`/`ocean` |
+| 图标不显示 | Lucide 用 PascalCase，品牌图标用 lowercase 或 kebab-case |
+| typecheck 报错 | 检查 `tsconfig.server.json` 包含的服务端文件 |
+| 静态构建配置不更新 | 运行 `npm run sync:static` 或检查 `config.local.yaml` |
+| Docker 配置修改不生效 | 确认 `COMPASS_CONFIG_PATH` 指向挂载文件 |
+| 主题无效 | `settings.theme` 必须为 `light` / `dark` / `ocean` |

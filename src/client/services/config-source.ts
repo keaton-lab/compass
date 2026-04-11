@@ -1,12 +1,10 @@
 import type {
   Config,
-  ResolvedConfig,
   Capabilities,
   GithubConnectionStatus,
   SessionStatus,
 } from '@/shared/types';
 import { parseConfigYaml } from '@/shared/config-yaml';
-import { resolveConfigIcons } from '@/shared/icon-resolver';
 
 async function readJsonResponse<T>(
   response: Response,
@@ -45,7 +43,26 @@ export async function fetchCapabilities(): Promise<Capabilities> {
   }
 }
 
+/**
+ * 获取内联配置（静态模式下从首页嵌入的 script 标签读取）
+ */
+function getInlineConfigYaml(): string | null {
+  if (typeof document === 'undefined') {
+    return null;
+  }
+
+  const inlineScript = document.getElementById('compass-inline-config');
+  return inlineScript?.textContent ?? null;
+}
+
 async function loadStaticConfig(): Promise<Config> {
+  // 优先从首页内联的配置读取
+  const inlineYaml = getInlineConfigYaml();
+  if (inlineYaml) {
+    return parseConfigYaml(inlineYaml);
+  }
+
+  // 回退到 fetch /config.yaml
   const configResponse = await fetch('/config.yaml');
 
   if (!configResponse.ok) {
@@ -76,7 +93,7 @@ async function loadApiRuntimeConfig(): Promise<Config> {
 /**
  * 加载运行时配置
  * 静态模式直接从 /config.yaml 加载
- * Server/GitHub 模式从 API 加载
+ * server 模式从 API 加载
  */
 export async function loadRuntimeConfig(
   capabilities?: Capabilities,
@@ -88,14 +105,6 @@ export async function loadRuntimeConfig(
   }
 
   return loadApiRuntimeConfig();
-}
-
-/**
- * 加载已解析图标的配置（用于首页显示）
- */
-export async function loadResolvedConfig(): Promise<ResolvedConfig> {
-  const config = await loadRuntimeConfig();
-  return resolveConfigIcons(config);
 }
 
 /**

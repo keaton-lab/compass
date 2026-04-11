@@ -1,170 +1,84 @@
 # 本地开发
 
-## 一、启动开发服务器
+## 环境要求
 
-### 静态模式
+- Node.js `>= 22.12.0`
+- npm `>= 10`
 
 ```bash
 npm install
-npm run dev:static
 ```
 
-访问 `http://localhost:3000`
+## 启动开发服务器
 
-### Server/GitHub 模式
-
-Server 和 GitHub 模式开发时使用单端口开发服务器，页面和 API 共用 `http://localhost:3000`。
+### Server 模式
 
 ```bash
-# Server 模式
 npm run dev
-
-# GitHub 模式
-GITHUB_CLIENT_ID=xxx \
-GITHUB_CLIENT_SECRET=xxx \
-GITHUB_REPO_OWNER=owner \
-GITHUB_REPO_NAME=repo \
-npm run dev:github
 ```
 
-如果只想跑纯静态前端：
+行为：
+
+- `/` 通过 Astro SSR 渲染
+- `/edit` 作为独立页面加载编辑器
+- `/api/*` 可直接联调
+- 默认注入 `COMPASS_ADMIN_TOKEN=dev-token`
+
+### Static 模式
 
 ```bash
 npm run dev:static
 ```
 
-访问 `http://localhost:3000`
+行为：
 
-说明：
-- `npm run dev`、`npm run dev:github`、`npm run dev:static` 都通过 Hono 挂载 Vite middleware，只暴露一个端口
-- `npm run dev` 默认会为开发环境注入 `COMPASS_ADMIN_TOKEN=dev-token`
-- 如果你想自定义口令，可在命令前显式传入 `COMPASS_ADMIN_TOKEN=your-secret`
+- 首页按静态模式读取构建期配置
+- `/edit` 只保留本地编辑与导出 YAML
+- 可用来验证纯静态托管场景
 
----
-
-## 二、构建与生产运行
-
-### 1. 静态导出
+## 生产构建验证
 
 ```bash
+npm run typecheck
+npm run lint
 npm run build:static
-# 产物输出到 dist/client/ 目录
-```
-
-可直接用任意静态服务器托管:
-
-```bash
-npx serve dist/client
-# 或
-python -m http.server 8080 -d dist/client
-```
-
-### 2. Docker 生产镜像构建
-
-```bash
 npm run build:server
-docker build -t compass .
 ```
 
----
+## 能力说明
 
-## 三、Docker 构建与运行
+### 保存到服务器
 
-### 1. 构建镜像
+满足以下条件后可用：
 
-```bash
-docker build -t compass .
-```
+- 运行在 `server` 模式
+- 配置了 `COMPASS_ADMIN_TOKEN`
+- 已在编辑器中登录
 
-### 2. 启动容器
+### GitHub 发布
 
-```bash
-docker run -d \
-  -p 3000:3000 \
-  -e COMPASS_RUNTIME_MODE=server \
-  -e COMPASS_ADMIN_TOKEN=your-secret \
-  -e COMPASS_SESSION_SECRET=another-secret \
-   -v /path/to/config.yaml:/app/public/config.yaml \
-  compass
-```
+GitHub 发布不再是独立运行模式，而是 `server` 模式下的可选能力。
 
-### 3. 使用 Docker Compose
+满足以下条件后可用：
 
-```bash
-# 准备配置文件
-mkdir -p docker
-cp public/config.yaml docker/config.yaml
+- `GITHUB_CLIENT_ID`
+- `GITHUB_CLIENT_SECRET`
+- `GITHUB_REPO_OWNER`
+- `GITHUB_REPO_NAME`
 
-# 修改 docker-compose.yml 中的口令后启动
-docker compose up --build
-```
+## 配置文件
 
----
+- 默认路径：`public/config.yaml`
+- 可通过 `COMPASS_CONFIG_PATH` 指向外挂 YAML
+- 开发时 `npm run sync:static` 会把 `public/config.local.yaml` 同步到 `public/config.yaml`
 
-## 四、开发模式说明
+## 目录结构
 
-### 静态模式 (static)
-- 前端直接读取 `/config.yaml`
-- `/edit` 仅支持编辑和导出 YAML
-- 适合静态托管平台
-
-### Server 模式 (server)
-- 前端通过 API 读取和保存配置
-- `/edit` 支持登录并保存到服务器
-- 适合 Docker 部署
-
-### GitHub 模式 (github)
-- 通过 GitHub App 授权
-- `/edit` 支持发布到指定仓库
-- 适合团队协作
-
----
-
-## 五、环境变量
-
-| 变量 | 说明 | 默认值 |
-|------|------|--------|
-| `COMPASS_RUNTIME_MODE` | 运行模式 | static |
-| `COMPASS_CONFIG_PATH` | 配置文件路径 | public/config.yaml |
-| `COMPASS_ADMIN_TOKEN` | 编辑器登录口令（server 模式必需） | 无 |
-| `COMPASS_SESSION_SECRET` | 会话签名密钥（可选，未设置时自动生成） | 随机值 |
-
----
-
-## 六、项目结构
-
-```
+```text
 src/
-├── client/           # React 前端应用
-│   ├── components/   # UI 组件
-│   ├── pages/        # 页面路由
-│   ├── contexts/     # 客户端状态
-│   └── services/     # API 服务
-├── server/           # Hono 服务端
-│   ├── routes/       # API 路由
-│   └── index.ts      # 服务入口
-└── shared/           # 共享模块
-    ├── types.ts      # 类型定义
-    ├── themes.ts     # 主题预设
-    └── config-yaml.ts # YAML 解析
-
-public/
-└── config.yaml       # 唯一配置文件
+├── layouts/          # Astro 布局
+├── pages/            # 页面与 API 路由
+├── client/           # React 组件、islands、编辑器
+├── server/           # 运行时能力与 YAML 读写
+└── shared/           # 共享类型、主题、图标解析
 ```
-
----
-
-## 七、技术栈
-
-- **前端**: Vite + React 18 + React Router + Tailwind CSS
-- **后端**: Hono + Node.js
-- **图标**: Lucide + Simple Icons (运行时解析)
-- **配置**: YAML
-
----
-
-## 备注
-
-- 图标在运行时解析，修改 YAML 中的图标名称后刷新即可生效
-- Docker 模式缺少 `COMPASS_ADMIN_TOKEN` 时容器会直接拒绝启动
-- 配置文件统一使用 `.yaml` 后缀

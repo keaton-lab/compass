@@ -2,133 +2,90 @@
 
 ## 运行模式
 
-Compass 支持三种运行模式:
+Compass 现在只有两种运行模式：
 
-### 1. Static 模式
-适用于静态托管平台(Cloudflare Pages、Vercel、Netlify 等)
+### 1. `static`
 
 ```bash
 npm run build:static
 ```
 
-**产物**: `dist/client/`
-**特点**:
-- 纯静态文件,无需服务器
-- 配置文件在构建时嵌入
-- `/edit` 仅支持导出 YAML
+- 输出目录：`dist/client/`
+- 生成 `dist/client/index.html` 和 `dist/client/edit/index.html`
+- 首页在构建期读取 `public/config.yaml` 并生成完整 HTML
+- `/edit` 仍可本地编辑和导出 YAML，但不会直接写回服务器
 
-### 2. Server 模式
-适用于 Docker 部署,支持运行时编辑
+### 2. `server`
 
 ```bash
 npm run build:server
 ```
 
-**产物**: `dist/client/` + `dist/server/`
-**特点**:
-- Hono 服务器
-- 运行时读取 YAML
-- `/edit` 支持登录并保存到服务器
-- 必需环境变量: `COMPASS_ADMIN_TOKEN`
-
-### 3. GitHub 模式
-支持通过 GitHub App 集成在线编辑并提交到仓库
-
-```bash
-npm run build:github
-```
-
-**产物**: `dist/client/` + `dist/server/`
-**特点**:
-- Hono 服务器
-- GitHub App OAuth 授权
-- 配置提交到指定仓库
-- 需要配置 GitHub App 相关环境变量
+- 输出目录：`dist/client/` + `dist/server/`
+- 运行入口：`dist/server/entry.mjs`
+- `/` 在运行时读取 YAML 并 SSR
+- `/edit` 是独立客户端页面
+- 登录保存和 GitHub 发布都属于 `server` 模式下的可选能力
 
 ## 静态部署
 
-### Cloudflare Pages
-```bash
-# 构建命令
-npm run build:static
+适用于 Cloudflare Pages、Vercel、Netlify 和任意静态托管：
 
-# 发布目录
+```bash
+npm run build:static
+```
+
+发布目录：
+
+```text
 dist/client
 ```
 
-### Vercel
-```bash
-# 构建命令
-npm run build:static
+## Server 部署
 
-# 发布目录
-dist/client
+### 本地运行构建产物
+
+```bash
+npm run build:server
+node dist/server/entry.mjs
 ```
 
-### Netlify
-```bash
-# 构建命令
-npm run build:static
-
-# 发布目录
-dist/client
-```
-
-## Docker 部署
-
-### 构建镜像
+### Docker 示例
 
 ```bash
 docker build -t compass .
-```
 
-### 启动容器 (Server 模式)
-
-```bash
 docker run -d \
   -p 3000:3000 \
   -e COMPASS_RUNTIME_MODE=server \
   -e COMPASS_ADMIN_TOKEN=change-me \
   -e COMPASS_SESSION_SECRET=change-me-too \
-   -v /path/to/config.yaml:/app/public/config.yaml \
+  -v /path/to/config.yaml:/app/public/config.yaml \
   compass
-```
-
-### 使用 Docker Compose
-
-```bash
-# 准备配置文件
-mkdir -p docker
-cp public/config.yaml docker/config.yaml
-
-# 修改 docker-compose.yml 中的口令后启动
-docker compose up --build
 ```
 
 ## 环境变量
 
 | 变量 | 说明 | 默认值 | 必需 |
 |------|------|--------|------|
-| `COMPASS_RUNTIME_MODE` | 运行模式 (static/server/github) | static | 否 |
-| `COMPASS_CONFIG_PATH` | 配置文件路径 | public/config.yaml | 否 |
-| `COMPASS_ADMIN_TOKEN` | 编辑器登录口令 | - | server 模式必需 |
+| `COMPASS_RUNTIME_MODE` | 运行模式（`static` / `server`） | 自动推断 | 否 |
+| `COMPASS_CONFIG_PATH` | 运行时配置文件路径 | `public/config.yaml` | 否 |
+| `COMPASS_ADMIN_TOKEN` | 编辑器登录口令 | - | 仅开启保存能力时需要 |
 | `COMPASS_SESSION_SECRET` | 会话签名密钥 | 随机生成 | 否 |
-| `PORT` | 服务端口 | 3000 | 否 |
-| `GITHUB_APP_ID` | GitHub App ID | - | github 模式必需 |
-| `GITHUB_APP_PRIVATE_KEY` | GitHub App 私钥 | - | github 模式必需 |
-| `GITHUB_CLIENT_ID` | GitHub OAuth Client ID | - | github 模式必需 |
-| `GITHUB_CLIENT_SECRET` | GitHub OAuth Client Secret | - | github 模式必需 |
-| `GITHUB_REPO_OWNER` | 目标仓库所有者 | - | github 模式必需 |
-| `GITHUB_REPO_NAME` | 目标仓库名称 | - | github 模式必需 |
-| `GITHUB_REPO_BRANCH` | 目标分支 | main | 否 |
-| `GITHUB_CONFIG_PATH` | 配置文件路径 | public/config.yaml | 否 |
+| `PORT` | 服务端口 | `3000` | 否 |
+| `APP_BASE_URL` | GitHub OAuth 回调基准地址 | 请求地址推断 | 否 |
+| `GITHUB_CLIENT_ID` | GitHub OAuth Client ID | - | 仅开启 GitHub 发布时需要 |
+| `GITHUB_CLIENT_SECRET` | GitHub OAuth Client Secret | - | 仅开启 GitHub 发布时需要 |
+| `GITHUB_REPO_OWNER` | 目标仓库所有者 | - | 仅开启 GitHub 发布时需要 |
+| `GITHUB_REPO_NAME` | 目标仓库名称 | - | 仅开启 GitHub 发布时需要 |
+| `GITHUB_REPO_BRANCH` | 目标分支 | `main` | 否 |
+| `GITHUB_CONFIG_PATH` | 仓库内配置路径 | `public/config.yaml` | 否 |
 
 ## 常用命令
 
 ```bash
-npm run build:static   # 静态构建
-npm run build:server   # Docker 服务构建
-npm run build:github   # GitHub 模式构建
-npm run lint           # ESLint 检查
-npm run typecheck      # TypeScript 类型检查
+npm run build:static
+npm run build:server
+npm run typecheck
+npm run lint
 ```

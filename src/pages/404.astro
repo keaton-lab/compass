@@ -1,0 +1,23 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { defaultThemeId } from '@/shared/themes';
+---
+
+<BaseLayout
+  title="404 - Compass"
+  description="页面未找到"
+  theme={defaultThemeId}
+>
+  <div class="flex min-h-screen items-center justify-center bg-[var(--background)]">
+    <div class="text-center">
+      <h1 class="mb-4 text-6xl font-bold text-[var(--text-primary)]">404</h1>
+      <p class="mb-8 text-xl text-[var(--text-secondary)]">页面未找到</p>
+      <a
+        href="/"
+        class="rounded-lg bg-[var(--accent)] px-6 py-3 text-white transition-opacity hover:opacity-90"
+      >
+        返回首页
+      </a>
+    </div>
+  </div>
+</BaseLayout>

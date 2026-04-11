@@ -1,4 +1,4 @@
-import yaml from 'js-yaml';
+import * as yaml from 'js-yaml';
 import type { Config } from './types';
 
 const DEFAULT_THEME = 'dark';

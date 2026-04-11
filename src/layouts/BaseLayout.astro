@@ -1,0 +1,86 @@
+---
+import globalStylesHref from '@/client/globals.css?url';
+import { getThemePreset } from '@/shared/themes';
+import { resolveIcon, iconToSvgString, svgToDataUri } from '@/shared/icon-resolver';
+import { loadConfigFile } from '@/server/config-store';
+import type { ThemeId } from '@/shared/types';
+
+interface Props {
+  title: string;
+  description: string;
+  theme: ThemeId;
+  criticalCss?: string;
+}
+
+const {
+  title,
+  description,
+  theme,
+  criticalCss = '',
+} = Astro.props as Props;
+const themePreset = getThemePreset(theme);
+
+// 从配置文件自动读取 avatar 生成 favicon
+let faviconDataUri: string | null = null;
+try {
+  const { loadConfigFile } = await import('@/server/config-store');
+  const config = loadConfigFile();
+  const avatar = config.profile.avatar;
+  if (avatar?.trim()) {
+    const resolvedIcon = await resolveIcon(avatar);
+    const svgString = iconToSvgString(resolvedIcon, { size: 32, color: themePreset.colors.accent });
+    if (svgString) {
+      faviconDataUri = svgToDataUri(svgString);
+    }
+  }
+} catch {
+  // 配置文件读取或图标解析失败时忽略 favicon
+}
+
+const themeScript = `
+(() => {
+  const storageKey = 'compass-settings';
+  const fallbackTheme = ${JSON.stringify(theme)};
+  let resolvedTheme = fallbackTheme;
+
+  try {
+    const rawStoredSettings = localStorage.getItem(storageKey);
+    if (rawStoredSettings) {
+      const parsedSettings = JSON.parse(rawStoredSettings);
+      if (typeof parsedSettings.theme === 'string' && parsedSettings.theme) {
+        resolvedTheme = parsedSettings.theme;
+      }
+    }
+  } catch {
+    resolvedTheme = fallbackTheme;
+  }
+
+  document.documentElement.setAttribute('data-theme', resolvedTheme);
+  document.documentElement.setAttribute('data-theme-ready', 'true');
+  document.documentElement.style.colorScheme = resolvedTheme === 'dark' ? 'dark' : 'light';
+})();
+`;
+---
+
+<!DOCTYPE html>
+<html
+  lang="zh-CN"
+  data-theme={theme}
+  data-theme-ready="true"
+  style={`color-scheme: ${themePreset.isDark ? 'dark' : 'light'};`}
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    {faviconDataUri && <link rel="icon" type="image/svg+xml" href={faviconDataUri} />}
+    <script is:inline set:html={themeScript}></script>
+    {criticalCss && <style is:inline set:html={criticalCss}></style>}
+    <link rel="preload" as="style" href={globalStylesHref} />
+    <link rel="stylesheet" href={globalStylesHref} />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import type { ReactNode } from 'react';
 import type { Settings } from '@/shared/types';
 import { defaultThemeId, getThemePreset, isThemeId, themePresets } from '@/shared/themes';
 
@@ -17,6 +18,7 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 const STORAGE_KEY = 'compass-settings';
 const THEME_SWITCH_CLASS = 'theme-switching';
 const THEME_TRANSITION_MS = 280;
+const THEME_SYNC_EVENT = 'compass-theme-sync';
 const THEME_CSS_VARIABLES = {
   background: '--background',
   foreground: '--foreground',
@@ -219,6 +221,26 @@ export function SettingsProvider({
 
   // 跨标签页同步
   useEffect(() => {
+    function handleThemeSync(event: Event) {
+      const customEvent = event as CustomEvent<{ theme?: Settings['theme'] }>;
+      const syncedTheme = customEvent.detail?.theme;
+
+      if (!syncedTheme || !isThemeId(syncedTheme)) {
+        return;
+      }
+
+      setSettings((prev) =>
+        prev.theme === syncedTheme ? prev : { ...prev, theme: syncedTheme },
+      );
+    }
+
+    window.addEventListener(THEME_SYNC_EVENT, handleThemeSync as EventListener);
+    return () => {
+      window.removeEventListener(THEME_SYNC_EVENT, handleThemeSync as EventListener);
+    };
+  }, []);
+
+  useEffect(() => {
     function handleStorageChange(e: StorageEvent) {
       if (e.key !== STORAGE_KEY) return;
       
@@ -242,6 +264,13 @@ export function SettingsProvider({
   const setTheme = useCallback((theme: Settings['theme']) => {
     lastAppliedThemeRef.current = theme;
     applyTheme(theme);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent(THEME_SYNC_EVENT, {
+          detail: { theme },
+        }),
+      );
+    }
     setSettings(prev => (prev.theme === theme ? prev : { ...prev, theme }));
   }, []);
 

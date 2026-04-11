@@ -1,12 +1,11 @@
 <p align="center">
   <h1 align="center">Compass</h1>
-  <p align="center">一个 YAML 文件驱动的个人导航页，Fork → 编辑 → 部署，没有数据库，没有后台</p>
+  <p align="center">一个 YAML 文件驱动的个人导航页，首页静态优先，编辑页按需客户端化。</p>
 </p>
 
 <p align="center">
-  <a href="https://vitejs.dev"><img src="https://img.shields.io/badge/Vite-8-646cff?logo=vite" alt="Vite"></a>
-  <a href="https://react.dev"><img src="https://img.shields.io/badge/React-18-61dafb?logo=react" alt="React"></a>
-  <a href="https://hono.dev"><img src="https://img.shields.io/badge/Hono-4-FF6900" alt="Hono"></a>
+  <a href="https://astro.build"><img src="https://img.shields.io/badge/Astro-6-ff5d01?logo=astro" alt="Astro"></a>
+  <a href="https://react.dev"><img src="https://img.shields.io/badge/React-19-61dafb?logo=react" alt="React"></a>
   <a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript" alt="TypeScript"></a>
   <a href="https://tailwindcss.com"><img src="https://img.shields.io/badge/Tailwind_CSS-3-06b6d4?logo=tailwindcss" alt="Tailwind CSS"></a>
   <a href="https://github.com/imzhoukunqiang/compass/blob/dev/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-green.svg" alt="License"></a>
@@ -21,11 +20,12 @@
 ## 特性
 
 - **YAML 配置** — 所有内容集中在 `public/config.yaml`，改完即生效
-- **三种运行模式** — 静态部署、Docker Server、GitHub App 集成
+- **双页架构** — `/` 为 Astro 首页，`/edit` 为独立 React 编辑器
+- **静态与 SSR** — 首页支持静态导出，也支持 server 模式下运行时 SSR
 - **运行时图标** — Lucide + Simple Icons 运行时解析，新增图标不用改代码
 - **三套主题** — Light / Dark / Ocean，玻璃拟态 UI
 - **内置编辑器** — 访问 `/edit` 直接在浏览器中修改配置
-- **搜索** — 实时过滤
+- **按需能力** — GitHub 发布是 `server` 模式下的可选能力，不再是独立运行模式
 
 ## 一键部署
 
@@ -49,24 +49,21 @@
 
 后续更新只需修改 `public/config.yaml` 并 Push，平台会自动重新部署。也可访问 `/edit` 路径使用内置编辑器在线修改。项目规范统一使用 `.yaml` 后缀。
 
-## 部署
+## 运行模式
 
-支持三种运行模式:
+### 静态模式
 
-### 静态模式 (static)
-构建产物输出到 `dist/client/`，可直接部署到任何静态托管平台。
+- 构建命令: `npm run build:static`
+- 产物目录: `dist/client`
+- 首页输出为完整静态 HTML
+- `/edit` 保留本地编辑与导出 YAML 能力
 
-| 平台 | 说明 |
-|------|------|
-| **Cloudflare Pages** | 构建命令 `npm run build:static`，发布目录 `dist/client` |
-| **Vercel** | 构建命令 `npm run build:static`，发布目录 `dist/client` |
-| **Netlify** | 构建命令 `npm run build:static`，发布目录 `dist/client` |
+### Server 模式
 
-### Server 模式 (Docker)
-支持运行时编辑和保存配置。
-
-### GitHub 模式
-通过 GitHub App 集成，支持在线编辑并提交到指定仓库。
+- 构建命令: `npm run build:server`
+- 产物目录: `dist/client` + `dist/server`
+- `/` 在运行时读取 YAML 并 SSR
+- `/edit` 可按能力开启登录保存与 GitHub 发布
 
 详细说明见 [BUILD.md](docs/BUILD.md) 和 [DEV.md](docs/DEV.md)。
 
@@ -78,8 +75,15 @@ cd compass && npm install
 npm run dev
 ```
 
-本地开发默认使用单端口开发服务器，打开 `http://localhost:3000`。
-`npm run dev` 会在同一个端口下提供前端页面和 `/api/*`，体验接近 Next.js。
+要求 Node.js `>= 22.12.0`。
+
+本地开发默认跑 `server` 模式，打开 `http://localhost:3000`。
+
+```bash
+npm run dev:static
+```
+
+可切到静态模式验证首页静态导出行为。
 
 详细说明见 [DEV.md](docs/DEV.md)，构建说明见 [BUILD.md](docs/BUILD.md)。
 
@@ -90,7 +94,7 @@ npm run dev
 ```yaml
 profile:
   name: Compass
-  avatar: "icon:navigation"
+  avatar: "navigation"
   description: Navigate Your World
   bio: 快速访问常用网站和工具
 
@@ -124,14 +128,15 @@ categories:
 
 ```
 src/
-├── client/           # React 前端应用
+├── client/           # React 组件、islands 与编辑器
 │   ├── components/   # UI 组件
-│   ├── pages/        # 页面路由
+│   ├── islands/      # 首页局部交互岛
+│   ├── pages/        # 编辑器页面
 │   ├── contexts/     # 客户端状态
 │   └── services/     # API 服务
-├── server/           # Hono 服务端
-│   ├── routes/       # API 路由
-│   └── index.ts      # 服务入口
+├── layouts/          # Astro 布局
+├── pages/            # Astro 页面与 API 路由
+├── server/           # 服务端配置与能力封装
 └── shared/           # 共享模块
     ├── types.ts      # 类型定义
     ├── themes.ts     # 主题预设
@@ -143,7 +148,7 @@ public/
 
 ## 技术栈
 
-[Vite](https://vitejs.dev) · [React](https://react.dev) 18 · [React Router](https://reactrouter.com) · [Hono](https://hono.dev) · [TypeScript](https://www.typescriptlang.org) · [Tailwind CSS](https://tailwindcss.com) · [Framer Motion](https://www.framer.com/motion) · [Lucide](https://lucide.dev) · [Simple Icons](https://simpleicons.org)
+[Astro](https://astro.build) · [React](https://react.dev) 19 · [TypeScript](https://www.typescriptlang.org) · [Tailwind CSS](https://tailwindcss.com) · [Lucide](https://lucide.dev) · [Simple Icons](https://simpleicons.org)
 
 ## License
 

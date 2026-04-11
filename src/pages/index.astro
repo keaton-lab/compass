@@ -1,0 +1,256 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ResolvedIcon from '@/client/components/ResolvedIcon';
+import { ProfileHeaderDesktopLeft } from '@/client/components/ProfileHeader';
+import CategorySection from '@/client/components/CategorySection';
+import HomeSearchIsland from '@/client/islands/HomeSearchIsland';
+import ThemeToggleIsland from '@/client/islands/ThemeToggleIsland';
+import { loadConfigFile } from '@/server/config-store';
+import { createHomePagePayload } from '@/server/home-page-data';
+import { IS_STATIC_BUILD } from '@/server/runtime';
+import { serializeConfig } from '@/shared/config-yaml';
+import homeCriticalCss from '@/styles/home-critical.css?raw';
+import type { ResolvedProfile } from '@/shared/types';
+
+export const prerender = IS_STATIC_BUILD;
+
+function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map((part) => part.charAt(0))
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+const rawConfig = loadConfigFile();
+const payload = await createHomePagePayload(rawConfig);
+const { profile, settings, categories, footerGithubIcon } = payload;
+// 为编辑页面准备内联配置数据（静态模式下使用）
+const inlineConfigYaml = IS_STATIC_BUILD ? serializeConfig(rawConfig) : '';
+const totalLinks = categories.reduce((acc, category) => acc + category.links.length, 0);
+const footerLinkClass = settings.animations
+  ? 'transition-colors duration-200 hover:text-[var(--text-primary)]'
+  : '';
+const avatarValue = profile.avatar ?? '';
+const isImageAvatar = avatarValue.startsWith('http://') || avatarValue.startsWith('https://');
+const isIconAvatar = !isImageAvatar && avatarValue.trim() !== '';
+const initials = getInitials(profile.name);
+const matrixPointerScript = `
+(() => {
+  const page = document.getElementById('home-page');
+
+  if (!page) {
+    return;
+  }
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const getFallbackY = () => Math.min(window.innerHeight * 0.28, 280);
+  let frameId = 0;
+  let nextX = window.innerWidth * 0.5;
+  let nextY = getFallbackY();
+
+  const applyPointer = (x, y) => {
+    page.style.setProperty('--matrix-pointer-x', \`\${x}px\`);
+    page.style.setProperty('--matrix-pointer-y', \`\${y}px\`);
+  };
+
+  const flush = () => {
+    frameId = 0;
+    applyPointer(nextX, nextY);
+  };
+
+  const schedule = () => {
+    if (frameId) {
+      return;
+    }
+
+    frameId = window.requestAnimationFrame(flush);
+  };
+
+  const reset = () => {
+    nextX = window.innerWidth * 0.5;
+    nextY = getFallbackY();
+    schedule();
+  };
+
+  applyPointer(nextX, nextY);
+
+  if (prefersReducedMotion) {
+    return;
+  }
+
+  window.addEventListener('pointermove', (event) => {
+    nextX = event.clientX;
+    nextY = event.clientY;
+    schedule();
+  }, { passive: true });
+
+  window.addEventListener('mouseout', (event) => {
+    if (!event.relatedTarget) {
+      reset();
+    }
+  });
+
+  window.addEventListener('blur', reset);
+  window.addEventListener('resize', reset, { passive: true });
+})();
+`;
+---
+
+<BaseLayout
+  title="Compass"
+  description="Compass - YAML 配置驱动的个人导航页"
+  theme={settings.theme}
+  criticalCss={homeCriticalCss}
+>
+  <div id="home-page" class="flex min-h-screen flex-col text-foreground">
+    <div id="home-shell" class="mx-auto w-full max-w-[1400px] flex-1 px-4 pt-4 pb-10 md:px-6 md:pt-5 md:pb-12 lg:px-8">
+      <header id="home-header" class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div class="md:hidden">
+          <div
+            class="home-mobile-profile-card rounded-2xl border bg-[var(--panel)] p-4 shadow-[0_10px_30px_rgba(15,23,42,0.05)]"
+            style={{ borderColor: 'var(--panel-border)' }}
+          >
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex min-w-0 flex-1 items-center gap-3.5">
+                {
+                  isIconAvatar ? (
+                    <div
+                      class="flex h-14 w-14 items-center justify-center rounded-lg border bg-[var(--bg-secondary)]"
+                      style={{ borderColor: 'var(--panel-border)' }}
+                    >
+                      <ResolvedIcon
+                        icon={profile.resolvedAvatarIcon}
+                        name={avatarValue}
+                        size={26}
+                        className="text-[var(--text-primary)]"
+                      />
+                    </div>
+                  ) : isImageAvatar ? (
+                    <div
+                      class="relative h-14 w-14 overflow-hidden rounded-lg border bg-[var(--bg-secondary)]"
+                      style={{ borderColor: 'var(--panel-border)' }}
+                    >
+                      <img
+                        src={avatarValue}
+                        alt={profile.name}
+                        class="h-full w-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      class="flex h-14 w-14 items-center justify-center rounded-lg border bg-[var(--bg-secondary)]"
+                      style={{ borderColor: 'var(--panel-border)' }}
+                    >
+                      <span class="text-base font-semibold text-[var(--text-primary)]">{initials}</span>
+                    </div>
+                  )
+                }
+                <div class="min-w-0 flex-1">
+                  <h1 class="truncate text-lg font-semibold tracking-[0.01em] text-[var(--text-primary)]">
+                    {profile.name}
+                  </h1>
+                  <p class="mt-1 line-clamp-2 text-sm leading-6 text-[var(--text-secondary)]">
+                    {profile.description}
+                  </p>
+                </div>
+              </div>
+              <ThemeToggleIsland client:load initialSettings={settings} mobileOnly />
+            </div>
+            {profile.bio && (
+              <p class="mt-3 text-sm leading-6 text-[var(--muted)]">{profile.bio}</p>
+            )}
+          </div>
+
+          {settings.showSearch && (
+            <div class="mt-4">
+              <HomeSearchIsland
+                client:load
+                initialQuery={settings.searchQuery ?? ''}
+                totalLinks={totalLinks}
+              />
+            </div>
+          )}
+        </div>
+
+        <div class="hidden w-full items-center justify-between md:flex">
+          <div
+            id="home-desktop-profile-card"
+            class="rounded-xl border bg-[var(--panel)] px-6 py-4 shadow-sm"
+            style={{ borderColor: 'var(--panel-border)' }}
+          >
+            <ProfileHeaderDesktopLeft profile={profile as ResolvedProfile} />
+          </div>
+          <div class="flex items-center gap-3">
+            {settings.showSearch && (
+              <HomeSearchIsland
+                client:load
+                compact
+                initialQuery={settings.searchQuery ?? ''}
+                totalLinks={totalLinks}
+              />
+            )}
+            <ThemeToggleIsland client:load initialSettings={settings} compact />
+          </div>
+        </div>
+      </header>
+
+      <main id="home-main" class="mt-6 space-y-8 md:mt-8">
+        {categories.map((category) => (
+          <div>
+            <CategorySection
+              category={category}
+              layout={settings.layout}
+              animations={settings.animations}
+            />
+          </div>
+        ))}
+
+        <div
+          id="home-no-results"
+          class="rounded-lg border bg-[var(--panel)] py-12 text-center"
+          style={{ borderColor: 'var(--panel-border)' }}
+          hidden
+        >
+          <h2 class="text-base font-medium text-[var(--text-primary)]">未找到结果</h2>
+          <p class="mt-1 text-sm text-[var(--muted)]">尝试其他关键词</p>
+        </div>
+      </main>
+    </div>
+
+    <footer id="home-footer" class="mt-auto py-5">
+      <div class="mx-auto h-px w-full max-w-[180px] bg-gradient-to-r from-transparent via-[var(--panel-border)] to-transparent opacity-40 md:max-w-sm" />
+      <div class="mx-auto mt-5 flex max-w-[1400px] flex-col items-center gap-2 px-4 text-center md:px-6 lg:px-8">
+        <div class="flex items-center justify-center">
+          <a
+            href="https://github.com/keaton-lab/compass"
+            target="_blank"
+            rel="noopener noreferrer"
+            class={`flex items-center gap-1.5 text-sm text-[var(--muted)] ${footerLinkClass}`}
+          >
+            <ResolvedIcon icon={footerGithubIcon} name="github" size={14} />
+            <span>Compass</span>
+          </a>
+        </div>
+        <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm text-[var(--muted)]">
+          <span>{categories.length} categories</span>
+          <span>{totalLinks} links</span>
+          <a href="/edit" class={footerLinkClass}>edit</a>
+        </div>
+      </div>
+    </footer>
+    
+    {/* 静态模式下内联配置数据，供编辑页面使用 */}
+    {IS_STATIC_BUILD && (
+      <script
+        is:inline
+        id="compass-inline-config"
+        type="application/yaml"
+        set:html={inlineConfigYaml}
+      />
+    )}
+
+    <script is:inline set:html={matrixPointerScript}></script>
+  </div>
+</BaseLayout>

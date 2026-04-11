@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import ResolvedIcon from './ResolvedIcon';
 import type { ResolvedLink as LinkType } from '@/shared/types';
 
@@ -9,7 +10,7 @@ interface NavigationCardProps {
 
 export default function NavigationCard({ link, color, animations }: NavigationCardProps) {
   const cardClassName = animations
-    ? 'transition-all duration-200 hover:border-[color:var(--accent-border)] hover:bg-[var(--panel-strong)] active:scale-[0.99]'
+    ? 'transition-all duration-200 hover:border-[color:var(--card-border-hover)] hover:bg-[var(--panel-strong)] active:scale-[0.99]'
     : '';
   const iconClassName = animations
     ? 'transition-transform duration-200 group-hover:scale-105'
@@ -20,14 +21,21 @@ export default function NavigationCard({ link, color, animations }: NavigationCa
   const arrowClassName = animations
     ? 'opacity-0 transition-all duration-200 group-hover:opacity-100 md:opacity-60'
     : 'opacity-60';
+  const cardStyle = {
+    borderColor: 'var(--panel-border)',
+    '--card-border-hover': `${color}55`,
+  } as CSSProperties;
 
   return (
     <a
       href={link.url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group relative flex min-h-[64px] cursor-pointer flex-col overflow-hidden rounded-lg border bg-[var(--panel)] p-2.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-border)] xsm:min-h-[72px] xsm:p-3 md:min-h-[68px] md:flex-row md:items-center md:gap-3 ${cardClassName}`}
-      style={{ borderColor: 'var(--panel-border)' }}
+      data-search-item
+      data-search-name={link.name.toLowerCase()}
+      data-search-description={link.description.toLowerCase()}
+      className={`home-nav-card group relative flex min-h-[64px] cursor-pointer flex-col overflow-hidden rounded-lg border bg-[var(--panel)] p-2.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-border)] xsm:min-h-[72px] xsm:p-3 md:min-h-[68px] md:flex-row md:items-center md:gap-3 ${cardClassName}`}
+      style={cardStyle}
     >
       {/* 左侧图标 */}
       <div

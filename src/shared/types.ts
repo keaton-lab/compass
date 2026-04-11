@@ -1,7 +1,7 @@
 /**
  * 运行时模式定义
  */
-export type RuntimeMode = 'static' | 'server' | 'github';
+export type RuntimeMode = 'static' | 'server';
 
 /**
  * 运行时能力描述
@@ -123,6 +123,10 @@ export interface ResolvedConfig {
   profile: ResolvedProfile;
   settings: Settings;
   categories: ResolvedCategory[];
+}
+
+export interface HomePagePayload extends ResolvedConfig {
+  footerGithubIcon: ResolvedIconData | null;
 }
 
 /**

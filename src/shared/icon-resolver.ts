@@ -1,4 +1,4 @@
-import type { ResolvedIconData, ResolvedSvgNode } from './types';
+import type { ResolvedIconData, ResolvedSvgNode, Config, ResolvedConfig } from './types';
 
 interface SimpleIconModuleEntry {
   slug: string;
@@ -28,7 +28,6 @@ function toKebabCase(value: string): string {
 function normalizeBrandIconKey(value: string): string {
   return value
     .trim()
-    .replace(/^icon:/i, '')
     .toLowerCase()
     .replace(/[^a-z0-9]/g, '');
 }
@@ -46,7 +45,7 @@ function normalizeLucideNodes(
 
 async function getLucideResolver() {
   if (!lucideResolverPromise) {
-    lucideResolverPromise = import('lucide-react/dynamicIconImports').then(
+    lucideResolverPromise = import('lucide-react/dynamicIconImports.mjs').then(
       (module) => {
         const iconLoaders = (module.default ?? module) as Record<
           string,
@@ -167,7 +166,57 @@ export async function resolveIcon(name: string): Promise<ResolvedIconData | null
   return brandIcon;
 }
 
-import type { Config, ResolvedConfig } from './types';
+/**
+ * 将 ResolvedSvgNode 数组转换为 SVG 元素字符串
+ */
+function nodesToSvgString(nodes: ResolvedSvgNode[]): string {
+  return nodes
+    .map((node) => {
+      const attrs = Object.entries(node.attrs)
+        .map(([key, value]) => `${key}="${value}"`)
+        .join(' ');
+      return `<${node.tag}${attrs ? ' ' + attrs : ''} />`;
+    })
+    .join('');
+}
+
+/**
+ * 将解析后的图标数据转换为 SVG 字符串
+ * 用于生成 favicon 等场景
+ */
+export function iconToSvgString(
+  icon: ResolvedIconData | null | undefined,
+  options: { size?: number; color?: string } = {},
+): string | null {
+  if (!icon) return null;
+
+  const { size = 32, color = 'currentColor' } = options;
+  const viewBox = '0 0 24 24';
+
+  if (icon.kind === 'lucide') {
+    const content = nodesToSvgString(icon.nodes);
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="${viewBox}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${content}</svg>`;
+  }
+
+  if (icon.kind === 'brand' && icon.path) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="${viewBox}" fill="${color}"><path d="${icon.path}" /></svg>`;
+  }
+
+  return null;
+}
+
+/**
+ * 将 SVG 字符串转换为 data URI
+ */
+export function svgToDataUri(svg: string): string {
+  const encoded = svg
+    .replace(/"/g, "'")
+    .replace(/</g, '%3C')
+    .replace(/>/g, '%3E')
+    .replace(/#/g, '%23')
+    .replace(/\s+/g, ' ');
+  return `data:image/svg+xml,${encoded}`;
+}
 
 /**
  * 解析配置中的所有图标
@@ -176,10 +225,7 @@ export async function resolveConfigIcons(config: Config): Promise<ResolvedConfig
   return {
     profile: {
       ...config.profile,
-      resolvedAvatarIcon:
-        config.profile.avatar?.startsWith('icon:')
-          ? await resolveIcon(config.profile.avatar.slice(5))
-          : null,
+      resolvedAvatarIcon: config.profile.avatar ? await resolveIcon(config.profile.avatar) : null,
     },
     settings: config.settings,
     categories: await Promise.all(

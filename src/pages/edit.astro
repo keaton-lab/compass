@@ -1,0 +1,30 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import EditPage from '@/client/pages/EditPage';
+import { defaultThemeId } from '@/shared/themes';
+import { loadConfigFile } from '@/server/config-store';
+import { serializeConfig } from '@/shared/config-yaml';
+import { IS_STATIC_BUILD } from '@/server/runtime';
+
+export const prerender = IS_STATIC_BUILD;
+
+// 静态模式下内联配置数据
+const inlineConfigYaml = IS_STATIC_BUILD ? serializeConfig(loadConfigFile()) : '';
+---
+
+<BaseLayout
+  title="Compass Editor"
+  description="Compass - YAML 配置编辑器"
+  theme={defaultThemeId}
+>
+  {/* 静态模式下内联配置数据 */}
+  {IS_STATIC_BUILD && (
+    <script
+      is:inline
+      id="compass-inline-config"
+      type="application/yaml"
+      set:html={inlineConfigYaml}
+    />
+  )}
+  <EditPage client:load />
+</BaseLayout>

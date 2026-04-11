@@ -1,5 +1,5 @@
 import { createElement } from 'react';
-import type { ResolvedIconData } from '@/shared/icon-types';
+import type { ResolvedIconData } from '@/shared/types';
 import BrandIcon from './BrandIcon';
 
 interface ResolvedIconProps {

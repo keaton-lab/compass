@@ -72,7 +72,7 @@ export default function SearchBar({
 
   if (compact) {
     return (
-      <div className="relative hidden items-center md:flex" aria-label="搜索" role="search">
+      <div className="home-search-bar home-search-bar--compact relative hidden items-center md:flex" aria-label="搜索" role="search">
         <div
           className="flex h-10 min-w-[280px] items-center rounded-lg border bg-[var(--panel-strong)] pl-3 pr-2 transition-colors duration-200 focus-within:border-[var(--accent)]"
           style={{ borderColor: 'var(--panel-border)' }}
@@ -106,7 +106,7 @@ export default function SearchBar({
   }
 
   return (
-    <div className="relative w-full max-w-2xl">
+    <div className="home-search-bar relative w-full max-w-2xl">
       <div
         className="relative rounded-lg border bg-[var(--panel-strong)] transition-colors duration-200 focus-within:border-[var(--accent)]"
         style={{ borderColor: 'var(--panel-border)' }}

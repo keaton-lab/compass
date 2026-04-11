@@ -15,9 +15,9 @@ export default function CategorySection({ category, layout, animations }: Catego
   const gapClass = layout === 'list' ? 'gap-3' : 'gap-2.5 xsm:gap-3';
 
   return (
-    <section className="content-auto">
+    <section className="home-category-section content-auto" data-search-category>
       {/* 分类标题 */}
-      <div className="mb-3 flex items-center gap-3 md:mb-4">
+      <div className="home-category-header mb-3 flex items-center gap-3 md:mb-4">
         <div
           className="flex h-8 w-8 items-center justify-center rounded-md border"
           style={{
@@ -41,7 +41,7 @@ export default function CategorySection({ category, layout, animations }: Catego
       </div>
 
       {/* 链接网格 */}
-      <div className={`grid ${gridColumnsClass} ${gapClass}`}>
+      <div className={`home-category-grid grid ${gridColumnsClass} ${gapClass}`}>
         {category.links.map((link) => (
           <div key={link.id} className="h-full">
             <NavigationCard link={link} color={category.color} animations={animations} />

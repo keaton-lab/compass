@@ -93,13 +93,15 @@ export function didGenerateSessionSecret(): boolean {
 
 export function assertServerStartupEnv() {
   const adminToken = getAdminToken();
+  const githubEnabled = canEnableGithubPublishing();
 
-  if (!adminToken) {
-    throw new Error('缺少 COMPASS_ADMIN_TOKEN，server 模式无法启动。');
+  if (!adminToken && !githubEnabled) {
+    throw new Error('server 模式至少需要配置 COMPASS_ADMIN_TOKEN 或完整的 GitHub 发布环境变量。');
   }
 
   return {
     adminToken,
+    githubEnabled,
     configPath: resolveConfigPath(),
     generatedSessionSecret: didGenerateSessionSecret(),
     sessionSecret: getSessionSecret(),
@@ -108,13 +110,12 @@ export function assertServerStartupEnv() {
 
 export function getRuntimeMode(): RuntimeMode {
   const mode = readEnvString('COMPASS_RUNTIME_MODE');
-  
-  if (mode === 'static' || mode === 'server' || mode === 'github') {
+
+  if (mode === 'static' || mode === 'server') {
     return mode;
   }
-  
-  // 默认根据是否有 admin token 判断
-  return hasAdminToken() ? 'server' : 'static';
+
+  return hasAdminToken() || canEnableGithubPublishing() ? 'server' : 'static';
 }
 
 export interface GithubRuntimeConfig {

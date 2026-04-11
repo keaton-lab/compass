@@ -1,5 +1,4 @@
 import ResolvedIcon from './ResolvedIcon';
-import DeferredThemeToggle from './DeferredThemeToggle';
 import type { ResolvedProfile as Profile } from '@/shared/types';
 
 function getInitials(name: string): string {
@@ -27,8 +26,8 @@ function ProfileAvatar({
   textSizeClass: string;
 }) {
   const avatarValue = avatar ?? '';
-  const isIconAvatar = avatarValue.startsWith('icon:');
-  const isImageAvatar = !isIconAvatar && avatarValue.trim() !== '';
+  const isImageAvatar = avatarValue.startsWith('http://') || avatarValue.startsWith('https://');
+  const isIconAvatar = !isImageAvatar && avatarValue.trim() !== '';
   const initials = getInitials(name);
 
   if (isIconAvatar) {
@@ -39,7 +38,7 @@ function ProfileAvatar({
       >
         <ResolvedIcon
           icon={profile.resolvedAvatarIcon}
-          name={avatarValue.slice(5)}
+          name={avatarValue}
           size={iconSize}
           className="text-[var(--text-primary)]"
         />
@@ -93,61 +92,5 @@ export function ProfileHeaderDesktopLeft({ profile }: { profile: Profile }) {
         {bio && <p className="truncate text-xs text-[var(--muted)]">{bio}</p>}
       </div>
     </div>
-  );
-}
-
-interface ProfileHeaderProps {
-  profile: Profile;
-}
-
-export default function ProfileHeader({ profile }: ProfileHeaderProps) {
-  const { name, avatar, description, bio } = profile;
-
-  return (
-    <>
-      {/* 移动端 */}
-      <div
-        className="rounded-2xl border bg-[var(--panel)] p-4 shadow-[0_10px_30px_rgba(15,23,42,0.05)] md:hidden"
-        style={{ borderColor: 'var(--panel-border)' }}
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex min-w-0 flex-1 items-center gap-3.5">
-            <ProfileAvatar
-              profile={profile}
-              name={name}
-              avatar={avatar}
-              sizeClass="h-14 w-14"
-              iconSize={26}
-              textSizeClass="text-base"
-            />
-            <div className="min-w-0 flex-1">
-              <h1 className="truncate text-lg font-semibold tracking-[0.01em] text-[var(--text-primary)]">{name}</h1>
-              <p className="mt-1 line-clamp-2 text-sm leading-6 text-[var(--text-secondary)]">{description}</p>
-            </div>
-          </div>
-          <DeferredThemeToggle mobileOnly />
-        </div>
-        {bio && <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{bio}</p>}
-      </div>
-
-      {/* 桌面端 */}
-      <div className="hidden items-center gap-3 md:flex">
-        <div className="shrink-0">
-          <ProfileAvatar
-            profile={profile}
-            name={name}
-            avatar={avatar}
-            sizeClass="h-12 w-12"
-            iconSize={24}
-            textSizeClass="text-lg"
-          />
-        </div>
-        <div className="min-w-0 flex-1">
-          <h1 className="truncate text-lg font-semibold text-[var(--text-primary)]">{name}</h1>
-          <p className="truncate text-sm text-[var(--text-secondary)]">{description}</p>
-          {bio && <p className="truncate text-xs text-[var(--muted)]">{bio}</p>}
-        </div>
-      </div>
-    </>
   );
 }
