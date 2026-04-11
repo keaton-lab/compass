@@ -2,6 +2,9 @@
   "name": "compass",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "generate:static-icons": "node scripts/generate-static-brand-icons.mjs",
     "dev": "node scripts/dev.mjs",
@@ -23,7 +26,6 @@
     "simple-icons": "^16.14.0"
   },
   "devDependencies": {
-    "@iconify/json": "^2.2.456",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20",
     "@types/react": "^19",

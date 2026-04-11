@@ -6,7 +6,7 @@ import { ChevronDown, Plus, ChevronUp, ChevronDown as ChevronDownIcon } from 'lu
 import type { Category } from '../../types';
 import LinkEditor from './LinkEditor';
 import LazyIconPicker from './LazyIconPicker';
-import Icon from '../../components/Icon';
+import DynamicIcon from '../../components/DynamicIcon';
 import ColorPicker from './ColorPicker';
 import DeleteConfirmButton from './DeleteConfirmButton';
 import { validateCategoryName } from '../utils/validators';
@@ -100,7 +100,7 @@ export default function CategoryEditor({
               style={{ borderColor: 'var(--panel-border)' }}
               title="点击更换图标"
             >
-              <Icon name={category.icon} size={18} />
+              <DynamicIcon name={category.icon} size={18} />
               <span className="max-w-[80px] truncate text-xs">{category.icon}</span>
             </button>
 

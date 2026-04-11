@@ -3,9 +3,14 @@
 import { Dialog, Tabs } from 'radix-ui';
 import { Search, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { loadBrandIcons } from '../../components/brand-icons';
 
-type BrandIcon = Awaited<ReturnType<typeof loadBrandIcons>>[number];
+// 品牌图标定义
+interface BrandIcon {
+  name: string;
+  slug: string;
+  path: string;
+  hex: string;
+}
 
 export interface IconPickerProps {
   value: string;
@@ -22,6 +27,29 @@ async function loadLucideIconNames(): Promise<string[]> {
     (key) => key[0] === key[0].toUpperCase() && key !== 'Icon' && key !== 'default' && !key.endsWith('Icon')
   );
   return lucideIconNamesCache;
+}
+
+let brandIconsCache: BrandIcon[] | null = null;
+
+async function loadBrandIcons(): Promise<BrandIcon[]> {
+  if (brandIconsCache) return brandIconsCache;
+  const simpleIcons = await import('simple-icons');
+  const entries = simpleIcons as unknown as Record<string, { slug: string; title: string; path: string; hex: string }>;
+
+  brandIconsCache = Object.keys(entries)
+    .filter((key) => key.startsWith('si') && key.length > 2)
+    .map((key) => {
+      const icon = entries[key];
+      return {
+        name: icon.title,
+        slug: icon.slug,
+        path: icon.path,
+        hex: icon.hex,
+      };
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  return brandIconsCache;
 }
 
 export default function IconPicker({ value, onChange, onClose }: IconPickerProps) {
