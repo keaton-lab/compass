@@ -11,26 +11,20 @@ npm run dev:static
 
 访问 `http://localhost:3000`
 
-### Server 模式
+### Server/GitHub 模式
 
-需要先设置环境变量:
+Server 和 GitHub 模式使用单一端口 (3000)，同时提供前端和 API：
 
 ```bash
 # 创建 .env.local 文件
 COMPASS_RUNTIME_MODE=server
 COMPASS_ADMIN_TOKEN=your-secret
-COMPASS_SESSION_SECRET=another-secret
-```
 
-然后启动:
-
-```bash
+# 启动服务器
 npm run dev
 ```
 
-这会同时启动:
-- Vite 开发服务器 (端口 3000)
-- Hono API 服务器 (端口 3001)
+访问 `http://localhost:3000`
 
 ---
 
