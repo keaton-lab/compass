@@ -26,11 +26,11 @@ ENV COMPASS_RUNTIME_MODE=server
 
 # 复制构建产物
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/src/config.yaml ./src/config.yaml
+COPY --from=builder /app/public/config.yaml ./public/config.yaml
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 3000
 
 # 启动 Hono 服务器
-CMD ["node", "dist/server/index.js"]
+CMD ["node", "dist/server/index.mjs"]

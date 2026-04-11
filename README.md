@@ -20,7 +20,7 @@
 
 ## 特性
 
-- **YAML 配置** — 所有内容集中在 `src/config.yaml`，改完即生效
+- **YAML 配置** — 所有内容集中在 `public/config.yaml`，改完即生效
 - **三种运行模式** — 静态部署、Docker Server、GitHub App 集成
 - **运行时图标** — Lucide + Simple Icons 运行时解析，新增图标不用改代码
 - **三套主题** — Light / Dark / Ocean，玻璃拟态 UI
@@ -42,12 +42,12 @@
 ## 使用教程
 
 1. **Fork 本项目** — 点击右上角 Fork 按钮，复制仓库到你的 GitHub 账号
-2. **修改配置** — 编辑 `src/config.yaml`，填入你的个人信息和导航链接
+2. **修改配置** — 编辑 `public/config.yaml`，填入你的个人信息和导航链接
 3. **连接部署平台** — 在 [Cloudflare Pages](https://pages.cloudflare.com/) / [Vercel](https://vercel.com) / [Netlify](https://www.netlify.com/) 中导入你的 Fork 仓库
 4. **等待自动部署** — 平台检测到代码变更会自动构建，完成后即可通过分配的域名访问
 5. **绑定自定义域名（可选）** — 在部署平台设置中添加你的域名，解析到对应 CNAME
 
-后续更新只需修改 `config.yaml` 并 Push，平台会自动重新部署。也可访问 `/edit` 路径使用内置编辑器在线修改。项目规范统一使用 `.yaml` 后缀。
+后续更新只需修改 `public/config.yaml` 并 Push，平台会自动重新部署。也可访问 `/edit` 路径使用内置编辑器在线修改。项目规范统一使用 `.yaml` 后缀。
 
 ## 部署
 
@@ -78,13 +78,14 @@ cd compass && npm install
 npm run dev
 ```
 
-本地开发默认使用静态预览模式，打开 `http://localhost:3000`。
+本地开发默认使用单端口开发服务器，打开 `http://localhost:3000`。
+`npm run dev` 会在同一个端口下提供前端页面和 `/api/*`，体验接近 Next.js。
 
 详细说明见 [DEV.md](docs/DEV.md)，构建说明见 [BUILD.md](docs/BUILD.md)。
 
 ## 配置
 
-编辑 `src/config.yaml` 即可自定义全部内容：
+编辑 `public/config.yaml` 即可自定义全部内容：
 
 ```yaml
 profile:
@@ -131,10 +132,12 @@ src/
 ├── server/           # Hono 服务端
 │   ├── routes/       # API 路由
 │   └── index.ts      # 服务入口
-├── shared/           # 共享模块
-│   ├── types.ts      # 类型定义
-│   ├── themes.ts     # 主题预设
-│   └── config-yaml.ts # YAML 解析
+└── shared/           # 共享模块
+    ├── types.ts      # 类型定义
+    ├── themes.ts     # 主题预设
+    └── config-yaml.ts # YAML 解析
+
+public/
 └── config.yaml       # 唯一配置文件
 ```
 

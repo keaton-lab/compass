@@ -32,7 +32,7 @@ npm run lint    # ESLint 检查
 
 所有内容来自 YAML 配置文件：
 
-- 默认路径：`src/config.yaml`
+- 默认路径：`public/config.yaml`
 - server 模式可通过 `COMPASS_CONFIG_PATH` 指向外挂 `config.yaml`
 - 规范统一使用 `.yaml`
 
@@ -78,7 +78,6 @@ src/
 │   ├── themes/              # light/dark/ocean 主题预设
 │   ├── types/               # TypeScript 接口
 │   └── globals.css          # 全局样式 + CSS 变量
-├── config.yaml              # 默认配置文件
 ├── server/                  # 运行时模式与 YAML 读写
 ```
 

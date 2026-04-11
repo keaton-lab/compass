@@ -14,7 +14,7 @@ app.get('/runtime', (c) => {
   try {
     const config = loadConfigFile();
     return c.json(config);
-  } catch (error) {
+  } catch {
     return c.json({ error: '加载配置失败' }, 500);
   }
 });
@@ -30,7 +30,7 @@ app.get('/source', (c) => {
       configPath,
       content: fileContents,
     });
-  } catch (error) {
+  } catch {
     return c.json({ error: '读取配置文件失败' }, 500);
   }
 });

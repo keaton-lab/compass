@@ -50,7 +50,7 @@ app.post('/', async (c) => {
     setCookie(c, SESSION_COOKIE_NAME, sessionValue, cookieOptions);
 
     return c.json({ ok: true });
-  } catch (error) {
+  } catch {
     return c.json({ error: '登录失败' }, 500);
   }
 });

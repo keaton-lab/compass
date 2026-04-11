@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { copyFileSync, existsSync, mkdirSync } from 'fs';
-import { dirname, join } from 'path';
+import { existsSync, mkdirSync } from 'fs';
+import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -14,14 +14,11 @@ if (!existsSync(publicDir)) {
   mkdirSync(publicDir, { recursive: true });
 }
 
-// 复制 config.yaml 到 public/
-const srcPath = join(rootDir, 'src', 'config.yaml');
-const destPath = join(publicDir, 'config.yaml');
-
-if (existsSync(srcPath)) {
-  copyFileSync(srcPath, destPath);
-  console.log('✅ 已复制 src/config.yaml 到 public/config.yaml');
-} else {
-  console.error('❌ 未找到 src/config.yaml');
+// 验证 public/config.yaml 存在
+const configPath = join(publicDir, 'config.yaml');
+if (!existsSync(configPath)) {
+  console.error('❌ 未找到 public/config.yaml，请先创建配置文件');
   process.exit(1);
 }
+
+console.log('✅ public/config.yaml 已就绪');

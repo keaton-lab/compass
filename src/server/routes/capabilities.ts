@@ -1,6 +1,11 @@
 import { Hono } from 'hono';
 import type { Capabilities } from '@/shared/types';
-import { getRuntimeMode, hasAdminToken, getSessionSecret } from '../env';
+import {
+  canEnableGithubPublishing,
+  getRuntimeMode,
+  hasAdminToken,
+  getSessionSecret,
+} from '../env';
 
 const app = new Hono();
 
@@ -17,7 +22,7 @@ app.get('/', (c) => {
     mode,
     canLogin: mode === 'server' && hasToken && hasSecret,
     canSaveToFile: mode === 'server' && hasToken && hasSecret,
-    canPublishToGithub: mode === 'github',
+    canPublishToGithub: mode === 'github' && canEnableGithubPublishing(),
   };
 
   return c.json(capabilities);

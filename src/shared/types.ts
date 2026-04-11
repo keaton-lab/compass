@@ -133,3 +133,15 @@ export interface GithubPublishPayload {
   yamlContent: string;
   commitMessage?: string;
 }
+
+export interface SessionStatus {
+  authenticated: boolean;
+}
+
+export interface GithubConnectionStatus {
+  configured: boolean;
+  authenticated: boolean;
+  repo: string | null;
+  branch: string;
+  path: string;
+}

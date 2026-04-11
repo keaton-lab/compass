@@ -90,7 +90,7 @@ docker run -d \
   -e COMPASS_RUNTIME_MODE=server \
   -e COMPASS_ADMIN_TOKEN=change-me \
   -e COMPASS_SESSION_SECRET=change-me-too \
-  -v /path/to/config.yaml:/app/src/config.yaml \
+   -v /path/to/config.yaml:/app/public/config.yaml \
   compass
 ```
 
@@ -99,7 +99,7 @@ docker run -d \
 ```bash
 # 准备配置文件
 mkdir -p docker
-cp src/config.yaml docker/config.yaml
+cp public/config.yaml docker/config.yaml
 
 # 修改 docker-compose.yml 中的口令后启动
 docker compose up --build
@@ -110,7 +110,7 @@ docker compose up --build
 | 变量 | 说明 | 默认值 | 必需 |
 |------|------|--------|------|
 | `COMPASS_RUNTIME_MODE` | 运行模式 (static/server/github) | static | 否 |
-| `COMPASS_CONFIG_PATH` | 配置文件路径 | src/config.yaml | 否 |
+| `COMPASS_CONFIG_PATH` | 配置文件路径 | public/config.yaml | 否 |
 | `COMPASS_ADMIN_TOKEN` | 编辑器登录口令 | - | server 模式必需 |
 | `COMPASS_SESSION_SECRET` | 会话签名密钥 | 随机生成 | 否 |
 | `PORT` | 服务端口 | 3000 | 否 |
@@ -121,7 +121,7 @@ docker compose up --build
 | `GITHUB_REPO_OWNER` | 目标仓库所有者 | - | github 模式必需 |
 | `GITHUB_REPO_NAME` | 目标仓库名称 | - | github 模式必需 |
 | `GITHUB_REPO_BRANCH` | 目标分支 | main | 否 |
-| `GITHUB_CONFIG_PATH` | 配置文件路径 | src/config.yaml | 否 |
+| `GITHUB_CONFIG_PATH` | 配置文件路径 | public/config.yaml | 否 |
 
 ## 常用命令
 

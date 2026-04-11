@@ -13,18 +13,32 @@ npm run dev:static
 
 ### Server/GitHub 模式
 
-Server 和 GitHub 模式使用单一端口 (3000)，同时提供前端和 API：
+Server 和 GitHub 模式开发时使用单端口开发服务器，页面和 API 共用 `http://localhost:3000`。
 
 ```bash
-# 创建 .env.local 文件
-COMPASS_RUNTIME_MODE=server
-COMPASS_ADMIN_TOKEN=your-secret
-
-# 启动服务器
+# Server 模式
 npm run dev
+
+# GitHub 模式
+GITHUB_CLIENT_ID=xxx \
+GITHUB_CLIENT_SECRET=xxx \
+GITHUB_REPO_OWNER=owner \
+GITHUB_REPO_NAME=repo \
+npm run dev:github
+```
+
+如果只想跑纯静态前端：
+
+```bash
+npm run dev:static
 ```
 
 访问 `http://localhost:3000`
+
+说明：
+- `npm run dev`、`npm run dev:github`、`npm run dev:static` 都通过 Hono 挂载 Vite middleware，只暴露一个端口
+- `npm run dev` 默认会为开发环境注入 `COMPASS_ADMIN_TOKEN=dev-token`
+- 如果你想自定义口令，可在命令前显式传入 `COMPASS_ADMIN_TOKEN=your-secret`
 
 ---
 
@@ -70,7 +84,7 @@ docker run -d \
   -e COMPASS_RUNTIME_MODE=server \
   -e COMPASS_ADMIN_TOKEN=your-secret \
   -e COMPASS_SESSION_SECRET=another-secret \
-  -v /path/to/config.yaml:/app/src/config.yaml \
+   -v /path/to/config.yaml:/app/public/config.yaml \
   compass
 ```
 
@@ -79,7 +93,7 @@ docker run -d \
 ```bash
 # 准备配置文件
 mkdir -p docker
-cp src/config.yaml docker/config.yaml
+cp public/config.yaml docker/config.yaml
 
 # 修改 docker-compose.yml 中的口令后启动
 docker compose up --build
@@ -111,7 +125,7 @@ docker compose up --build
 | 变量 | 说明 | 默认值 |
 |------|------|--------|
 | `COMPASS_RUNTIME_MODE` | 运行模式 | static |
-| `COMPASS_CONFIG_PATH` | 配置文件路径 | src/config.yaml |
+| `COMPASS_CONFIG_PATH` | 配置文件路径 | public/config.yaml |
 | `COMPASS_ADMIN_TOKEN` | 编辑器登录口令（server 模式必需） | 无 |
 | `COMPASS_SESSION_SECRET` | 会话签名密钥（可选，未设置时自动生成） | 随机值 |
 
@@ -129,10 +143,12 @@ src/
 ├── server/           # Hono 服务端
 │   ├── routes/       # API 路由
 │   └── index.ts      # 服务入口
-├── shared/           # 共享模块
-│   ├── types.ts      # 类型定义
-│   ├── themes.ts     # 主题预设
-│   └── config-yaml.ts # YAML 解析
+└── shared/           # 共享模块
+    ├── types.ts      # 类型定义
+    ├── themes.ts     # 主题预设
+    └── config-yaml.ts # YAML 解析
+
+public/
 └── config.yaml       # 唯一配置文件
 ```
 

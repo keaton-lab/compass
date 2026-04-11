@@ -1,8 +1,22 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import type { Config, Capabilities } from '@/shared/types';
-import { loadRuntimeConfig, fetchCapabilities, saveConfigToServer } from '@/client/services/config-source';
-import { serializeConfig } from '@/shared/config-yaml';
+import type {
+  Config,
+  Capabilities,
+  GithubConnectionStatus,
+  SessionStatus,
+} from '@/shared/types';
+import {
+  fetchCapabilities,
+  fetchGithubStatus,
+  fetchSessionStatus,
+  loadRuntimeConfig,
+  loginToServer,
+  logoutFromServer,
+  publishConfigToGithub,
+  saveConfigToServer,
+} from '@/client/services/config-source';
+import { parseConfigYaml, serializeConfig } from '@/shared/config-yaml';
 import LoadingSpinner from '@/client/components/LoadingSpinner';
 
 /**
@@ -11,35 +25,55 @@ import LoadingSpinner from '@/client/components/LoadingSpinner';
 export default function EditPage() {
   const [config, setConfig] = useState<Config | null>(null);
   const [capabilities, setCapabilities] = useState<Capabilities | null>(null);
+  const [sessionStatus, setSessionStatus] = useState<SessionStatus>({
+    authenticated: false,
+  });
+  const [githubStatus, setGithubStatus] = useState<GithubConnectionStatus | null>(null);
+  const [adminToken, setAdminToken] = useState('');
   const [yamlContent, setYamlContent] = useState('');
   const [loading, setLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([loadRuntimeConfig(), fetchCapabilities()])
-      .then(([configData, caps]) => {
-        setConfig(configData);
+    fetchCapabilities()
+      .then(async (caps) => {
         setCapabilities(caps);
+
+        const [configData, sessionData, githubData] = await Promise.all([
+          loadRuntimeConfig(caps),
+          caps.canLogin ? fetchSessionStatus() : Promise.resolve({ authenticated: false }),
+          caps.mode === 'github'
+            ? fetchGithubStatus().catch(() => null)
+            : Promise.resolve(null),
+        ]);
+
+        setConfig(configData);
         setYamlContent(serializeConfig(configData));
+        setSessionStatus(sessionData);
+        setGithubStatus(githubData);
       })
       .catch((err) => {
         console.error('加载失败:', err);
-        setError(err.message || '加载失败');
+        setError(err instanceof Error ? err.message : '加载失败');
       })
       .finally(() => setLoading(false));
   }, []);
 
   const handleSaveToServer = async () => {
-    if (!config) return;
-    
+    if (!capabilities) return;
+
     setSaving(true);
     setError(null);
     setSuccess(null);
-    
+
     try {
-      await saveConfigToServer(config);
+      const parsedConfig = parseConfigYaml(yamlContent);
+      await saveConfigToServer(parsedConfig);
+      setConfig(parsedConfig);
+      setYamlContent(serializeConfig(parsedConfig));
       setSuccess('保存成功！');
     } catch (err) {
       setError(err instanceof Error ? err.message : '保存失败');
@@ -48,10 +82,52 @@ export default function EditPage() {
     }
   };
 
-  const handleCopyYaml = () => {
-    navigator.clipboard.writeText(yamlContent);
-    setSuccess('YAML 已复制到剪贴板！');
-    setTimeout(() => setSuccess(null), 2000);
+  const handleLogin = async () => {
+    if (!adminToken.trim()) {
+      setError('请输入管理口令');
+      return;
+    }
+
+    setAuthLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      await loginToServer(adminToken.trim());
+      setSessionStatus({ authenticated: true });
+      setAdminToken('');
+      setSuccess('登录成功，现在可以保存到服务器了。');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '登录失败');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    setAuthLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      await logoutFromServer();
+      setSessionStatus({ authenticated: false });
+      setSuccess('已退出登录。');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '登出失败');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleCopyYaml = async () => {
+    try {
+      await navigator.clipboard.writeText(yamlContent);
+      setSuccess('YAML 已复制到剪贴板！');
+      window.setTimeout(() => setSuccess(null), 2000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '复制失败');
+    }
   };
 
   const handleDownloadYaml = () => {
@@ -62,6 +138,22 @@ export default function EditPage() {
     a.download = 'config.yaml';
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleGithubPublish = async () => {
+    setSaving(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      parseConfigYaml(yamlContent);
+      await publishConfigToGithub(yamlContent);
+      setSuccess('已发布到 GitHub。');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '发布失败');
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -144,23 +236,63 @@ export default function EditPage() {
           )}
 
           {/* Server 模式 */}
-          {capabilities?.mode === 'server' && capabilities.canSaveToFile && (
-            <button
-              onClick={handleSaveToServer}
-              disabled={saving}
-              className="px-6 py-2 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-            >
-              {saving ? '保存中...' : '保存到服务器'}
-            </button>
+          {capabilities?.mode === 'server' && capabilities.canSaveToFile && sessionStatus.authenticated && (
+            <>
+              <button
+                onClick={handleSaveToServer}
+                disabled={saving}
+                className="px-6 py-2 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                {saving ? '保存中...' : '保存到服务器'}
+              </button>
+              <button
+                onClick={handleLogout}
+                disabled={authLoading}
+                className="px-6 py-2 bg-[var(--bg-secondary)] text-[var(--text-primary)] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                {authLoading ? '处理中...' : '退出登录'}
+              </button>
+            </>
+          )}
+
+          {capabilities?.mode === 'server' && capabilities.canLogin && !sessionStatus.authenticated && (
+            <div className="flex gap-3 flex-wrap items-center">
+              <input
+                type="password"
+                value={adminToken}
+                onChange={(e) => setAdminToken(e.target.value)}
+                placeholder="输入管理口令"
+                className="px-4 py-2 min-w-56 bg-[var(--panel)] border border-[var(--panel-border)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent)]"
+              />
+              <button
+                onClick={handleLogin}
+                disabled={authLoading}
+                className="px-6 py-2 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                {authLoading ? '登录中...' : '登录后保存'}
+              </button>
+            </div>
           )}
 
           {/* GitHub 模式 */}
-          {capabilities?.mode === 'github' && (
+          {capabilities?.mode === 'github' && githubStatus?.configured && !githubStatus.authenticated && (
             <button
-              onClick={() => window.location.href = '/api/github/connect'}
+              onClick={() => {
+                window.location.href = '/api/github/connect';
+              }}
               className="px-6 py-2 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 transition-opacity"
             >
-              发布到 GitHub
+              连接 GitHub
+            </button>
+          )}
+
+          {capabilities?.mode === 'github' && githubStatus?.configured && githubStatus.authenticated && (
+            <button
+              onClick={handleGithubPublish}
+              disabled={saving}
+              className="px-6 py-2 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              {saving ? '发布中...' : '发布到 GitHub'}
             </button>
           )}
         </div>
@@ -170,10 +302,25 @@ export default function EditPage() {
           <p className="mb-2">💡 提示:</p>
           <ul className="list-disc list-inside space-y-1">
             <li>完整的可视化编辑器正在迁移中,当前为简化版</li>
-            <li>可直接编辑 YAML 内容</li>
+            <li>可直接编辑 YAML 内容，保存前会先做语法校验</li>
             {capabilities?.mode === 'static' && <li>静态模式下请复制或下载 YAML 后手动替换配置文件</li>}
-            {capabilities?.mode === 'server' && <li>Server 模式下保存会直接写入服务器配置文件</li>}
-            {capabilities?.mode === 'github' && <li>GitHub 模式会将配置提交到指定仓库</li>}
+            {capabilities?.mode === 'server' && capabilities.canLogin && !sessionStatus.authenticated && (
+              <li>Server 模式需要先输入管理口令登录后才能保存</li>
+            )}
+            {capabilities?.mode === 'server' && sessionStatus.authenticated && (
+              <li>Server 模式下保存会直接写入服务器配置文件</li>
+            )}
+            {capabilities?.mode === 'github' && githubStatus?.configured && !githubStatus.authenticated && (
+              <li>GitHub 模式需要先完成 OAuth 授权，再发布到固定仓库</li>
+            )}
+            {capabilities?.mode === 'github' && githubStatus?.configured && githubStatus.authenticated && (
+              <li>
+                当前将发布到 {githubStatus.repo} 的 {githubStatus.branch} 分支，路径为 {githubStatus.path}
+              </li>
+            )}
+            {capabilities?.mode === 'github' && !githubStatus?.configured && (
+              <li>GitHub 模式尚未配置完整环境变量，当前不可发布</li>
+            )}
           </ul>
         </div>
       </div>
