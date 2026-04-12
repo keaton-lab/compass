@@ -4,13 +4,12 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { dump as yamlDump, load as yamlLoad } from 'js-yaml';
-import { User, Settings, FolderOpen, Code2, AlertCircle, Check, Lock, Loader2 } from 'lucide-react';
+import { LayoutGrid, FolderOpen, Code2, AlertCircle, Check, Lock, Loader2 } from 'lucide-react';
 import type { Config } from '../types';
 import { useEditState } from './hooks/use-edit-state';
 import EditHeader from './components/EditHeader';
-import ProfileEditor from './components/ProfileEditor';
 
-const SettingsEditor = dynamic(() => import('./components/SettingsEditor'), {
+const GeneralSettings = dynamic(() => import('./components/GeneralSettings'), {
   loading: () => <SectionLoading />,
 });
 
@@ -23,7 +22,7 @@ interface EditClientProps {
   canSaveToServer: boolean;
 }
 
-type EditSection = 'profile' | 'settings' | 'categories' | 'yaml';
+type EditSection = 'general' | 'categories' | 'yaml';
 type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated';
 type EditSectionConfig = { key: EditSection; label: string; icon: React.ReactNode; count?: number };
 
@@ -184,10 +183,9 @@ function useServerEditAccess(canSaveToServer: boolean) {
 
 export default function EditClient({ initialConfig, canSaveToServer }: EditClientProps) {
   const { config, setConfig } = useEditState(initialConfig);
-  const [activeSection, setActiveSection] = useState<EditSection>('profile');
+  const [activeSection, setActiveSection] = useState<EditSection>('general');
   const [yamlError, setYamlError] = useState<string | null>(null);
   const [yamlInput, setYamlInput] = useState<string>('');
-  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
   const yamlParseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const {
     authStatus,
@@ -209,11 +207,6 @@ export default function EditClient({ initialConfig, canSaveToServer }: EditClien
     return yamlDump(config, YAML_DUMP_OPTIONS);
   }, [config]);
 
-  const openCategoryIds = useMemo(
-    () => config.categories.map((category) => category.id).filter((id) => !collapsedCategories.has(id)),
-    [collapsedCategories, config.categories]
-  );
-
   useEffect(() => {
     if (activeSection !== 'yaml') {
       setYamlInput(yamlContent);
@@ -227,15 +220,6 @@ export default function EditClient({ initialConfig, canSaveToServer }: EditClien
       }
     };
   }, []);
-
-  useEffect(() => {
-    setCollapsedCategories((prev) => {
-      const currentIds = new Set(config.categories.map((category) => category.id));
-      const next = new Set(Array.from(prev).filter((id) => currentIds.has(id)));
-
-      return next.size === prev.size ? prev : next;
-    });
-  }, [config.categories]);
 
   const handleSectionChange = useCallback((nextSection: EditSection) => {
     if (nextSection === 'yaml') {
@@ -322,26 +306,12 @@ export default function EditClient({ initialConfig, canSaveToServer }: EditClien
     [setConfig]
   );
 
-  const moveCategoryUp = useCallback((index: number) => {
-    if (index <= 0) return;
-    setConfig((prev: Config) => {
-      const categories = [...prev.categories];
-      const temp = categories[index];
-      categories[index] = categories[index - 1];
-      categories[index - 1] = temp;
-      return { ...prev, categories };
-    });
-  }, [setConfig]);
-
-  const moveCategoryDown = useCallback((index: number) => {
-    setConfig((prev: Config) => {
-      if (index >= prev.categories.length - 1) return prev;
-      const categories = [...prev.categories];
-      const temp = categories[index];
-      categories[index] = categories[index + 1];
-      categories[index + 1] = temp;
-      return { ...prev, categories };
-    });
+  // 处理分类拖拽排序
+  const handleCategoriesChange = useCallback((newCategories: Config['categories']) => {
+    setConfig((prev: Config) => ({
+      ...prev,
+      categories: newCategories,
+    }));
   }, [setConfig]);
 
   const addLink = useCallback(
@@ -391,48 +361,8 @@ export default function EditClient({ initialConfig, canSaveToServer }: EditClien
     [setConfig]
   );
 
-  const moveLinkUp = useCallback((catIdx: number, linkIdx: number) => {
-    if (linkIdx <= 0) return;
-    setConfig((prev: Config) => {
-      const categories = [...prev.categories];
-      const links = [...categories[catIdx].links];
-      const temp = links[linkIdx];
-      links[linkIdx] = links[linkIdx - 1];
-      links[linkIdx - 1] = temp;
-      categories[catIdx] = { ...categories[catIdx], links };
-      return { ...prev, categories };
-    });
-  }, [setConfig]);
-
-  const moveLinkDown = useCallback((catIdx: number, linkIdx: number) => {
-    setConfig((prev: Config) => {
-      const categories = [...prev.categories];
-      if (linkIdx >= categories[catIdx].links.length - 1) return prev;
-      const links = [...categories[catIdx].links];
-      const temp = links[linkIdx];
-      links[linkIdx] = links[linkIdx + 1];
-      links[linkIdx + 1] = temp;
-      categories[catIdx] = { ...categories[catIdx], links };
-      return { ...prev, categories };
-    });
-  }, [setConfig]);
-
-  const handleCategoryOpenChange = useCallback((openIds: string[]) => {
-    const openIdSet = new Set(openIds);
-    setCollapsedCategories(new Set(config.categories.map((category) => category.id).filter((id) => !openIdSet.has(id))));
-  }, [config.categories]);
-
-  const toggleAllCategories = useCallback(() => {
-    if (collapsedCategories.size === config.categories.length) {
-      setCollapsedCategories(new Set());
-    } else {
-      setCollapsedCategories(new Set(config.categories.map((c) => c.id)));
-    }
-  }, [collapsedCategories.size, config.categories]);
-
   const sections: EditSectionConfig[] = [
-    { key: 'profile', label: '个人资料', icon: <User className="w-4 h-4" /> },
-    { key: 'settings', label: '设置', icon: <Settings className="w-4 h-4" /> },
+    { key: 'general', label: '基础设置', icon: <LayoutGrid className="w-4 h-4" /> },
     { key: 'categories', label: '分类和链接', icon: <FolderOpen className="w-4 h-4" />, count: config.categories.length },
     { key: 'yaml', label: 'YAML 编辑', icon: <Code2 className="w-4 h-4" /> },
   ];
@@ -501,35 +431,14 @@ export default function EditClient({ initialConfig, canSaveToServer }: EditClien
           </div>
         </div>
 
-        {activeSection === 'profile' && (
+        {activeSection === 'general' && (
           <div className="outline-none">
-            <section className="rounded-[24px] border bg-[var(--panel-strong)]" style={{ borderColor: 'var(--panel-border)' }}>
-              <div className="border-b px-5 py-4" style={{ borderColor: 'var(--panel-border)' }}>
-                <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--foreground)]">
-                  <User className="w-4 h-4 text-[var(--accent)]" />
-                  个人资料
-                </h2>
-              </div>
-              <div className="p-5">
-                <ProfileEditor profile={config.profile} onChange={updateProfile} />
-              </div>
-            </section>
-          </div>
-        )}
-
-        {activeSection === 'settings' && (
-          <div className="outline-none">
-            <section className="rounded-[24px] border bg-[var(--panel-strong)]" style={{ borderColor: 'var(--panel-border)' }}>
-              <div className="border-b px-5 py-4" style={{ borderColor: 'var(--panel-border)' }}>
-                <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--foreground)]">
-                  <Settings className="w-4 h-4 text-[var(--accent)]" />
-                  设置
-                </h2>
-              </div>
-              <div className="p-5">
-                <SettingsEditor settings={config.settings} onChange={updateSettings} />
-              </div>
-            </section>
+            <GeneralSettings
+              profile={config.profile}
+              settings={config.settings}
+              onProfileChange={updateProfile}
+              onSettingsChange={updateSettings}
+            />
           </div>
         )}
 
@@ -537,20 +446,13 @@ export default function EditClient({ initialConfig, canSaveToServer }: EditClien
           <div className="outline-none">
             <CategoriesEditorSection
               categories={config.categories}
-              collapsedCategories={collapsedCategories}
-              openCategoryIds={openCategoryIds}
-              onOpenChange={handleCategoryOpenChange}
-              onToggleAll={toggleAllCategories}
+              onCategoriesChange={handleCategoriesChange}
               onAddCategory={addCategory}
               onUpdateCategory={updateCategory}
               onDeleteCategory={deleteCategory}
               onUpdateLink={updateLink}
               onAddLink={addLink}
               onDeleteLink={deleteLink}
-              onMoveLinkUp={moveLinkUp}
-              onMoveLinkDown={moveLinkDown}
-              onMoveCategoryUp={moveCategoryUp}
-              onMoveCategoryDown={moveCategoryDown}
             />
           </div>
         )}

@@ -39,14 +39,7 @@ export default function ColorPicker({ value, onChange, colors = DEFAULT_COLORS }
           title={color.name}
         />
       ))}
-      <label className="relative h-7 w-7 cursor-pointer overflow-hidden rounded-full border transition-transform hover:scale-105" style={{ borderColor: 'var(--panel-border)' }}>
-        <input
-          type="color"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="absolute -top-2 -left-2 w-10 h-10 cursor-pointer border-0 p-0"
-        />
-      </label>
+
     </div>
   );
 }

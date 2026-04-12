@@ -15,39 +15,71 @@ type LucideIconLoader = () => Promise<{ default: LucideIcon }>;
 
 const lucideResolverCache = new Map<string, LucideIcon>();
 const brandIconCache = new Map<string, string | null>();
+let lucideLoaderMapPromise: Promise<Map<string, LucideIconLoader>> | null = null;
+let brandIconMapPromise: Promise<Map<string, string>> | null = null;
+
+async function getLucideLoaderMap() {
+  if (!lucideLoaderMapPromise) {
+    lucideLoaderMapPromise = import('lucide-react/dynamicIconImports').then((dynamicImports) => {
+      const loaders = (dynamicImports.default ?? dynamicImports) as Record<string, LucideIconLoader>;
+      const normalizedLoaderMap = new Map<string, LucideIconLoader>();
+
+      Object.entries(loaders).forEach(([key, loader]) => {
+        normalizedLoaderMap.set(key, loader);
+        normalizedLoaderMap.set(key.replace(/-/g, ''), loader);
+      });
+
+      return normalizedLoaderMap;
+    });
+  }
+
+  return lucideLoaderMapPromise;
+}
 
 async function loadLucideIcon(name: string): Promise<LucideIcon | null> {
   const kebab = toKebabCase(name);
   const compact = kebab.replace(/-/g, '');
-
-  const dynamicImports = await import('lucide-react/dynamicIconImports');
-  const loaders = (dynamicImports.default ?? dynamicImports) as Record<string, LucideIconLoader>;
-
-  const loader = loaders[kebab] ?? loaders[compact];
+  const loaderMap = await getLucideLoaderMap();
+  const loader = loaderMap.get(kebab) ?? loaderMap.get(compact);
   if (!loader) return null;
 
   const mod = await loader();
   return mod.default;
 }
 
+async function getBrandIconMap() {
+  if (!brandIconMapPromise) {
+    brandIconMapPromise = import('simple-icons').then((simpleIcons) => {
+      const iconMap = new Map<string, string>();
+      const entries = simpleIcons as unknown as Record<string, SimpleIconModuleEntry>;
+
+      for (const key of Object.keys(entries)) {
+        if (!key.startsWith('si') || key.length <= 2) continue;
+
+        const icon = entries[key];
+        const aliases = [icon.slug, icon.title, icon.slug.replace(/-/g, ''), icon.title.replace(/[^a-zA-Z0-9]/g, '')];
+
+        for (const alias of aliases) {
+          const normalizedAlias = normalizeBrandIconKey(alias);
+          if (normalizedAlias && !iconMap.has(normalizedAlias)) {
+            iconMap.set(normalizedAlias, icon.path);
+          }
+        }
+      }
+
+      return iconMap;
+    });
+  }
+
+  return brandIconMapPromise;
+}
+
 async function loadBrandIconPath(name: string): Promise<string | null> {
   const normalizedName = normalizeBrandIconKey(name);
   if (!normalizedName) return null;
 
-  const simpleIcons = await import('simple-icons');
-  const entries = simpleIcons as unknown as Record<string, SimpleIconModuleEntry>;
-
-  for (const key of Object.keys(entries)) {
-    if (!key.startsWith('si') || key.length <= 2) continue;
-    const icon = entries[key];
-    const aliases = [icon.slug, icon.title, icon.slug.replace(/-/g, ''), icon.title.replace(/[^a-zA-Z0-9]/g, '')];
-    for (const alias of aliases) {
-      if (normalizeBrandIconKey(alias) === normalizedName) {
-        return icon.path;
-      }
-    }
-  }
-  return null;
+  const iconMap = await getBrandIconMap();
+  return iconMap.get(normalizedName) ?? null;
 }
 
 export default function DynamicIcon({ name, size = 24, className = '', color }: DynamicIconProps) {
