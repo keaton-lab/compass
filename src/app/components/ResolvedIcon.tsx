@@ -1,6 +1,5 @@
 import { createElement } from 'react';
 import type { ResolvedIconData } from '../icon-types';
-import BrandIcon from './BrandIcon';
 
 interface ResolvedIconProps {
   icon: ResolvedIconData | null | undefined;
@@ -43,13 +42,22 @@ export default function ResolvedIcon({
     );
   }
 
+  const path = icon?.kind === 'brand' ? icon.path : null;
+
+  if (!path) {
+    return <span className={className} style={{ fontSize: size * 0.5 }}>{name.slice(0, 2)}</span>;
+  }
+
   return (
-    <BrandIcon
-      name={name}
-      path={icon?.kind === 'brand' ? icon.path : null}
-      size={size}
+    <svg
       className={className}
-      color={color}
-    />
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill={color || 'currentColor'}
+      aria-hidden="true"
+    >
+      <path d={path} />
+    </svg>
   );
 }

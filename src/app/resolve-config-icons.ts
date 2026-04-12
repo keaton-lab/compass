@@ -1,14 +1,9 @@
 import 'server-only';
 
 import type { ResolvedIconData, ResolvedSvgNode } from './icon-types';
+import { normalizeBrandIconKey, toKebabCase, type SimpleIconModuleEntry } from './icon-utils';
 import type { Config, ResolvedConfig } from './types';
 import { getAvatarIconName } from './avatar-utils';
-
-interface SimpleIconModuleEntry {
-  slug: string;
-  title: string;
-  path: string;
-}
 
 type LucideIconModule = {
   __iconNode?: [string, Record<string, string | number>][];
@@ -19,23 +14,6 @@ type LucideIconLoader = () => Promise<LucideIconModule>;
 let lucideResolverPromise: Promise<(name: string) => Promise<ResolvedIconData | null>> | null = null;
 let brandResolverPromise: Promise<(name: string) => Promise<ResolvedIconData | null>> | null = null;
 const resolvedIconCache = new Map<string, ResolvedIconData | null>();
-
-function toKebabCase(value: string): string {
-  return value
-    .trim()
-    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-    .replace(/[_\s]+/g, '-')
-    .replace(/-+/g, '-')
-    .toLowerCase();
-}
-
-function normalizeBrandIconKey(value: string): string {
-  return value
-    .trim()
-    .replace(/^icon:/i, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '');
-}
 
 function normalizeLucideNodes(
   iconNode: [string, Record<string, string | number>][],

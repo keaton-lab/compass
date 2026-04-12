@@ -2,7 +2,7 @@
 
 import type { LucideIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import BrandIcon from './BrandIcon';
+import { normalizeBrandIconKey, toKebabCase, type SimpleIconModuleEntry } from '../icon-utils';
 
 interface DynamicIconProps {
   name: string;
@@ -15,23 +15,6 @@ type LucideIconLoader = () => Promise<{ default: LucideIcon }>;
 
 const lucideResolverCache = new Map<string, LucideIcon>();
 const brandIconCache = new Map<string, string | null>();
-
-function toKebabCase(value: string): string {
-  return value
-    .trim()
-    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-    .replace(/[_\s]+/g, '-')
-    .replace(/-+/g, '-')
-    .toLowerCase();
-}
-
-function normalizeBrandIconKey(value: string): string {
-  return value
-    .trim()
-    .replace(/^icon:/i, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '');
-}
 
 async function loadLucideIcon(name: string): Promise<LucideIcon | null> {
   const kebab = toKebabCase(name);
@@ -52,7 +35,7 @@ async function loadBrandIconPath(name: string): Promise<string | null> {
   if (!normalizedName) return null;
 
   const simpleIcons = await import('simple-icons');
-  const entries = simpleIcons as unknown as Record<string, { slug: string; title: string; path: string }>;
+  const entries = simpleIcons as unknown as Record<string, SimpleIconModuleEntry>;
 
   for (const key of Object.keys(entries)) {
     if (!key.startsWith('si') || key.length <= 2) continue;
@@ -74,25 +57,31 @@ export default function DynamicIcon({ name, size = 24, className = '', color }: 
   useEffect(() => {
     let cancelled = false;
 
-    // 检查缓存
-    const cachedLucide = lucideResolverCache.get(name);
-    const cachedBrand = brandIconCache.get(name);
+    Promise.resolve().then(async () => {
+      const cachedLucide = lucideResolverCache.get(name);
+      const cachedBrand = brandIconCache.get(name);
 
-    if (cachedLucide) {
-      setLucideIcon(cachedLucide);
-      setBrandPath(null);
-      return;
-    }
+      if (cachedLucide) {
+        if (!cancelled) {
+          setLucideIcon(cachedLucide);
+          setBrandPath(null);
+        }
+        return;
+      }
 
-    if (cachedBrand !== undefined) {
-      setLucideIcon(null);
-      setBrandPath(cachedBrand);
-      return;
-    }
+      if (cachedBrand !== undefined) {
+        if (!cancelled) {
+          setLucideIcon(null);
+          setBrandPath(cachedBrand);
+        }
+        return;
+      }
 
-    // 先尝试 Lucide
-    loadLucideIcon(name).then((icon) => {
-      if (cancelled) return;
+      const icon = await loadLucideIcon(name);
+      if (cancelled) {
+        return;
+      }
+
       if (icon) {
         lucideResolverCache.set(name, icon);
         setLucideIcon(icon);
@@ -100,12 +89,14 @@ export default function DynamicIcon({ name, size = 24, className = '', color }: 
         return;
       }
 
-      // 再尝试品牌图标
-      loadBrandIconPath(name).then((path) => {
-        if (cancelled) return;
-        brandIconCache.set(name, path);
-        setBrandPath(path);
-      });
+      const path = await loadBrandIconPath(name);
+      if (cancelled) {
+        return;
+      }
+
+      brandIconCache.set(name, path);
+      setLucideIcon(null);
+      setBrandPath(path);
     });
 
     return () => {
@@ -118,5 +109,20 @@ export default function DynamicIcon({ name, size = 24, className = '', color }: 
     return <LucideComponent size={size} className={className} color={color} />;
   }
 
-  return <BrandIcon name={name} path={brandPath} size={size} className={className} color={color} />;
+  if (!brandPath) {
+    return <span className={className} style={{ fontSize: size * 0.5 }}>{name.slice(0, 2)}</span>;
+  }
+
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill={color || 'currentColor'}
+      aria-hidden="true"
+    >
+      <path d={brandPath} />
+    </svg>
+  );
 }

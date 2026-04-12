@@ -13,7 +13,7 @@
     "build": "node scripts/build.mjs static",
     "build:static": "node scripts/build.mjs static",
     "build:server": "node scripts/build.mjs server",
-    "lint": "next lint"
+    "lint": "eslint ."
   },
   "dependencies": {
     "framer-motion": "^11.11.0",
@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
-    "@types/node": "^20",
+    "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

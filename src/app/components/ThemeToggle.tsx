@@ -2,7 +2,15 @@
 
 import { Dialog, DropdownMenu } from 'radix-ui';
 import { Check, Moon, Palette, Sun, X } from 'lucide-react';
-import { useSettings } from '../contexts/SettingsContext';
+import { useEffect, useState } from 'react';
+import {
+  THEME_CSS_VARIABLES,
+  THEME_STORAGE_KEY,
+  getThemePreset,
+  isThemeId,
+  themePresets,
+  type ThemeId,
+} from '../themes';
 
 function ThemeIcon({ id, size = 18, className = '' }: { id: string; size?: number; className?: string }) {
   if (id === 'light') return <Sun size={size} className={className} />;
@@ -59,12 +67,53 @@ function getThemeIconStyles(domThemeId: string) {
 }
 
 interface ThemeToggleProps {
-  compact?: boolean;
-  mobileOnly?: boolean;
+  initialTheme: ThemeId;
+  variant: 'mobile' | 'compact' | 'inline';
 }
 
-export default function ThemeToggle({ compact = false, mobileOnly = false }: ThemeToggleProps) {
-  const { availableThemes, setTheme, theme } = useSettings();
+function applyTheme(theme: ThemeId) {
+  const root = document.documentElement;
+  const preset = getThemePreset(theme);
+
+  root.dataset.theme = preset.id;
+  root.classList.toggle('dark', preset.isDark);
+  root.style.colorScheme = preset.isDark ? 'dark' : 'light';
+
+  for (const [key, cssVariable] of Object.entries(THEME_CSS_VARIABLES)) {
+    const colorKey = key as keyof typeof preset.colors;
+    root.style.setProperty(cssVariable, preset.colors[colorKey]);
+  }
+}
+
+export default function ThemeToggle({ initialTheme, variant }: ThemeToggleProps) {
+  const [theme, setTheme] = useState<ThemeId>(() => {
+    if (typeof document !== 'undefined') {
+      const domTheme = document.documentElement.dataset.theme;
+      if (domTheme && isThemeId(domTheme)) {
+        return domTheme;
+      }
+    }
+
+    return initialTheme;
+  });
+
+  useEffect(() => {
+    applyTheme(theme);
+
+    try {
+      const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+      const parsed = stored ? JSON.parse(stored) : {};
+      window.localStorage.setItem(
+        THEME_STORAGE_KEY,
+        JSON.stringify({
+          ...parsed,
+          theme,
+        }),
+      );
+    } catch {
+      // Ignore storage errors.
+    }
+  }, [theme]);
 
   function renderThemeOption(optionId: string, label: string, iconSize: number) {
     const isActive = optionId === theme;
@@ -81,7 +130,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
     );
   }
 
-  if (mobileOnly) {
+  if (variant === 'mobile') {
     return (
       <Dialog.Root>
         <Dialog.Trigger asChild>
@@ -114,7 +163,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
             </div>
 
             <div className="grid gap-2">
-              {availableThemes.map((option) => {
+              {themePresets.map((option) => {
                 const isActive = option.id === theme;
 
                 return (
@@ -140,7 +189,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
     );
   }
 
-  if (compact) {
+  if (variant === 'compact') {
     return (
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
@@ -164,8 +213,8 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
             <div className="px-2 pb-2 pt-1 text-xs font-medium text-[var(--muted)]">
               选择主题
             </div>
-            <DropdownMenu.RadioGroup value={theme} onValueChange={(value) => setTheme(value as 'dark' | 'light' | 'ocean')}>
-              {availableThemes.map((option) => {
+            <DropdownMenu.RadioGroup value={theme} onValueChange={(value) => isThemeId(value) && setTheme(value)}>
+              {themePresets.map((option) => {
                 const isActive = option.id === theme;
 
                 return (
@@ -195,7 +244,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
         className="flex items-center gap-1 rounded-lg border bg-[var(--panel-strong)] px-1.5 py-1.5"
         style={{ borderColor: 'var(--panel-border)' }}
       >
-        {availableThemes.map((option) => {
+        {themePresets.map((option) => {
           const isActive = option.id === theme;
           const iconStyles = getThemeIconStyles(option.id);
 

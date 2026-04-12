@@ -1,46 +1,25 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import './globals.css';
-import { SettingsProvider } from './contexts/SettingsContext';
-import { getThemePreset, getThemeStyleVariables, themePresets } from './themes';
+import {
+  THEME_CSS_VARIABLES,
+  THEME_STORAGE_KEY,
+  getThemeBootPayload,
+  getThemePreset,
+  getThemeStyleVariables,
+} from './themes';
 import { getAvatarImageUrl } from './avatar-utils';
 import type { ResolvedIconData } from './icon-types';
-import { loadConfig, loadResolvedConfig } from './load-config';
-import { defaultThemeId, isThemeId } from './themes';
-
-const THEME_STORAGE_KEY = 'compass-settings';
-const VALID_THEMES = ['light', 'dark', 'ocean'];
+import { loadInitialTheme, loadResolvedConfig } from './load-config';
 
 function getThemeBootScript(initialTheme: string) {
   return `(() => {
   const root = document.documentElement;
   const fallbackTheme = '${initialTheme}';
   const storageKey = '${THEME_STORAGE_KEY}';
-  const validThemes = ${JSON.stringify(VALID_THEMES)};
-  const themeMap = ${JSON.stringify(
-    Object.fromEntries(
-      themePresets.map((theme) => [
-        theme.id,
-        {
-          colors: theme.colors,
-          isDark: theme.isDark,
-        },
-      ]),
-    ),
-  )};
-  const cssVariableMap = {
-    background: '--background',
-    foreground: '--foreground',
-    panel: '--panel',
-    panelStrong: '--panel-strong',
-    panelBorder: '--panel-border',
-    muted: '--muted',
-    textPrimary: '--text-primary',
-    textSecondary: '--text-secondary',
-    bgSecondary: '--bg-secondary',
-    accent: '--accent',
-    accentAlpha: '--accent-alpha',
-    accentBorder: '--accent-border'
-  };
+  const themeMap = ${JSON.stringify(getThemeBootPayload())};
+  const validThemes = Object.keys(themeMap);
+  const cssVariableMap = ${JSON.stringify(THEME_CSS_VARIABLES)};
 
   root.classList.add('theme-preload');
 
@@ -136,11 +115,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const initialConfig = loadConfig();
-  const initialSettings = initialConfig.settings;
-  const initialTheme = isThemeId(initialConfig.settings?.theme)
-    ? initialConfig.settings.theme
-    : defaultThemeId;
+  const initialTheme = loadInitialTheme();
   const initialThemePreset = getThemePreset(initialTheme);
   const themeBootScript = getThemeBootScript(initialTheme);
 
@@ -153,14 +128,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={initialThemePreset.isDark ? 'dark' : undefined}
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+        <Script id="theme-boot" strategy="beforeInteractive">
+          {themeBootScript}
+        </Script>
       </head>
       <body>
-        <SettingsProvider initialSettings={initialSettings}>
-          <div className="app-shell">
-            {children}
-          </div>
-        </SettingsProvider>
+        <div className="app-shell">{children}</div>
       </body>
     </html>
   );
