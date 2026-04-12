@@ -390,8 +390,8 @@ export default function EditClient({ initialConfig, canSaveToServer }: EditClien
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+    <div className="h-[100dvh] overflow-hidden bg-[var(--background)] text-[var(--foreground)]">
+      <div className="mx-auto flex h-full max-w-6xl flex-col px-4 py-3 sm:px-6 sm:py-4">
         <EditHeader
           yamlContent={yamlContent}
           canSaveToServer={canSaveToServer}
@@ -404,8 +404,8 @@ export default function EditClient({ initialConfig, canSaveToServer }: EditClien
           onLogout={canSaveToServer ? () => void handleLogout() : undefined}
         />
 
-        <div className="mb-6 overflow-x-auto pb-1">
-          <div className="inline-flex rounded-[22px] border bg-[var(--panel-strong)] p-1" style={{ borderColor: 'var(--panel-border)' }}>
+        <div className="mb-3 shrink-0 overflow-x-auto pb-1">
+          <div className="inline-flex rounded-[18px] border bg-[var(--panel-strong)] p-1" style={{ borderColor: 'var(--panel-border)' }}>
             {sections.map(({ key, label, icon, count }) => {
               const isActive = key === activeSection;
 
@@ -414,7 +414,7 @@ export default function EditClient({ initialConfig, canSaveToServer }: EditClien
                   key={key}
                   type="button"
                   onClick={() => handleSectionChange(key)}
-                  className={`flex items-center gap-2 rounded-[18px] px-4 py-2.5 text-sm font-medium whitespace-nowrap outline-none transition-colors ${
+                  className={`flex items-center gap-1.5 rounded-[14px] px-3 py-2 text-sm font-medium whitespace-nowrap outline-none transition-colors ${
                     isActive
                       ? 'bg-[var(--accent-alpha)] text-[var(--foreground)]'
                       : 'text-[var(--muted)]'
@@ -431,40 +431,42 @@ export default function EditClient({ initialConfig, canSaveToServer }: EditClien
           </div>
         </div>
 
-        {activeSection === 'general' && (
-          <div className="outline-none">
-            <GeneralSettings
-              profile={config.profile}
-              settings={config.settings}
-              onProfileChange={updateProfile}
-              onSettingsChange={updateSettings}
-            />
-          </div>
-        )}
+        <div className="min-h-0 flex-1 overflow-hidden">
+          {activeSection === 'general' && (
+            <div className="h-full overflow-y-auto pr-1 outline-none [scrollbar-gutter:stable]">
+              <GeneralSettings
+                profile={config.profile}
+                settings={config.settings}
+                onProfileChange={updateProfile}
+                onSettingsChange={updateSettings}
+              />
+            </div>
+          )}
 
-        {activeSection === 'categories' && (
-          <div className="outline-none">
-            <CategoriesEditorSection
-              categories={config.categories}
-              onCategoriesChange={handleCategoriesChange}
-              onAddCategory={addCategory}
-              onUpdateCategory={updateCategory}
-              onDeleteCategory={deleteCategory}
-              onUpdateLink={updateLink}
-              onAddLink={addLink}
-              onDeleteLink={deleteLink}
-            />
-          </div>
-        )}
+          {activeSection === 'categories' && (
+            <div className="h-full outline-none">
+              <CategoriesEditorSection
+                categories={config.categories}
+                onCategoriesChange={handleCategoriesChange}
+                onAddCategory={addCategory}
+                onUpdateCategory={updateCategory}
+                onDeleteCategory={deleteCategory}
+                onUpdateLink={updateLink}
+                onAddLink={addLink}
+                onDeleteLink={deleteLink}
+              />
+            </div>
+          )}
 
-        {activeSection === 'yaml' && (
-          <YamlEditorSection
-            yamlInput={yamlInput}
-            yamlError={yamlError}
-            canSaveToServer={canSaveToServer}
-            onChange={handleYamlChange}
-          />
-        )}
+          {activeSection === 'yaml' && (
+            <YamlEditorSection
+              yamlInput={yamlInput}
+              yamlError={yamlError}
+              canSaveToServer={canSaveToServer}
+              onChange={handleYamlChange}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
@@ -567,8 +569,11 @@ function YamlEditorSection({
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="outline-none">
-      <section className="rounded-[24px] border bg-[var(--panel-strong)]" style={{ borderColor: 'var(--panel-border)' }}>
+    <div className="h-full outline-none">
+      <section
+        className="flex h-full min-h-0 flex-col overflow-hidden rounded-[24px] border bg-[var(--panel-strong)]"
+        style={{ borderColor: 'var(--panel-border)' }}
+      >
         <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: 'var(--panel-border)' }}>
           <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--foreground)]">
             <Code2 className="w-4 h-4 text-[var(--accent)]" />
@@ -588,11 +593,11 @@ function YamlEditorSection({
             )}
           </div>
         </div>
-        <div className="p-4">
+        <div className="min-h-0 flex-1 overflow-y-auto p-4 [scrollbar-gutter:stable]">
           <textarea
             value={yamlInput}
             onChange={(event) => onChange(event.target.value)}
-            className={`h-[calc(100vh-280px)] min-h-[400px] w-full resize-y rounded-[20px] border bg-[var(--background)] p-4 font-mono text-sm text-[var(--foreground)] outline-none transition-colors ${
+            className={`h-full min-h-[320px] w-full resize-none rounded-[20px] border bg-[var(--background)] p-4 font-mono text-sm text-[var(--foreground)] outline-none transition-colors ${
               yamlError ? 'border-red-500/50' : ''
             }`}
             style={{ borderColor: yamlError ? undefined : 'var(--panel-border)' }}

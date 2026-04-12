@@ -194,9 +194,9 @@ function CategoryEditor({
   }, [category.links, onLinksReorder]);
 
   return (
-    <div className="space-y-5">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       {/* 分类基本信息 */}
-      <div className="rounded-[18px] border bg-[var(--background)] p-4" style={{ borderColor: 'var(--panel-border)' }}>
+      <div className="shrink-0 rounded-[18px] border bg-[var(--background)] p-4" style={{ borderColor: 'var(--panel-border)' }}>
         <div className="flex items-center gap-3">
           {/* 图标选择 */}
           <button
@@ -237,7 +237,7 @@ function CategoryEditor({
       </div>
 
       {/* 链接列表 */}
-      <div>
+      <div className="mt-5 flex min-h-0 flex-1 flex-col overflow-hidden">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-sm font-medium text-[var(--foreground)]">
             链接列表 <span className="text-[var(--muted)]">({category.links.length})</span>
@@ -276,15 +276,17 @@ function CategoryEditor({
               items={category.links.map((l) => l.id)}
               strategy={verticalListSortingStrategy}
             >
-              <div className="space-y-2">
-                {category.links.map((link, linkIdx) => (
-                  <SortableLinkItem
-                    key={link.id}
-                    link={link}
-                    onUpdate={(field, value) => onUpdateLink(linkIdx, field, value)}
-                    onDelete={() => onDeleteLink(linkIdx)}
-                  />
-                ))}
+              <div className="min-h-0 flex-1 overflow-y-auto pr-1 [scrollbar-gutter:stable]">
+                <div className="space-y-2">
+                  {category.links.map((link, linkIdx) => (
+                    <SortableLinkItem
+                      key={link.id}
+                      link={link}
+                      onUpdate={(field, value) => onUpdateLink(linkIdx, field, value)}
+                      onDelete={() => onDeleteLink(linkIdx)}
+                    />
+                  ))}
+                </div>
               </div>
             </SortableContext>
           </DndContext>
@@ -391,7 +393,10 @@ export default function CategoriesEditorSection({
   }
 
   return (
-    <section className="rounded-[24px] border bg-[var(--panel-strong)]" style={{ borderColor: 'var(--panel-border)' }}>
+    <section
+      className="flex h-full min-h-0 flex-col overflow-hidden rounded-[24px] border bg-[var(--panel-strong)]"
+      style={{ borderColor: 'var(--panel-border)' }}
+    >
       <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: 'var(--panel-border)' }}>
         <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--foreground)]">
           <FolderOpen className="h-4 w-4 text-[var(--accent)]" />
@@ -407,10 +412,10 @@ export default function CategoriesEditorSection({
         </button>
       </div>
 
-      <div className="flex flex-col lg:flex-row">
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         {/* 左侧分类列表 */}
-        <div className="border-b lg:border-b-0 lg:border-r lg:w-64 xl:w-72 shrink-0" style={{ borderColor: 'var(--panel-border)' }}>
-          <div className="p-3">
+        <div className="shrink-0 border-b lg:flex lg:min-h-0 lg:w-64 lg:border-b-0 lg:border-r xl:w-72" style={{ borderColor: 'var(--panel-border)' }}>
+          <div className="min-h-0 w-full p-3">
             <DndContext
               sensors={categorySensors}
               collisionDetection={closestCenter}
@@ -420,7 +425,7 @@ export default function CategoriesEditorSection({
                 items={categories.map((c) => c.id)}
                 strategy={verticalListSortingStrategy}
               >
-                <div className="space-y-1 overflow-x-hidden overflow-y-auto [scrollbar-gutter:stable] max-h-[300px] lg:max-h-[calc(100vh-300px)]">
+                <div className="space-y-1 overflow-x-hidden overflow-y-auto [scrollbar-gutter:stable] max-h-[300px] lg:h-full lg:max-h-none">
                   {categories.map((category, idx) => (
                     <SortableCategoryTab
                       key={category.id}
@@ -437,7 +442,7 @@ export default function CategoriesEditorSection({
         </div>
 
         {/* 右侧编辑区域 */}
-        <div className="flex-1 p-5">
+        <div className="flex min-h-0 flex-1 overflow-hidden p-5">
           {selectedCategory && (
             <CategoryEditor
               category={selectedCategory}

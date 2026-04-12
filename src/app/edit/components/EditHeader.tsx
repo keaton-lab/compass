@@ -100,12 +100,12 @@ export default function EditHeader({
   };
 
   return (
-    <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-[22px] border bg-[var(--panel-strong)] px-5 py-4" style={{ borderColor: 'var(--panel-border)' }}>
+    <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-[20px] border bg-[var(--panel-strong)] px-4 py-3" style={{ borderColor: 'var(--panel-border)' }}>
       <div className="min-w-0 flex-1">
-        <h1 className="text-2xl font-bold text-[var(--foreground)]">
+        <h1 className="text-xl font-bold text-[var(--foreground)]">
           编辑配置
         </h1>
-        <p className="text-sm text-[var(--muted)] mt-1">
+        <p className="mt-0.5 text-xs text-[var(--muted)] sm:text-sm">
           {canSaveToServer
             ? `当前为在线编辑模式`
             : `当前为静态导出模式，请复制 YAML 后手动保存到 public/config.yaml`}
@@ -117,13 +117,13 @@ export default function EditHeader({
         )}
       </div>
 
-      <div className="flex shrink-0 items-center gap-2">
+      <div className="flex shrink-0 flex-wrap items-center gap-1.5 sm:gap-2">
         {canSaveToServer && onSave && (
           <button
             type="button"
             onClick={onSave}
             disabled={saveDisabled}
-            className={`flex items-center gap-2 rounded-[16px] px-4 py-2.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+            className={`flex items-center gap-1.5 rounded-[14px] px-3 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
               isSaving || saved
                 ? 'bg-emerald-500/16 text-emerald-500'
                 : 'bg-[var(--accent)] text-white'
@@ -151,7 +151,7 @@ export default function EditHeader({
         <button
           type="button"
           onClick={handleCopy}
-          className={`flex items-center gap-2 rounded-[16px] px-4 py-2.5 text-sm font-medium transition-colors ${
+          className={`flex items-center gap-1.5 rounded-[14px] px-3 py-2 text-sm font-medium transition-colors ${
             copied
               ? 'bg-emerald-500/16 text-emerald-500'
               : 'bg-[var(--accent)] text-white'
@@ -174,7 +174,7 @@ export default function EditHeader({
           <button
             type="button"
             onClick={onLogout}
-            className="flex items-center gap-1.5 rounded-[16px] px-3 py-2 text-sm text-[var(--muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--foreground)]"
+            className="flex items-center gap-1.5 rounded-[14px] px-2.5 py-2 text-sm text-[var(--muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--foreground)]"
           >
             <LogOut className="w-4 h-4" />
             退出
@@ -184,7 +184,7 @@ export default function EditHeader({
         {/* Back link */}
         <Link
           href="/"
-          className="flex items-center gap-1.5 rounded-[16px] px-3 py-2 text-sm text-[var(--muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--foreground)]"
+          className="flex items-center gap-1.5 rounded-[14px] px-2.5 py-2 text-sm text-[var(--muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--foreground)]"
         >
           返回
         </Link>
