@@ -5,6 +5,24 @@
 :root {
   --theme-transition-duration: 200ms;
   --theme-transition-easing: ease-out;
+  --edit-tab-font-size-mobile: 13px;
+  --edit-tab-font-size-desktop: 14px;
+  --edit-tab-line-height-mobile: 18px;
+  --edit-tab-line-height-desktop: 20px;
+  --edit-panel-radius: 24px;
+  --edit-panel-header-px: 16px;
+  --edit-panel-header-py: 14px;
+  --edit-panel-body-px: 16px;
+  --edit-panel-body-py: 16px;
+  --edit-panel-gap: 16px;
+  --edit-panel-title-size: 15px;
+  --edit-panel-title-line-height: 22px;
+  --edit-label-size: 13px;
+  --edit-label-line-height: 18px;
+  --edit-input-size: 14px;
+  --edit-input-line-height: 20px;
+  --edit-helper-size: 12px;
+  --edit-helper-line-height: 16px;
 
   /* 深色主题 - 石墨灰 + 琥珀铜 */
   --background: #0f1113;
@@ -200,6 +218,75 @@ html[data-theme='ocean'] .theme-toggle-current-icon-ocean {
   .glass-panel-strong {
     background-color: var(--panel-strong);
     border: 1px solid var(--panel-border);
+  }
+
+  .edit-panel {
+    border-radius: var(--edit-panel-radius);
+    border: 1px solid var(--panel-border);
+    background-color: var(--panel-strong);
+  }
+
+  .edit-panel-header {
+    border-bottom: 1px solid var(--panel-border);
+    padding: var(--edit-panel-header-py) var(--edit-panel-header-px);
+  }
+
+  .edit-panel-body {
+    padding: var(--edit-panel-body-py) var(--edit-panel-body-px);
+  }
+
+  .edit-panel-title {
+    font-size: var(--edit-panel-title-size);
+    line-height: var(--edit-panel-title-line-height);
+    font-weight: 600;
+    color: var(--foreground);
+  }
+
+  .edit-section-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--edit-panel-gap);
+  }
+
+  .edit-field-label {
+    display: block;
+    margin-bottom: 0.375rem;
+    font-size: var(--edit-label-size);
+    line-height: var(--edit-label-line-height);
+    font-weight: 500;
+    color: var(--foreground);
+  }
+
+  .edit-field-input {
+    width: 100%;
+    border-radius: 18px;
+    border: 1px solid var(--panel-border);
+    background-color: var(--background);
+    padding: 0.625rem 1rem;
+    font-size: var(--edit-input-size);
+    line-height: var(--edit-input-line-height);
+    color: var(--foreground);
+    outline: none;
+    transition: border-color 150ms ease-out, background-color 150ms ease-out, color 150ms ease-out;
+  }
+
+  .edit-helper-text {
+    font-size: var(--edit-helper-size);
+    line-height: var(--edit-helper-line-height);
+  }
+}
+
+@media (min-width: 640px) {
+  :root {
+    --edit-panel-header-px: 20px;
+    --edit-panel-header-py: 16px;
+    --edit-panel-body-px: 20px;
+    --edit-panel-body-py: 20px;
+    --edit-panel-gap: 20px;
+    --edit-panel-title-size: 16px;
+    --edit-panel-title-line-height: 24px;
+    --edit-label-size: 14px;
+    --edit-label-line-height: 20px;
   }
 }
 

@@ -251,16 +251,16 @@ export default function IconPicker({ value, onChange, onClose }: IconPickerProps
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--background)]/72 backdrop-blur-sm" />
         <Dialog.Content
-          className="fixed inset-x-4 top-[6vh] bottom-[6vh] z-[51] mx-auto flex max-w-5xl flex-col overflow-hidden rounded-[24px] border bg-[var(--panel-strong)] outline-none"
+          className="fixed inset-x-2 sm:inset-x-4 top-[4vh] sm:top-[6vh] bottom-[4vh] sm:bottom-[6vh] z-[51] mx-auto flex max-w-5xl flex-col overflow-hidden rounded-[20px] sm:rounded-[24px] border bg-[var(--panel-strong)] outline-none"
           style={{ borderColor: 'var(--panel-border)' }}
         >
           <div
-            className="flex items-center justify-between border-b px-6 py-5"
+            className="flex items-center justify-between border-b px-4 sm:px-6 py-3 sm:py-5"
             style={{ borderColor: 'var(--panel-border)' }}
           >
             <div>
-              <Dialog.Title className="text-xl font-semibold text-[var(--text-primary)]">选择图标</Dialog.Title>
-              <Dialog.Description className="mt-1 text-sm text-[var(--muted)]">
+              <Dialog.Title className="text-lg sm:text-xl font-semibold text-[var(--text-primary)]">选择图标</Dialog.Title>
+              <Dialog.Description className="mt-1 text-xs sm:text-sm text-[var(--muted)] hidden sm:block">
                 通用图标和品牌图标都在打开时一次性加载，后续切换和滚动只做本地渲染。
               </Dialog.Description>
             </div>
@@ -285,7 +285,7 @@ export default function IconPicker({ value, onChange, onClose }: IconPickerProps
             }}
             className="flex min-h-0 flex-1 flex-col"
           >
-            <div className="border-b px-6 py-4" style={{ borderColor: 'var(--panel-border)' }}>
+            <div className="border-b px-4 sm:px-6 py-3 sm:py-4" style={{ borderColor: 'var(--panel-border)' }}>
               <div className="relative">
                 <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
                 <input
@@ -295,28 +295,28 @@ export default function IconPicker({ value, onChange, onClose }: IconPickerProps
                     setSearch(event.target.value);
                     setCurrentVisibleCount(INITIAL_VISIBLE_COUNT);
                   }}
-                  placeholder="搜索图标名称..."
+                  placeholder="搜索图标..."
                   autoFocus
-                  className="w-full rounded-[18px] border bg-[var(--background)] px-11 py-3 text-sm text-[var(--foreground)] outline-none transition-colors placeholder:text-[var(--muted)] focus:border-[var(--accent-border)]"
+                  className="w-full rounded-[14px] sm:rounded-[18px] border bg-[var(--background)] px-10 sm:px-11 py-2.5 sm:py-3 text-sm text-[var(--foreground)] outline-none transition-colors placeholder:text-[var(--muted)] focus:border-[var(--accent-border)]"
                   style={{ borderColor: 'var(--panel-border)' }}
                 />
               </div>
 
               <Tabs.List
-                className="mt-4 inline-flex rounded-[18px] border bg-[var(--background)] p-1"
+                className="mt-3 sm:mt-4 inline-flex rounded-[14px] sm:rounded-[18px] border bg-[var(--background)] p-1"
                 style={{ borderColor: 'var(--panel-border)' }}
               >
                 <Tabs.Trigger
                   value="lucide"
-                  className="rounded-[14px] px-4 py-2 text-sm font-medium text-[var(--muted)] outline-none transition-colors data-[state=active]:bg-[var(--accent-alpha)] data-[state=active]:text-[var(--foreground)]"
+                  className="rounded-[10px] sm:rounded-[14px] px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-[var(--muted)] outline-none transition-colors data-[state=active]:bg-[var(--accent-alpha)] data-[state=active]:text-[var(--foreground)]"
                 >
-                  通用图标 ({lucideIconNames.length > 0 ? filteredLucideIcons.length : '...'})
+                  通用 ({lucideIconNames.length > 0 ? filteredLucideIcons.length : '...'})
                 </Tabs.Trigger>
                 <Tabs.Trigger
                   value="brand"
-                  className="rounded-[14px] px-4 py-2 text-sm font-medium text-[var(--muted)] outline-none transition-colors data-[state=active]:bg-[var(--accent-alpha)] data-[state=active]:text-[var(--foreground)]"
+                  className="rounded-[10px] sm:rounded-[14px] px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-[var(--muted)] outline-none transition-colors data-[state=active]:bg-[var(--accent-alpha)] data-[state=active]:text-[var(--foreground)]"
                 >
-                  品牌图标 ({brandIcons.length > 0 ? filteredBrandIcons.length : '...'})
+                  品牌 ({brandIcons.length > 0 ? filteredBrandIcons.length : '...'})
                 </Tabs.Trigger>
               </Tabs.List>
             </div>
@@ -380,9 +380,9 @@ export default function IconPicker({ value, onChange, onClose }: IconPickerProps
             </Tabs.Content>
           </Tabs.Root>
 
-          <div className="border-t px-6 py-4 text-sm text-[var(--muted)]" style={{ borderColor: 'var(--panel-border)' }}>
+          <div className="border-t px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-[var(--muted)]" style={{ borderColor: 'var(--panel-border)' }}>
             当前选中:{' '}
-            <code className="rounded-[10px] bg-[var(--background)] px-2 py-1 text-[var(--text-primary)]">{value}</code>
+            <code className="rounded-[8px] sm:rounded-[10px] bg-[var(--background)] px-2 py-1 text-[var(--text-primary)]">{value}</code>
           </div>
         </Dialog.Content>
       </Dialog.Portal>
@@ -493,7 +493,7 @@ function LucideIconGrid({
   onSelect: (name: string) => void;
 }) {
   return (
-    <div className="grid grid-cols-5 gap-3 sm:grid-cols-7 md:grid-cols-9 lg:grid-cols-10">
+    <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 sm:gap-3">
       {icons.map((icon) => {
         const isSelected = selectedValue === icon.normalizedKey;
 
@@ -502,7 +502,7 @@ function LucideIconGrid({
             key={icon.key}
             type="button"
             onClick={() => onSelect(icon.name)}
-            className={`rounded-[16px] border px-2 py-3 text-xs transition-colors ${
+            className={`rounded-[12px] sm:rounded-[16px] border px-1.5 sm:px-2 py-3 sm:py-4 text-xs transition-colors active:scale-95 ${
               isSelected
                 ? 'bg-[var(--accent-alpha)] text-[var(--foreground)]'
                 : 'bg-[var(--background)] text-[var(--muted)] hover:bg-[var(--bg-secondary)]'
@@ -533,7 +533,7 @@ function BrandIconGrid({
   onSelect: (name: string) => void;
 }) {
   return (
-    <div className="grid grid-cols-5 gap-3 sm:grid-cols-7 md:grid-cols-9 lg:grid-cols-10">
+    <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 sm:gap-3">
       {icons.map((icon) => {
         const isSelected = selectedValue === normalizeBrandIconKey(icon.slug);
 
@@ -542,7 +542,7 @@ function BrandIconGrid({
             key={icon.slug}
             type="button"
             onClick={() => onSelect(icon.slug)}
-            className={`rounded-[16px] border px-2 py-3 text-xs transition-colors ${
+            className={`rounded-[12px] sm:rounded-[16px] border px-1.5 sm:px-2 py-3 sm:py-4 text-xs transition-colors active:scale-95 ${
               isSelected
                 ? 'bg-[var(--accent-alpha)] text-[var(--foreground)]'
                 : 'bg-[var(--background)] text-[var(--muted)] hover:bg-[var(--bg-secondary)]'

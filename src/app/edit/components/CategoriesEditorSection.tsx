@@ -5,9 +5,11 @@ import {
   DndContext,
   closestCenter,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
+  type Modifier,
   type DragEndEvent,
 } from '@dnd-kit/core';
 import {
@@ -18,7 +20,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { FolderOpen, Plus, Folder, GripVertical } from 'lucide-react';
+import { FolderOpen, Plus, Folder, GripVertical, ChevronLeft } from 'lucide-react';
 import type { Config, Category } from '../../types';
 import DynamicIcon from '../../components/DynamicIcon';
 import ColorPicker from './ColorPicker';
@@ -26,6 +28,11 @@ import LazyIconPicker from './LazyIconPicker';
 import DeleteConfirmButton from './DeleteConfirmButton';
 import { validateCategoryName } from '../utils/validators';
 import SortableLinkItem from './SortableLinkItem';
+
+const restrictToVerticalAxis: Modifier = ({ transform }) => ({
+  ...transform,
+  x: 0,
+});
 
 interface CategoriesEditorSectionProps {
   categories: Config['categories'];
@@ -80,6 +87,7 @@ function SortableCategoryTab({
     attributes,
     listeners,
     setNodeRef,
+    setActivatorNodeRef,
     transform,
     transition,
     isDragging,
@@ -108,7 +116,8 @@ function SortableCategoryTab({
         type="button"
         {...attributes}
         {...listeners}
-        className="flex h-6 w-4 cursor-grab touch-none items-center justify-center text-[var(--muted)] transition-colors hover:text-[var(--foreground)] active:cursor-grabbing"
+        ref={setActivatorNodeRef}
+        className="flex h-8 w-6 cursor-grab touch-none select-none items-center justify-center text-[var(--muted)] transition-colors hover:text-[var(--foreground)] active:cursor-grabbing"
         onClick={(e) => e.stopPropagation()}
       >
         <GripVertical className="h-3.5 w-3.5" />
@@ -137,9 +146,9 @@ function SortableCategoryTab({
         {category.links.length}
       </span>
 
-      {/* 删除按钮（仅在 hover 时显示） */}
+      {/* 删除按钮（仅在 PC hover 时显示） */}
       <div
-        className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity hidden lg:block"
         onClick={(e) => e.stopPropagation()}
       >
         <DeleteConfirmButton
@@ -162,6 +171,8 @@ function CategoryEditor({
   onUpdateLink,
   onDeleteLink,
   onLinksReorder,
+  onBack,
+  isMobile,
 }: {
   category: Category;
   onUpdate: (field: keyof Category, value: string) => void;
@@ -169,14 +180,19 @@ function CategoryEditor({
   onUpdateLink: (linkIdx: number, field: keyof Category['links'][number], value: string) => void;
   onDeleteLink: (linkIdx: number) => void;
   onLinksReorder: (newLinks: Category['links']) => void;
+  onBack?: () => void;
+  isMobile?: boolean;
 }) {
   const [showIconPicker, setShowIconPicker] = useState(false);
   const nameError = validateCategoryName(category.name);
 
   // 配置链接拖拽传感器
   const linkSensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: { distance: 8 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { distance: 6 },
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
@@ -194,58 +210,115 @@ function CategoryEditor({
   }, [category.links, onLinksReorder]);
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto pr-1 [scrollbar-gutter:stable]">
+      {/* 移动端返回按钮 */}
+      {isMobile && onBack && (
+        <button
+          type="button"
+          onClick={onBack}
+          className="mb-2 flex items-center gap-1 text-xs text-[var(--muted)] transition-colors hover:text-[var(--foreground)]"
+        >
+          <ChevronLeft className="h-3.5 w-3.5" />
+          返回分类列表
+        </button>
+      )}
+
       {/* 分类基本信息 */}
-      <div className="shrink-0 rounded-[18px] border bg-[var(--background)] p-4" style={{ borderColor: 'var(--panel-border)' }}>
-        <div className="flex items-center gap-3">
-          {/* 图标选择 */}
-          <button
-            type="button"
-            onClick={() => setShowIconPicker(true)}
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] border bg-[var(--panel-strong)] text-[var(--foreground)] transition-colors hover:bg-[var(--bg-secondary)]"
-            style={{ borderColor: 'var(--panel-border)' }}
-          >
-            <DynamicIcon name={category.icon} size={24} />
-          </button>
+      <div className="rounded-[18px] border bg-[var(--background)] p-3 sm:shrink-0 sm:p-4" style={{ borderColor: 'var(--panel-border)' }}>
+        {/* PC端：水平布局 */}
+        {!isMobile && (
+          <div className="flex items-center gap-3">
+            {/* 图标选择 */}
+            <button
+              type="button"
+              onClick={() => setShowIconPicker(true)}
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] border bg-[var(--panel-strong)] text-[var(--foreground)] transition-colors hover:bg-[var(--bg-secondary)]"
+              style={{ borderColor: 'var(--panel-border)' }}
+            >
+              <DynamicIcon name={category.icon} size={24} />
+            </button>
 
-          {/* 名称输入 */}
-          <div className="flex-1 min-w-0">
-            <label className="mb-1.5 block text-xs font-medium text-[var(--muted)]">
-              分类名称
-            </label>
-            <input
-              type="text"
-              value={category.name}
-              onChange={(e) => onUpdate('name', e.target.value)}
-              className={`w-full rounded-[14px] border bg-[var(--panel-strong)] px-4 py-2.5 text-sm font-medium text-[var(--foreground)] outline-none transition-colors ${
-                nameError ? 'border-red-500/50' : ''
-              }`}
-              style={{ borderColor: nameError ? undefined : 'var(--panel-border)' }}
-              placeholder="分类名称"
-            />
-            {nameError && <p className="mt-1 text-xs text-red-400">{nameError}</p>}
-          </div>
+            {/* 名称输入 */}
+            <div className="flex-1 min-w-0">
+              <label className="mb-1.5 block text-xs font-medium text-[var(--muted)]">
+                分类名称
+              </label>
+              <input
+                type="text"
+                value={category.name}
+                onChange={(e) => onUpdate('name', e.target.value)}
+                className={`w-full rounded-[14px] border bg-[var(--panel-strong)] px-4 py-2.5 text-sm font-medium text-[var(--foreground)] outline-none transition-colors ${
+                  nameError ? 'border-red-500/50' : ''
+                }`}
+                style={{ borderColor: nameError ? undefined : 'var(--panel-border)' }}
+                placeholder="分类名称"
+              />
+              {nameError && <p className="mt-1 text-xs text-red-400">{nameError}</p>}
+            </div>
 
-          {/* 颜色选择器 */}
-          <div className="shrink-0">
-            <label className="mb-1.5 block text-xs font-medium text-[var(--muted)]">
-              颜色
-            </label>
-            <ColorPicker value={category.color} onChange={(color) => onUpdate('color', color)} />
+            {/* 颜色选择器 */}
+            <div className="shrink-0">
+              <label className="mb-1.5 block text-xs font-medium text-[var(--muted)]">
+                颜色
+              </label>
+              <ColorPicker value={category.color} onChange={(color) => onUpdate('color', color)} />
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* 移动端：垂直布局 */}
+        {isMobile && (
+          <div className="flex flex-col gap-2.5">
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => setShowIconPicker(true)}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] border bg-[var(--panel-strong)] text-[var(--foreground)] transition-colors hover:bg-[var(--bg-secondary)]"
+                style={{ borderColor: 'var(--panel-border)' }}
+              >
+                <DynamicIcon name={category.icon} size={20} />
+              </button>
+
+              <div className="flex-1 min-w-0">
+                <label className="mb-1 block text-[11px] font-medium text-[var(--muted)]">
+                  分类名称
+                </label>
+                <input
+                  type="text"
+                  value={category.name}
+                  onChange={(e) => onUpdate('name', e.target.value)}
+                  className={`w-full rounded-[12px] border bg-[var(--panel-strong)] px-3 py-2 text-sm font-medium text-[var(--foreground)] outline-none transition-colors ${
+                    nameError ? 'border-red-500/50' : ''
+                  }`}
+                  style={{ borderColor: nameError ? undefined : 'var(--panel-border)' }}
+                  placeholder="分类名称"
+                />
+                {nameError && <p className="mt-1 text-xs text-red-400">{nameError}</p>}
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-[11px] font-medium text-[var(--muted)]">
+                颜色
+              </label>
+              <div className="flex gap-2 overflow-x-auto py-2 [scrollbar-gutter:stable]">
+                <ColorPicker value={category.color} onChange={(color) => onUpdate('color', color)} />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 链接列表 */}
-      <div className="mt-5 flex min-h-0 flex-1 flex-col overflow-hidden">
-        <div className="mb-3 flex items-center justify-between">
+      <div className={isMobile ? 'mt-3 flex flex-1 flex-col' : 'mt-5 flex flex-1 flex-col'}>
+        <div className="mb-2 flex items-center justify-between">
           <h3 className="text-sm font-medium text-[var(--foreground)]">
             链接列表 <span className="text-[var(--muted)]">({category.links.length})</span>
           </h3>
           <button
             type="button"
             onClick={onAddLink}
-            className="flex items-center gap-1.5 rounded-[12px] bg-[var(--accent)] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:opacity-90"
+            className="flex items-center gap-1 rounded-[12px] bg-[var(--accent)] px-2.5 py-1.5 text-xs font-medium text-white transition-colors hover:opacity-90"
           >
             <Plus className="h-3.5 w-3.5" />
             添加链接
@@ -270,21 +343,34 @@ function CategoryEditor({
           <DndContext
             sensors={linkSensors}
             collisionDetection={closestCenter}
+            modifiers={[restrictToVerticalAxis]}
             onDragEnd={handleLinkDragEnd}
           >
             <SortableContext
               items={category.links.map((l) => l.id)}
               strategy={verticalListSortingStrategy}
             >
-              <div className="min-h-0 flex-1 overflow-y-auto pr-1 [scrollbar-gutter:stable]">
+              <div className="flex-1">
                 <div className="space-y-2">
                   {category.links.map((link, linkIdx) => (
-                    <SortableLinkItem
-                      key={link.id}
-                      link={link}
-                      onUpdate={(field, value) => onUpdateLink(linkIdx, field, value)}
-                      onDelete={() => onDeleteLink(linkIdx)}
-                    />
+                    (() => {
+                      const isNewLink =
+                        linkIdx === category.links.length - 1 &&
+                        link.name === '新链接' &&
+                        link.url === 'https://' &&
+                        !link.description;
+
+                      return (
+                        <SortableLinkItem
+                          key={link.id}
+                          link={link}
+                          defaultExpanded={isNewLink}
+                          autoScrollIntoView={isNewLink}
+                          onUpdate={(field, value) => onUpdateLink(linkIdx, field, value)}
+                          onDelete={() => onDeleteLink(linkIdx)}
+                        />
+                      );
+                    })()
                   ))}
                 </div>
               </div>
@@ -316,11 +402,16 @@ export default function CategoriesEditorSection({
 }: CategoriesEditorSectionProps) {
   // 当前选中的分类索引
   const [selectedCatIdx, setSelectedCatIdx] = useState(0);
+  // 移动端是否显示编辑区
+  const [showMobileEditor, setShowMobileEditor] = useState(false);
 
   // 配置分类拖拽传感器
   const categorySensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: { distance: 8 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { distance: 6 },
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
@@ -357,6 +448,8 @@ export default function CategoriesEditorSection({
     } else if (idx < selectedCatIdx) {
       setSelectedCatIdx(selectedCatIdx - 1);
     }
+    // 移动端删除后返回列表
+    setShowMobileEditor(false);
   }, [categories.length, onDeleteCategory, selectedCatIdx]);
 
   // 处理链接重新排序
@@ -364,15 +457,26 @@ export default function CategoriesEditorSection({
     onUpdateCategory(selectedCatIdx, 'links', newLinks as unknown as string);
   }, [onUpdateCategory, selectedCatIdx]);
 
+  // 处理分类选择（移动端）
+  const handleCategorySelect = useCallback((idx: number) => {
+    setSelectedCatIdx(idx);
+    setShowMobileEditor(true);
+  }, []);
+
+  // 处理返回列表（移动端）
+  const handleBackToList = useCallback(() => {
+    setShowMobileEditor(false);
+  }, []);
+
   // 确保选中索引有效
   const validSelectedIdx = Math.min(selectedCatIdx, Math.max(0, categories.length - 1));
   const selectedCategory = categories[validSelectedIdx];
 
   if (categories.length === 0) {
     return (
-      <section className="rounded-[24px] border bg-[var(--panel-strong)]" style={{ borderColor: 'var(--panel-border)' }}>
-        <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: 'var(--panel-border)' }}>
-          <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--foreground)]">
+      <section className="edit-panel">
+        <div className="edit-panel-header flex items-center justify-between">
+          <h2 className="edit-panel-title flex items-center gap-2">
             <FolderOpen className="h-4 w-4 text-[var(--accent)]" />
             分类和链接
           </h2>
@@ -385,7 +489,7 @@ export default function CategoriesEditorSection({
             添加分类
           </button>
         </div>
-        <div className="p-5">
+        <div className="edit-panel-body">
           <EmptyState onAdd={onAddCategory} />
         </div>
       </section>
@@ -394,38 +498,40 @@ export default function CategoriesEditorSection({
 
   return (
     <section
-      className="flex h-full min-h-0 flex-col overflow-hidden rounded-[24px] border bg-[var(--panel-strong)]"
-      style={{ borderColor: 'var(--panel-border)' }}
+      className="edit-panel flex h-full min-h-0 flex-col overflow-hidden"
     >
-      <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: 'var(--panel-border)' }}>
-        <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--foreground)]">
+      <div className="edit-panel-header flex items-center justify-between">
+        <h2 className="edit-panel-title flex items-center gap-2">
           <FolderOpen className="h-4 w-4 text-[var(--accent)]" />
           分类和链接
         </h2>
         <button
           type="button"
           onClick={onAddCategory}
-          className="flex items-center gap-1.5 rounded-[16px] bg-[var(--accent)] px-3 py-2 text-xs font-medium text-white transition-colors hover:opacity-90"
+          className="flex items-center gap-1 rounded-[14px] bg-[var(--accent)] px-2.5 py-1.5 text-xs font-medium text-white transition-colors hover:opacity-90 sm:gap-1.5 sm:rounded-[16px] sm:px-3 sm:py-2"
         >
           <Plus className="h-3.5 w-3.5" />
-          添加分类
+          <span className="hidden xsm:inline">添加分类</span>
+          <span className="xsm:hidden">添加</span>
         </button>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+      {/* PC端布局：左右分栏 */}
+      <div className="hidden lg:flex min-h-0 flex-1">
         {/* 左侧分类列表 */}
-        <div className="shrink-0 border-b lg:flex lg:min-h-0 lg:w-64 lg:border-b-0 lg:border-r xl:w-72" style={{ borderColor: 'var(--panel-border)' }}>
-          <div className="min-h-0 w-full p-3">
+        <div className="shrink-0 border-r w-64 xl:w-72" style={{ borderColor: 'var(--panel-border)' }}>
+          <div className="h-full p-3 overflow-hidden">
             <DndContext
               sensors={categorySensors}
               collisionDetection={closestCenter}
+              modifiers={[restrictToVerticalAxis]}
               onDragEnd={handleCategoryDragEnd}
             >
               <SortableContext
                 items={categories.map((c) => c.id)}
                 strategy={verticalListSortingStrategy}
               >
-                <div className="space-y-1 overflow-x-hidden overflow-y-auto [scrollbar-gutter:stable] max-h-[300px] lg:h-full lg:max-h-none">
+                <div className="space-y-1 overflow-x-hidden overflow-y-auto [scrollbar-gutter:stable] h-full">
                   {categories.map((category, idx) => (
                     <SortableCategoryTab
                       key={category.id}
@@ -451,6 +557,52 @@ export default function CategoriesEditorSection({
               onUpdateLink={(linkIdx, field, value) => onUpdateLink(validSelectedIdx, linkIdx, field, value)}
               onDeleteLink={(linkIdx) => onDeleteLink(validSelectedIdx, linkIdx)}
               onLinksReorder={handleLinksReorder}
+            />
+          )}
+        </div>
+      </div>
+
+      {/* 移动端/平板布局：列表和编辑区切换 */}
+      <div className="lg:hidden flex min-h-0 flex-1 overflow-hidden">
+        {/* 分类列表（当不显示编辑区时） */}
+        <div className={`${showMobileEditor ? 'hidden' : 'flex'} flex-col w-full h-full p-2.5 overflow-hidden sm:p-3`}>
+          <DndContext
+            sensors={categorySensors}
+            collisionDetection={closestCenter}
+            modifiers={[restrictToVerticalAxis]}
+            onDragEnd={handleCategoryDragEnd}
+          >
+            <SortableContext
+              items={categories.map((c) => c.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-1 overflow-x-hidden overflow-y-auto [scrollbar-gutter:stable]">
+                {categories.map((category, idx) => (
+                  <SortableCategoryTab
+                    key={category.id}
+                    category={category}
+                    isSelected={idx === validSelectedIdx}
+                    onClick={() => handleCategorySelect(idx)}
+                    onDelete={() => handleDeleteCategory(idx)}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </div>
+
+        {/* 编辑区域（当显示编辑区时） */}
+        <div className={`${showMobileEditor ? 'flex' : 'hidden'} flex-col w-full h-full p-3 overflow-hidden sm:p-4`}>
+          {selectedCategory && (
+            <CategoryEditor
+              category={selectedCategory}
+              onUpdate={(field, value) => onUpdateCategory(validSelectedIdx, field, value)}
+              onAddLink={() => onAddLink(validSelectedIdx)}
+              onUpdateLink={(linkIdx, field, value) => onUpdateLink(validSelectedIdx, linkIdx, field, value)}
+              onDeleteLink={(linkIdx) => onDeleteLink(validSelectedIdx, linkIdx)}
+              onLinksReorder={handleLinksReorder}
+              onBack={handleBackToList}
+              isMobile={true}
             />
           )}
         </div>

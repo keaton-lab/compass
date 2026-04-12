@@ -29,7 +29,7 @@ function Toggle({
 }) {
   return (
     <label className="flex cursor-pointer items-center justify-between rounded-[18px] border bg-[var(--background)] px-4 py-3.5 transition-colors" style={{ borderColor: 'var(--panel-border)' }}>
-      <span className="text-sm font-medium text-[var(--foreground)]">{label}</span>
+      <span className="text-[length:var(--edit-input-size)] font-medium leading-[var(--edit-input-line-height)] text-[var(--foreground)]">{label}</span>
       <Switch.Root
         checked={checked}
         onCheckedChange={onChange}
@@ -55,7 +55,7 @@ function FlatSelect({
   return (
     <Select.Root value={value} onValueChange={onChange}>
       <Select.Trigger
-        className="flex w-full items-center justify-between rounded-[18px] border bg-[var(--background)] px-4 py-3 text-sm text-[var(--foreground)] outline-none transition-colors"
+        className="flex w-full items-center justify-between rounded-[18px] border bg-[var(--background)] px-4 py-3 text-[length:var(--edit-input-size)] leading-[var(--edit-input-line-height)] text-[var(--foreground)] outline-none transition-colors"
         style={{ borderColor: 'var(--panel-border)' }}
       >
         <Select.Value />
@@ -79,7 +79,7 @@ function FlatSelect({
               <Select.Item
                 key={option.value}
                 value={option.value}
-                className="relative flex cursor-pointer items-center rounded-[14px] px-9 py-2.5 text-sm text-[var(--foreground)] outline-none transition-colors data-[highlighted]:bg-[var(--bg-secondary)]"
+                className="relative flex cursor-pointer items-center rounded-[14px] px-9 py-2.5 text-[length:var(--edit-input-size)] leading-[var(--edit-input-line-height)] text-[var(--foreground)] outline-none transition-colors data-[highlighted]:bg-[var(--bg-secondary)]"
               >
                 <Select.ItemText>{option.label}</Select.ItemText>
                 <Select.ItemIndicator className="absolute left-3 inline-flex items-center">
@@ -111,20 +111,20 @@ export default function GeneralSettings({
   const avatarIcon = profile.avatar || 'Compass';
 
   return (
-    <div className="space-y-6">
+    <div className="edit-section-stack">
       {/* 站点信息卡片 */}
-      <section className="rounded-[24px] border bg-[var(--panel-strong)]" style={{ borderColor: 'var(--panel-border)' }}>
-        <div className="border-b px-5 py-4" style={{ borderColor: 'var(--panel-border)' }}>
-          <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--foreground)]">
+      <section className="edit-panel">
+        <div className="edit-panel-header">
+          <h2 className="edit-panel-title flex items-center gap-2">
             <User className="w-4 h-4 text-[var(--accent)]" />
             站点信息
           </h2>
         </div>
-        <div className="p-5 space-y-4">
+        <div className="edit-panel-body space-y-4">
           {/* Logo 和 名称 */}
           <div className="grid grid-cols-[auto_1fr] gap-3">
             <div>
-              <label className="block text-sm font-medium mb-1.5 text-[var(--foreground)]">
+              <label className="edit-field-label">
                 Logo
               </label>
               <button
@@ -138,55 +138,55 @@ export default function GeneralSettings({
               </button>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1.5 text-[var(--foreground)]">
+              <label className="edit-field-label">
                 名称 <span className="text-red-400">*</span>
               </label>
               <input
                 type="text"
                 value={profile.name}
                 onChange={(e) => onProfileChange('name', e.target.value)}
-                className={`w-full rounded-[18px] border bg-[var(--background)] px-4 py-2.5 text-sm text-[var(--foreground)] outline-none transition-colors ${
+                className={`edit-field-input ${
                   nameError ? 'border-red-500/50' : ''
                 }`}
                 style={{ borderColor: nameError ? undefined : 'var(--panel-border)' }}
                 placeholder="站点名称"
               />
               {nameError && (
-                <p className="mt-1 text-xs text-red-400">{nameError}</p>
+                <p className="edit-helper-text mt-1 text-red-400">{nameError}</p>
               )}
             </div>
           </div>
 
           {/* 描述 */}
           <div>
-            <label className="block text-sm font-medium mb-1.5 text-[var(--foreground)]">
+            <label className="edit-field-label">
               描述 <span className="text-red-400">*</span>
             </label>
             <input
               type="text"
               value={profile.description}
               onChange={(e) => onProfileChange('description', e.target.value)}
-              className={`w-full rounded-[18px] border bg-[var(--background)] px-4 py-2.5 text-sm text-[var(--foreground)] outline-none transition-colors ${
+              className={`edit-field-input ${
                 descError ? 'border-red-500/50' : ''
               }`}
               style={{ borderColor: descError ? undefined : 'var(--panel-border)' }}
               placeholder="站点描述"
             />
             {descError && (
-              <p className="mt-1 text-xs text-red-400">{descError}</p>
+              <p className="edit-helper-text mt-1 text-red-400">{descError}</p>
             )}
           </div>
 
           {/* 简介 */}
           <div>
-            <label className="block text-sm font-medium mb-1.5 text-[var(--foreground)]">
+            <label className="edit-field-label">
               简介 <span className="text-[var(--muted)]">（可选）</span>
             </label>
             <input
               type="text"
               value={profile.bio || ''}
               onChange={(e) => onProfileChange('bio', e.target.value)}
-              className="w-full rounded-[18px] border bg-[var(--background)] px-4 py-2.5 text-sm text-[var(--foreground)] outline-none transition-colors"
+              className="edit-field-input"
               style={{ borderColor: 'var(--panel-border)' }}
               placeholder="一句简短的自我介绍"
             />
@@ -203,18 +203,18 @@ export default function GeneralSettings({
       )}
 
       {/* 外观设置卡片 */}
-      <section className="rounded-[24px] border bg-[var(--panel-strong)]" style={{ borderColor: 'var(--panel-border)' }}>
-        <div className="border-b px-5 py-4" style={{ borderColor: 'var(--panel-border)' }}>
-          <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--foreground)]">
+      <section className="edit-panel">
+        <div className="edit-panel-header">
+          <h2 className="edit-panel-title flex items-center gap-2">
             <Palette className="w-4 h-4 text-[var(--accent)]" />
             外观设置
           </h2>
         </div>
-        <div className="p-5">
+        <div className="edit-panel-body">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* 主题 */}
             <div>
-              <label className="block text-sm font-medium mb-1.5 text-[var(--foreground)]">
+              <label className="edit-field-label">
                 主题
               </label>
               <FlatSelect
@@ -226,7 +226,7 @@ export default function GeneralSettings({
 
             {/* 布局 */}
             <div>
-              <label className="block text-sm font-medium mb-1.5 text-[var(--foreground)]">
+              <label className="edit-field-label">
                 布局
               </label>
               <FlatSelect

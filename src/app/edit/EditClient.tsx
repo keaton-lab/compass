@@ -208,6 +208,26 @@ export default function EditClient({ initialConfig, canSaveToServer }: EditClien
   }, [config]);
 
   useEffect(() => {
+    const { documentElement, body } = document;
+    const previousHtmlOverflow = documentElement.style.overflow;
+    const previousHtmlHeight = documentElement.style.height;
+    const previousBodyOverflow = body.style.overflow;
+    const previousBodyHeight = body.style.height;
+
+    documentElement.style.overflow = 'hidden';
+    documentElement.style.height = '100%';
+    body.style.overflow = 'hidden';
+    body.style.height = '100%';
+
+    return () => {
+      documentElement.style.overflow = previousHtmlOverflow;
+      documentElement.style.height = previousHtmlHeight;
+      body.style.overflow = previousBodyOverflow;
+      body.style.height = previousBodyHeight;
+    };
+  }, []);
+
+  useEffect(() => {
     if (activeSection !== 'yaml') {
       setYamlInput(yamlContent);
     }
@@ -391,7 +411,7 @@ export default function EditClient({ initialConfig, canSaveToServer }: EditClien
 
   return (
     <div className="h-[100dvh] overflow-hidden bg-[var(--background)] text-[var(--foreground)]">
-      <div className="mx-auto flex h-full max-w-6xl flex-col px-4 py-3 sm:px-6 sm:py-4">
+      <div className="mx-auto flex h-full max-w-6xl flex-col box-border px-3 py-2 sm:px-6 sm:py-4">
         <EditHeader
           yamlContent={yamlContent}
           canSaveToServer={canSaveToServer}
@@ -404,8 +424,8 @@ export default function EditClient({ initialConfig, canSaveToServer }: EditClien
           onLogout={canSaveToServer ? () => void handleLogout() : undefined}
         />
 
-        <div className="mb-3 shrink-0 overflow-x-auto pb-1">
-          <div className="inline-flex rounded-[18px] border bg-[var(--panel-strong)] p-1" style={{ borderColor: 'var(--panel-border)' }}>
+        <div className="mb-2 shrink-0 sm:mb-3">
+          <div className="grid grid-cols-3 gap-1 rounded-[18px] border bg-[var(--panel-strong)] p-1 sm:inline-flex sm:min-w-max" style={{ borderColor: 'var(--panel-border)' }}>
             {sections.map(({ key, label, icon, count }) => {
               const isActive = key === activeSection;
 
@@ -414,16 +434,16 @@ export default function EditClient({ initialConfig, canSaveToServer }: EditClien
                   key={key}
                   type="button"
                   onClick={() => handleSectionChange(key)}
-                  className={`flex items-center gap-1.5 rounded-[14px] px-3 py-2 text-sm font-medium whitespace-nowrap outline-none transition-colors ${
+                  className={`flex min-w-0 items-center justify-center gap-1 rounded-[14px] px-2 py-2 text-[length:var(--edit-tab-font-size-mobile)] font-medium leading-[var(--edit-tab-line-height-mobile)] outline-none transition-colors sm:gap-1.5 sm:px-3 sm:py-2 sm:text-[length:var(--edit-tab-font-size-desktop)] sm:leading-[var(--edit-tab-line-height-desktop)] sm:whitespace-nowrap ${
                     isActive
                       ? 'bg-[var(--accent-alpha)] text-[var(--foreground)]'
                       : 'text-[var(--muted)]'
                   }`}
                 >
                   {icon}
-                  <span>{label}</span>
+                  <span className="truncate">{label}</span>
                   {count !== undefined && (
-                    <span className="text-xs opacity-60">({count})</span>
+                    <span className="hidden opacity-60 sm:inline">({count})</span>
                   )}
                 </button>
               );
@@ -560,22 +580,19 @@ function EditLoginScreen({
 function YamlEditorSection({
   yamlInput,
   yamlError,
-  canSaveToServer,
   onChange,
 }: {
   yamlInput: string;
   yamlError: string | null;
-  canSaveToServer: boolean;
   onChange: (value: string) => void;
 }) {
   return (
-    <div className="h-full outline-none">
+    <div className="h-full overflow-hidden outline-none">
       <section
-        className="flex h-full min-h-0 flex-col overflow-hidden rounded-[24px] border bg-[var(--panel-strong)]"
-        style={{ borderColor: 'var(--panel-border)' }}
+        className="edit-panel flex h-full min-h-0 flex-col overflow-hidden"
       >
-        <div className="flex items-center justify-between border-b px-5 py-4" style={{ borderColor: 'var(--panel-border)' }}>
-          <h2 className="flex items-center gap-2 text-base font-semibold text-[var(--foreground)]">
+        <div className="edit-panel-header flex items-center justify-between">
+          <h2 className="edit-panel-title flex items-center gap-2">
             <Code2 className="w-4 h-4 text-[var(--accent)]" />
             YAML 编辑器
           </h2>
@@ -593,11 +610,11 @@ function YamlEditorSection({
             )}
           </div>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto p-4 [scrollbar-gutter:stable]">
+        <div className="edit-panel-body flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
           <textarea
             value={yamlInput}
             onChange={(event) => onChange(event.target.value)}
-            className={`h-full min-h-[320px] w-full resize-none rounded-[20px] border bg-[var(--background)] p-4 font-mono text-sm text-[var(--foreground)] outline-none transition-colors ${
+            className={`min-h-0 flex-1 overflow-y-auto rounded-[20px] border bg-[var(--background)] p-4 font-mono text-[length:var(--edit-input-size)] leading-[var(--edit-input-line-height)] text-[var(--foreground)] outline-none transition-colors [scrollbar-gutter:stable] ${
               yamlError ? 'border-red-500/50' : ''
             }`}
             style={{ borderColor: yamlError ? undefined : 'var(--panel-border)' }}
@@ -605,15 +622,13 @@ function YamlEditorSection({
             spellCheck={false}
           />
           {yamlError && (
-            <p className="mt-2 flex items-start gap-2 text-sm text-red-400">
+            <p className="mt-2 flex items-start gap-2 text-[length:var(--edit-input-size)] leading-[var(--edit-input-line-height)] text-red-400">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
               <span>{yamlError}</span>
             </p>
           )}
-          <p className="mt-3 text-xs text-[var(--muted)]">
-            {canSaveToServer
-              ? '直接编辑 YAML 内容，修改会自动同步到表单。格式正确后可以点击右上角「保存」直接写回配置文件。'
-              : '直接编辑 YAML 内容，修改会自动同步到表单。编辑完成后点击右上角「复制」按钮保存到文件。'}
+          <p className="edit-helper-text mt-3 text-[var(--muted)]">
+            直接编辑 YAML 内容，修改会自动同步到表单。
           </p>
         </div>
       </section>

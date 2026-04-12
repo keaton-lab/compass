@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Clipboard, ClipboardCheck, Save, LogOut, Loader2, Check } from 'lucide-react';
+import { Clipboard, ClipboardCheck, Save, LogOut, Loader2, Check, ArrowLeft, AlertCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface EditHeaderProps {
@@ -99,96 +99,140 @@ export default function EditHeader({
     }
   };
 
-  return (
-    <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-[20px] border bg-[var(--panel-strong)] px-4 py-3" style={{ borderColor: 'var(--panel-border)' }}>
-      <div className="min-w-0 flex-1">
-        <h1 className="text-xl font-bold text-[var(--foreground)]">
-          编辑配置
-        </h1>
-        <p className="mt-0.5 text-xs text-[var(--muted)] sm:text-sm">
-          {canSaveToServer
-            ? `当前为在线编辑模式`
-            : `当前为静态导出模式，请复制 YAML 后手动保存到 public/config.yaml`}
-        </p>
-        {(statusMessage || saveError) && (
-          <p className={`mt-2 text-xs ${saveError ? 'text-red-400' : 'text-emerald-500'}`}>
-            {saveError ?? statusMessage}
-          </p>
-        )}
-      </div>
+  const feedback = saveError
+    ? {
+        text: saveError,
+        className: 'text-red-400',
+        icon: <AlertCircle className="h-3.5 w-3.5 shrink-0" />,
+      }
+    : statusMessage
+      ? {
+          text: statusMessage,
+          className: 'text-emerald-500',
+          icon: <Check className="h-3.5 w-3.5 shrink-0" />,
+        }
+      : isSaving
+        ? {
+            text: '正在保存到服务器',
+            className: 'text-[var(--muted)]',
+            icon: <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />,
+          }
+        : saved
+          ? {
+              text: '配置已保存',
+              className: 'text-emerald-500',
+              icon: <Check className="h-3.5 w-3.5 shrink-0" />,
+            }
+          : null;
 
-      <div className="flex shrink-0 flex-wrap items-center gap-1.5 sm:gap-2">
-        {canSaveToServer && onSave && (
+  return (
+    <section className="mb-2 rounded-[18px] border bg-[var(--panel-strong)] px-3 py-3 sm:mb-3 sm:px-4 sm:py-3.5" style={{ borderColor: 'var(--panel-border)' }}>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <Link
+                href="/"
+                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] text-[var(--muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--foreground)]"
+                title="返回首页"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Link>
+              <h1 className="text-base font-semibold text-[var(--foreground)] sm:text-lg">
+                编辑配置
+              </h1>
+              <span
+                className="hidden rounded-full px-2.5 py-1 text-xs font-medium sm:inline-flex"
+                style={{ backgroundColor: 'var(--background)', color: 'var(--muted)' }}
+              >
+                {canSaveToServer ? '在线模式' : '静态模式'}
+              </span>
+            </div>
+
+            {feedback && (
+              <div className={`mt-1 flex items-center gap-1.5 text-xs sm:text-sm ${feedback.className}`}>
+                {feedback.icon}
+                <span className="truncate">{feedback.text}</span>
+              </div>
+            )}
+          </div>
+
+          <span
+            className="inline-flex shrink-0 rounded-full px-2.5 py-1 text-xs font-medium sm:hidden"
+            style={{ backgroundColor: 'var(--background)', color: 'var(--muted)' }}
+          >
+            {canSaveToServer ? '在线模式' : '静态模式'}
+          </span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {canSaveToServer && onSave && (
+            <button
+              type="button"
+              onClick={onSave}
+              disabled={saveDisabled}
+              className={`inline-flex h-9 items-center justify-center gap-1.5 rounded-[12px] px-3 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+                isSaving || saved
+                  ? 'bg-emerald-500/16 text-emerald-500'
+                  : 'bg-[var(--accent)] text-white'
+              }`}
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>保存中</span>
+                </>
+              ) : saved ? (
+                <>
+                  <Check className="h-4 w-4" />
+                  <span>已保存</span>
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  <span>保存</span>
+                </>
+              )}
+            </button>
+          )}
+
           <button
             type="button"
-            onClick={onSave}
-            disabled={saveDisabled}
-            className={`flex items-center gap-1.5 rounded-[14px] px-3 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-              isSaving || saved
-                ? 'bg-emerald-500/16 text-emerald-500'
-                : 'bg-[var(--accent)] text-white'
+            onClick={handleCopy}
+            className={`inline-flex h-9 items-center justify-center gap-1.5 rounded-[12px] border px-3 text-sm font-medium transition-colors ${
+              copied
+                ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-500'
+                : 'text-[var(--foreground)] hover:bg-[var(--background)]'
             }`}
+            style={{ borderColor: copied ? undefined : 'var(--panel-border)' }}
           >
-            {isSaving ? (
+            {copied ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                保存中
-              </>
-            ) : saved ? (
-              <>
-                <Check className="w-4 h-4" />
-                已保存
+                <ClipboardCheck className="h-4 w-4" />
+                <span>已复制</span>
               </>
             ) : (
               <>
-                <Save className="w-4 h-4" />
-                保存
+                <Clipboard className="h-4 w-4" />
+                <span>复制 YAML</span>
               </>
             )}
           </button>
-        )}
 
-        <button
-          type="button"
-          onClick={handleCopy}
-          className={`flex items-center gap-1.5 rounded-[14px] px-3 py-2 text-sm font-medium transition-colors ${
-            copied
-              ? 'bg-emerald-500/16 text-emerald-500'
-              : 'bg-[var(--accent)] text-white'
-          }`}
-        >
-          {copied ? (
-            <>
-              <ClipboardCheck className="w-4 h-4" />
-              已复制
-            </>
-          ) : (
-            <>
-              <Clipboard className="w-4 h-4" />
-              复制
-            </>
+          {canSaveToServer && onLogout && (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[12px] border px-3 text-sm font-medium text-[var(--muted)] transition-colors hover:bg-[var(--background)] hover:text-[var(--foreground)]"
+              style={{ borderColor: 'var(--panel-border)' }}
+              title="退出登录"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>退出</span>
+            </button>
           )}
-        </button>
-
-        {canSaveToServer && onLogout && (
-          <button
-            type="button"
-            onClick={onLogout}
-            className="flex items-center gap-1.5 rounded-[14px] px-2.5 py-2 text-sm text-[var(--muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--foreground)]"
-          >
-            <LogOut className="w-4 h-4" />
-            退出
-          </button>
-        )}
-
-        {/* Back link */}
-        <Link
-          href="/"
-          className="flex items-center gap-1.5 rounded-[14px] px-2.5 py-2 text-sm text-[var(--muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--foreground)]"
-        >
-          返回
-        </Link>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
