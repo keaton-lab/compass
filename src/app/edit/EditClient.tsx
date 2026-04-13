@@ -482,7 +482,6 @@ export default function EditClient({ initialConfig, canSaveToServer }: EditClien
             <YamlEditorSection
               yamlInput={yamlInput}
               yamlError={yamlError}
-              canSaveToServer={canSaveToServer}
               onChange={handleYamlChange}
             />
           )}
