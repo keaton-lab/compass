@@ -2,33 +2,42 @@
   "name": "compass",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
-    "dev": "node scripts/dev.js",
-    "prebuild": "node scripts/generate-icons-manifest.js",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "generate:static-icons": "node scripts/generate-static-brand-icons.mjs",
+    "dev": "node scripts/dev.mjs",
+    "dev:static": "node scripts/dev.mjs static",
+    "dev:server": "node scripts/dev.mjs server",
+    "build": "node scripts/build.mjs static",
+    "build:static": "node scripts/build.mjs static",
+    "build:server": "node scripts/build.mjs server",
+    "lint": "eslint ."
   },
   "dependencies": {
-    "framer-motion": "^11.18.2",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "framer-motion": "^11.11.0",
     "js-yaml": "^4.1.0",
-    "lucide-react": "^1.7.0",
-    "next": "14.2.35",
+    "lucide-react": "^1.8.0",
+    "next": "16.2.3",
     "radix-ui": "^1.4.3",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
     "simple-icons": "^16.14.0"
   },
   "devDependencies": {
-    "@iconify/json": "^2.2.456",
     "@types/js-yaml": "^4.0.9",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.35",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.3",
     "postcss": "^8",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "server-only": "^0.0.1",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.7.3"
   }
 }

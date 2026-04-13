@@ -19,9 +19,9 @@
 
 ## 特性
 
-- **YAML 配置** — 所有内容集中在 `src/config.yaml`，改完即生效
-- **零数据库** — 纯静态站点，不依赖任何后端服务
-- **3000+ 图标** — Lucide + Simple Icons 自动按需生成，无需手动管理
+- **YAML 配置** — 所有内容集中在 `public/config.yaml`，改完即生效
+- **零数据库** — 静态导出可直接部署；Docker 模式直接读写挂载 YAML
+- **运行时图标** — Lucide + Simple Icons 运行时解析，新增图标不用改代码
 - **三套主题** — Light / Dark / Ocean，玻璃拟态 UI
 - **内置编辑器** — 访问 `/edit` 直接在浏览器中修改配置
 - **搜索** — 实时过滤
@@ -41,12 +41,12 @@
 ## 使用教程
 
 1. **Fork 本项目** — 点击右上角 Fork 按钮，复制仓库到你的 GitHub 账号
-2. **修改配置** — 编辑 `src/config.yaml`，填入你的个人信息和导航链接
+2. **修改配置** — 编辑 `public/config.yaml`，填入你的个人信息和导航链接
 3. **连接部署平台** — 在 [Cloudflare Pages](https://pages.cloudflare.com/) / [Vercel](https://vercel.com) / [Netlify](https://www.netlify.com/) 中导入你的 Fork 仓库
 4. **等待自动部署** — 平台检测到代码变更会自动构建，完成后即可通过分配的域名访问
 5. **绑定自定义域名（可选）** — 在部署平台设置中添加你的域名，解析到对应 CNAME
 
-后续更新只需修改 `config.yaml` 并 Push，平台会自动重新部署。也可访问 `/edit` 路径使用内置编辑器在线修改。
+后续更新只需修改 `public/config.yaml` 并 Push，平台会自动重新部署。也可访问 `/edit` 路径使用内置编辑器在线修改。项目规范统一使用 `.yaml` 后缀。
 
 ## 部署
 
@@ -66,16 +66,18 @@ cd compass && npm install
 npm run dev
 ```
 
-打开 `http://localhost:3000`，开发服务器会监听 `config.yaml` 变更并自动重新生成图标。
+本地开发默认使用静态预览模式，打开 `http://localhost:3000`。
+
+详细说明见 [DEV.md](docs/DEV.md)，构建说明见 [BUILD.md](docs/BUILD.md)。
 
 ## 配置
 
-编辑 `src/config.yaml` 即可自定义全部内容：
+编辑 `public/config.yaml` 即可自定义全部内容：
 
 ```yaml
 profile:
   name: Compass
-  avatar: "icon:navigation"
+  avatar: "navigation"
   description: Navigate Your World
   bio: 快速访问常用网站和工具
 
@@ -101,15 +103,16 @@ categories:
 | 类型 | 来源 | 命名 | 示例 |
 |------|------|------|------|
 | 通用 | [Lucide](https://lucide.dev) | PascalCase | `Calendar`, `Mail`, `Wrench` |
-| 品牌 | [Simple Icons](https://simpleicons.org) | 小写 | `github`, `vercel`, `youtube` |
+| 品牌 | [Simple Icons](https://simpleicons.org) | 小写或 kebab-case | `github`, `vercel`, `google-gemini` |
 
-图标从 `config.yaml` 自动提取生成到 `icons-manifest.ts`，无需手动维护。
+图标在运行时解析，无需手动维护。
 
 ## 项目结构
 
 ```
-src/
+public/
 ├── config.yaml              # 唯一配置文件
+src/
 ├── app/
 │   ├── page.tsx             # 主页（服务端读取 YAML）
 │   ├── components/          # UI 组件
@@ -118,13 +121,11 @@ src/
 │   ├── types/               # 类型定义
 │   ├── globals.css          # 全局样式
 │   └── edit/                # 可视化编辑
-└── data/
-    └── icons-manifest.ts    # 自动生成（勿手动编辑）
 ```
 
 ## 工作流
 
-修改 `config.yaml` → 提交 → 平台自动构建部署。也可通过 `/edit` 页面在线编辑后导出 YAML。
+修改 `public/config.yaml` → 提交 → 平台自动构建部署。也可通过 `/edit` 页面在线编辑后导出 YAML。
 
 ## 技术栈
 

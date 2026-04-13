@@ -2,7 +2,15 @@
 
 import { Dialog, DropdownMenu } from 'radix-ui';
 import { Check, Moon, Palette, Sun, X } from 'lucide-react';
-import { useSettings } from '../contexts/SettingsContext';
+import { useEffect, useState } from 'react';
+import {
+  THEME_CSS_VARIABLES,
+  THEME_STORAGE_KEY,
+  getThemePreset,
+  isThemeId,
+  themePresets,
+  type ThemeId,
+} from '../themes';
 
 function ThemeIcon({ id, size = 18, className = '' }: { id: string; size?: number; className?: string }) {
   if (id === 'light') return <Sun size={size} className={className} />;
@@ -59,12 +67,58 @@ function getThemeIconStyles(domThemeId: string) {
 }
 
 interface ThemeToggleProps {
-  compact?: boolean;
-  mobileOnly?: boolean;
+  initialTheme: ThemeId;
+  variant: 'mobile' | 'compact' | 'inline';
 }
 
-export default function ThemeToggle({ compact = false, mobileOnly = false }: ThemeToggleProps) {
-  const { availableThemes, setTheme, theme } = useSettings();
+function applyTheme(theme: ThemeId) {
+  const root = document.documentElement;
+  const preset = getThemePreset(theme);
+
+  root.classList.add('theme-switching');
+
+  root.dataset.theme = preset.id;
+  root.classList.toggle('dark', preset.isDark);
+  root.style.colorScheme = preset.isDark ? 'dark' : 'light';
+
+  for (const [key, cssVariable] of Object.entries(THEME_CSS_VARIABLES)) {
+    const colorKey = key as keyof typeof preset.colors;
+    root.style.setProperty(cssVariable, preset.colors[colorKey]);
+  }
+
+  const duration = parseFloat(getComputedStyle(root).getPropertyValue('--theme-transition-duration')) || 200;
+  setTimeout(() => root.classList.remove('theme-switching'), duration);
+}
+
+export default function ThemeToggle({ initialTheme, variant }: ThemeToggleProps) {
+  const [theme, setTheme] = useState<ThemeId>(() => {
+    if (typeof document !== 'undefined') {
+      const domTheme = document.documentElement.dataset.theme;
+      if (domTheme && isThemeId(domTheme)) {
+        return domTheme;
+      }
+    }
+
+    return initialTheme;
+  });
+
+  useEffect(() => {
+    applyTheme(theme);
+
+    try {
+      const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+      const parsed = stored ? JSON.parse(stored) : {};
+      window.localStorage.setItem(
+        THEME_STORAGE_KEY,
+        JSON.stringify({
+          ...parsed,
+          theme,
+        }),
+      );
+    } catch {
+      // Ignore storage errors.
+    }
+  }, [theme]);
 
   function renderThemeOption(optionId: string, label: string, iconSize: number) {
     const isActive = optionId === theme;
@@ -81,14 +135,14 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
     );
   }
 
-  if (mobileOnly) {
+  if (variant === 'mobile') {
     return (
       <Dialog.Root>
         <Dialog.Trigger asChild>
           <button
             type="button"
             aria-label="切换主题"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border bg-[var(--panel-strong)] text-[var(--muted)] transition-colors duration-200 hover:border-[var(--accent-border)] md:hidden"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border bg-[var(--panel-strong)] text-[var(--muted)] transition-colors duration-theme hover:border-[var(--accent-border)] md:hidden"
             style={{ borderColor: 'var(--panel-border)' }}
           >
             <CurrentThemeIcon size={18} />
@@ -106,7 +160,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
               <Dialog.Close asChild>
                 <button
                   type="button"
-                  className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--muted)] transition-colors duration-200 hover:text-[var(--text-primary)]"
+                  className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--muted)] transition-colors duration-theme hover:text-[var(--text-primary)]"
                 >
                   <X size={16} />
                 </button>
@@ -114,7 +168,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
             </div>
 
             <div className="grid gap-2">
-              {availableThemes.map((option) => {
+              {themePresets.map((option) => {
                 const isActive = option.id === theme;
 
                 return (
@@ -122,7 +176,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
                     <button
                       type="button"
                       onClick={() => setTheme(option.id)}
-                      className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                      className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition-all duration-theme ${
                         isActive
                           ? 'border-[var(--accent-border)] bg-[var(--accent-alpha)] text-[var(--text-primary)]'
                           : 'border-[var(--panel-border)] bg-[var(--bg-secondary)] text-[var(--muted)] hover:border-[var(--accent-border)] hover:text-[var(--text-primary)]'
@@ -140,14 +194,14 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
     );
   }
 
-  if (compact) {
+  if (variant === 'compact') {
     return (
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
           <button
             type="button"
             aria-label="切换主题"
-            className="flex h-9 w-9 items-center justify-center rounded-lg border bg-[var(--panel-strong)] text-[var(--muted)] transition-colors duration-200 hover:border-[var(--accent-border)]"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border bg-[var(--panel-strong)] text-[var(--muted)] transition-colors duration-theme hover:border-[var(--accent-border)]"
             style={{ borderColor: 'var(--panel-border)' }}
           >
             <CurrentThemeIcon size={18} />
@@ -164,15 +218,15 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
             <div className="px-2 pb-2 pt-1 text-xs font-medium text-[var(--muted)]">
               选择主题
             </div>
-            <DropdownMenu.RadioGroup value={theme} onValueChange={(value) => setTheme(value as 'dark' | 'light' | 'ocean')}>
-              {availableThemes.map((option) => {
+            <DropdownMenu.RadioGroup value={theme} onValueChange={(value) => isThemeId(value) && setTheme(value)}>
+              {themePresets.map((option) => {
                 const isActive = option.id === theme;
 
                 return (
                   <DropdownMenu.RadioItem
                     key={option.id}
                     value={option.id}
-                    className={`flex cursor-pointer items-center rounded-md px-2.5 py-2 text-sm outline-none transition-all duration-200 ${
+                    className={`flex cursor-pointer items-center rounded-md px-2.5 py-2 text-sm outline-none transition-all duration-theme ${
                       isActive
                         ? 'bg-[var(--accent-alpha)] text-[var(--text-primary)]'
                         : 'text-[var(--muted)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
@@ -195,7 +249,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
         className="flex items-center gap-1 rounded-lg border bg-[var(--panel-strong)] px-1.5 py-1.5"
         style={{ borderColor: 'var(--panel-border)' }}
       >
-        {availableThemes.map((option) => {
+        {themePresets.map((option) => {
           const isActive = option.id === theme;
           const iconStyles = getThemeIconStyles(option.id);
 
@@ -204,7 +258,7 @@ export default function ThemeToggle({ compact = false, mobileOnly = false }: The
               key={option.id}
               type="button"
               onClick={() => setTheme(option.id)}
-              className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium transition-all duration-200 ${
+              className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium transition-all duration-theme ${
                 isActive
                   ? 'bg-[var(--accent-alpha)] text-[var(--text-primary)]'
                   : 'text-[var(--muted)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'

@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  compass:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      COMPASS_ADMIN_TOKEN: change-me
+      COMPASS_SESSION_SECRET: change-me-too
+      PORT: 3000
+    volumes:
+      - ./docker/config.yaml:/app/public/config.yaml

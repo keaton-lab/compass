@@ -26,6 +26,9 @@ const config: Config = {
       screens: {
         'xsm': '390px',
       },
+      transitionDuration: {
+        'theme': 'var(--theme-transition-duration)',
+      },
     },
   },
   plugins: [],

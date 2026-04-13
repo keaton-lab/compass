@@ -27,6 +27,23 @@ export interface ThemePreset {
 
 export type ThemeId = ThemePreset['id'];
 
+export const THEME_STORAGE_KEY = 'compass-settings';
+
+export const THEME_CSS_VARIABLES = {
+  background: '--background',
+  foreground: '--foreground',
+  panel: '--panel',
+  panelStrong: '--panel-strong',
+  panelBorder: '--panel-border',
+  muted: '--muted',
+  textPrimary: '--text-primary',
+  textSecondary: '--text-secondary',
+  bgSecondary: '--bg-secondary',
+  accent: '--accent',
+  accentAlpha: '--accent-alpha',
+  accentBorder: '--accent-border',
+} as const;
+
 export const themePresets: ThemePreset[] = [
   {
     id: 'light',
@@ -130,4 +147,16 @@ export function getThemeStyleVariables(themeId: ThemeId): Record<string, string>
     '--accent-border': themePreset.colors.accentBorder,
     colorScheme: themePreset.isDark ? 'dark' : 'light',
   };
+}
+
+export function getThemeBootPayload() {
+  return Object.fromEntries(
+    themePresets.map((theme) => [
+      theme.id,
+      {
+        colors: theme.colors,
+        isDark: theme.isDark,
+      },
+    ]),
+  );
 }

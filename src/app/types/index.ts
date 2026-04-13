@@ -1,4 +1,5 @@
 import type { ThemeId } from '../themes';
+import type { ResolvedIconData } from '../icon-types';
 
 export type { ThemeId };
 
@@ -23,7 +24,6 @@ export interface Profile {
   avatar?: string;
   description: string;
   bio?: string;
-  repo?: string;
 }
 
 export interface Settings {
@@ -38,4 +38,23 @@ export interface Config {
   profile: Profile;
   settings: Settings;
   categories: Category[];
+}
+
+export interface ResolvedLink extends Link {
+  resolvedIcon?: ResolvedIconData | null;
+}
+
+export interface ResolvedCategory extends Omit<Category, 'links'> {
+  links: ResolvedLink[];
+  resolvedIcon?: ResolvedIconData | null;
+}
+
+export interface ResolvedProfile extends Profile {
+  resolvedAvatarIcon?: ResolvedIconData | null;
+}
+
+export interface ResolvedConfig {
+  profile: ResolvedProfile;
+  settings: Settings;
+  categories: ResolvedCategory[];
 }

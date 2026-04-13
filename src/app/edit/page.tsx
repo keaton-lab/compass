@@ -1,12 +1,14 @@
 import EditClient from './EditClient';
-import { loadConfig } from '../load-config';
-
-export const dynamic = 'force-static';
+import { loadConfig, loadEditCapabilities } from '../load-config';
 
 export default function EditPage() {
   const config = loadConfig();
+  const capabilities = loadEditCapabilities();
 
   return (
-    <EditClient initialConfig={config} />
+    <EditClient
+      initialConfig={config}
+      canSaveToServer={capabilities.canSaveToServer}
+    />
   );
 }

@@ -1,10 +1,8 @@
 import ClientLayout from './components/ClientLayout';
-import { loadConfig } from './load-config';
+import { loadResolvedConfig } from './load-config';
 
-export const dynamic = 'force-static';
-
-export default function HomePage() {
-  const config = loadConfig();
+export default async function HomePage() {
+  const config = await loadResolvedConfig();
   const { profile, settings, categories } = config;
 
   return (

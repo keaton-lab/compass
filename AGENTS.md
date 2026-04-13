@@ -7,38 +7,41 @@
 ## 关键命令
 
 ```bash
-npm run dev     # 开发服务器（自动监视 config.yaml 变更并重新生成图标）
-npm run build   # 生产构建（prebuild → generate-icons-manifest.js → next build）
+npm run dev           # 开发服务器（静态预览）
+npm run build         # 静态导出构建（默认）
+npm run build:static  # 静态导出构建
+npm run build:server  # Node 服务构建
 npm run lint    # ESLint 检查
 ```
 
 > **注意**：无测试框架，无 typecheck 脚本。
 
----
 
 ## 图标系统（⚠️ 重要）
 
-图标通过 `scripts/generate-icons-manifest.js` 从 `src/config.yaml` **自动生成**到 `src/data/icons-manifest.ts`。
+图标改为**运行时解析**，不再依赖构建前生成 manifest。
 
-- **永远不要手动编辑** `src/data/icons-manifest.ts`
-- 添加图标：在 `config.yaml` 中使用图标名称，`npm run dev` 自动重新生成
 - **Lucide 图标**：PascalCase（如 `Calendar`, `Mail`）
-- **品牌图标**：lowercase（如 `github`, `vercel`），来自 `simple-icons`
-- 头像格式：`avatar: "icon:navigation"`（带 `icon:` 前缀）
+- **品牌图标**：lowercase 或 kebab-case（如 `github`, `google-gemini`），来自 `simple-icons`
+- 头像格式：直接写图标名即可，如 `avatar: "navigation"`
+- 新增图标时，直接在 YAML 中写图标名即可
 
 ---
 
 ## 配置驱动架构
 
-所有内容来自 `src/config.yaml`：
+所有内容来自 YAML 配置文件：
+
+- 默认路径：`public/config.yaml`
+- server 模式可通过 `COMPASS_CONFIG_PATH` 指向外挂 `config.yaml`
+- 规范统一使用 `.yaml`
 
 ```yaml
 profile:
   name: Compass
-  avatar: "icon:navigation"
+  avatar: "navigation"
   description: ...
   bio: ...
-  repo: "https://github.com/..."
 
 settings:
   theme: dark        # light | dark | ocean
@@ -58,13 +61,15 @@ categories:
         icon: github   # 品牌
 ```
 
-**页面加载流程**：`page.tsx`（服务端）→ 读取 `config.yaml` → 传给 `ClientLayout` → `SettingsContext` 管理客户端状态
+**页面加载流程**：`page.tsx`（服务端）→ 读取运行时 YAML → 传给 `ClientLayout` → `SettingsContext` 管理客户端状态
 
 ---
 
 ## 项目结构
 
 ```
+public/
+├── config.yaml              # 默认配置文件
 src/
 ├── app/
 │   ├── page.tsx             # 主页（服务端组件）
@@ -74,9 +79,7 @@ src/
 │   ├── themes/              # light/dark/ocean 主题预设
 │   ├── types/               # TypeScript 接口
 │   └── globals.css          # 全局样式 + CSS 变量
-├── data/
-│   ├── config.yaml          # 唯一配置源
-│   └── icons-manifest.ts    # 自动生成（只读）
+├── server/                  # 运行时模式与 YAML 读写
 ```
 
 ---
@@ -94,9 +97,10 @@ src/
 
 ## 部署
 
-- **目标**：Cloudflare Pages（`wrangler.toml` 配置 `pages_build_output_dir = "out"`）
-- **构建输出**：`out/`（Next.js 静态导出）
-- **构建命令**：`npm run build`（已包含 `prebuild`）
+- **静态模式目标**：Cloudflare Pages / Netlify / 任意静态托管
+- **静态构建输出**：`out/`
+- **Docker 模式目标**：Node 服务 + 外挂 YAML
+- **server 构建命令**：`npm run build:server`
 
 ---
 
@@ -104,6 +108,6 @@ src/
 
 | 问题 | 解决 |
 |------|------|
-| 图标不显示 | 检查命名（Lucide 用 PascalCase，品牌图标用小写） |
-| 修改 config.yaml 后图标未更新 | 确保 `npm run dev` 在运行 |
+| 图标不显示 | 检查命名（Lucide 用 PascalCase，品牌图标用小写或 kebab-case） |
+| Docker 模式修改 YAML 不生效 | 确认 `COMPASS_CONFIG_PATH` 指向挂载文件，刷新页面重试 |
 | 主题不生效 | 检查 `settings.theme` 是否为 `light`/`dark`/`ocean` |

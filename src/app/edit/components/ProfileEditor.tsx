@@ -1,7 +1,7 @@
 'use client';
 
 import type { Profile } from '../../types';
-import { validateRequired, validateUrl } from '../utils/validators';
+import { validateRequired } from '../utils/validators';
 
 interface ProfileEditorProps {
   profile: Profile;
@@ -11,13 +11,11 @@ interface ProfileEditorProps {
 export default function ProfileEditor({ profile, onChange }: ProfileEditorProps) {
   const nameError = validateRequired(profile.name, '名称');
   const descError = validateRequired(profile.description, '描述');
-  const repoError = profile.repo ? validateUrl(profile.repo) : null;
 
   const fields = [
     { key: 'name' as const, label: '名称', value: profile.name, error: nameError, type: 'text' as const },
     { key: 'description' as const, label: '描述', value: profile.description, error: descError, type: 'text' as const },
     { key: 'bio' as const, label: '简介', value: profile.bio || '', error: null, type: 'text' as const },
-    { key: 'repo' as const, label: '仓库链接', value: profile.repo || '', error: repoError, type: 'text' as const },
   ];
 
   return (
