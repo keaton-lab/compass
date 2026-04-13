@@ -178,7 +178,11 @@ html.theme-preload *::after {
   animation: none !important;
 }
 
+html.theme-switching,
 html.theme-switching body,
+html.theme-switching #home-page,
+html.theme-switching #home-page::before,
+html.theme-switching #home-page::after,
 html.theme-switching .glass-panel,
 html.theme-switching .glass-panel-strong,
 html.theme-switching header,
@@ -188,14 +192,14 @@ html.theme-switching [class*="rounded"],
 html.theme-switching [class*="border"],
 html.theme-switching [class*="bg-"],
 html.theme-switching [class*="text-"] {
-  transition-property: background-color, border-color, color;
+  transition-property: background-color, border-color, color, background;
   transition-duration: var(--theme-transition-duration);
   transition-timing-function: var(--theme-transition-easing);
 }
 
 .theme-toggle-current-icon {
   opacity: 0;
-  transition: opacity 120ms ease-out;
+  transition: opacity var(--theme-transition-duration) var(--theme-transition-easing);
 }
 
 html[data-theme='light'] .theme-toggle-current-icon-light,
@@ -267,7 +271,7 @@ html[data-theme='ocean'] .theme-toggle-current-icon-ocean {
     line-height: var(--edit-input-line-height);
     color: var(--foreground);
     outline: none;
-    transition: border-color 150ms ease-out, background-color 150ms ease-out, color 150ms ease-out;
+    transition: border-color var(--theme-transition-duration) var(--theme-transition-easing), background-color var(--theme-transition-duration) var(--theme-transition-easing), color var(--theme-transition-duration) var(--theme-transition-easing);
   }
 
   .edit-helper-text {

@@ -78,7 +78,7 @@ export default function CategoryEditor({
             {/* 折叠按钮 */}
             <Accordion.Header className="shrink-0">
               <Accordion.Trigger className="accordion-trigger flex h-10 w-10 items-center justify-center rounded-[14px] border bg-[var(--background)] text-[var(--muted)] outline-none transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--foreground)]" style={{ borderColor: 'var(--panel-border)' }}>
-                <ChevronDown className="accordion-chevron h-4 w-4 transition-transform duration-200" />
+                <ChevronDown className="accordion-chevron h-4 w-4 transition-transform duration-theme" />
               </Accordion.Trigger>
             </Accordion.Header>
 
@@ -130,7 +130,7 @@ export default function CategoryEditor({
               <div className="flex flex-col gap-1 shrink-0">
                 <Accordion.Header>
                   <Accordion.Trigger className="accordion-trigger flex h-10 w-10 items-center justify-center rounded-[12px] border bg-[var(--background)] text-[var(--muted)] outline-none transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--foreground)]" style={{ borderColor: 'var(--panel-border)' }}>
-                    <ChevronDown className="accordion-chevron h-4 w-4 transition-transform duration-200" />
+                    <ChevronDown className="accordion-chevron h-4 w-4 transition-transform duration-theme" />
                   </Accordion.Trigger>
                 </Accordion.Header>
                 {/* 上下移动按钮（移动端简化为横向） */}

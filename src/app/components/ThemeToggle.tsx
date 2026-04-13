@@ -75,6 +75,8 @@ function applyTheme(theme: ThemeId) {
   const root = document.documentElement;
   const preset = getThemePreset(theme);
 
+  root.classList.add('theme-switching');
+
   root.dataset.theme = preset.id;
   root.classList.toggle('dark', preset.isDark);
   root.style.colorScheme = preset.isDark ? 'dark' : 'light';
@@ -83,6 +85,9 @@ function applyTheme(theme: ThemeId) {
     const colorKey = key as keyof typeof preset.colors;
     root.style.setProperty(cssVariable, preset.colors[colorKey]);
   }
+
+  const duration = parseFloat(getComputedStyle(root).getPropertyValue('--theme-transition-duration')) || 200;
+  setTimeout(() => root.classList.remove('theme-switching'), duration);
 }
 
 export default function ThemeToggle({ initialTheme, variant }: ThemeToggleProps) {
@@ -137,7 +142,7 @@ export default function ThemeToggle({ initialTheme, variant }: ThemeToggleProps)
           <button
             type="button"
             aria-label="切换主题"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border bg-[var(--panel-strong)] text-[var(--muted)] transition-colors duration-200 hover:border-[var(--accent-border)] md:hidden"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border bg-[var(--panel-strong)] text-[var(--muted)] transition-colors duration-theme hover:border-[var(--accent-border)] md:hidden"
             style={{ borderColor: 'var(--panel-border)' }}
           >
             <CurrentThemeIcon size={18} />
@@ -155,7 +160,7 @@ export default function ThemeToggle({ initialTheme, variant }: ThemeToggleProps)
               <Dialog.Close asChild>
                 <button
                   type="button"
-                  className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--muted)] transition-colors duration-200 hover:text-[var(--text-primary)]"
+                  className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--muted)] transition-colors duration-theme hover:text-[var(--text-primary)]"
                 >
                   <X size={16} />
                 </button>
@@ -171,7 +176,7 @@ export default function ThemeToggle({ initialTheme, variant }: ThemeToggleProps)
                     <button
                       type="button"
                       onClick={() => setTheme(option.id)}
-                      className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                      className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition-all duration-theme ${
                         isActive
                           ? 'border-[var(--accent-border)] bg-[var(--accent-alpha)] text-[var(--text-primary)]'
                           : 'border-[var(--panel-border)] bg-[var(--bg-secondary)] text-[var(--muted)] hover:border-[var(--accent-border)] hover:text-[var(--text-primary)]'
@@ -196,7 +201,7 @@ export default function ThemeToggle({ initialTheme, variant }: ThemeToggleProps)
           <button
             type="button"
             aria-label="切换主题"
-            className="flex h-9 w-9 items-center justify-center rounded-lg border bg-[var(--panel-strong)] text-[var(--muted)] transition-colors duration-200 hover:border-[var(--accent-border)]"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border bg-[var(--panel-strong)] text-[var(--muted)] transition-colors duration-theme hover:border-[var(--accent-border)]"
             style={{ borderColor: 'var(--panel-border)' }}
           >
             <CurrentThemeIcon size={18} />
@@ -221,7 +226,7 @@ export default function ThemeToggle({ initialTheme, variant }: ThemeToggleProps)
                   <DropdownMenu.RadioItem
                     key={option.id}
                     value={option.id}
-                    className={`flex cursor-pointer items-center rounded-md px-2.5 py-2 text-sm outline-none transition-all duration-200 ${
+                    className={`flex cursor-pointer items-center rounded-md px-2.5 py-2 text-sm outline-none transition-all duration-theme ${
                       isActive
                         ? 'bg-[var(--accent-alpha)] text-[var(--text-primary)]'
                         : 'text-[var(--muted)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
@@ -253,7 +258,7 @@ export default function ThemeToggle({ initialTheme, variant }: ThemeToggleProps)
               key={option.id}
               type="button"
               onClick={() => setTheme(option.id)}
-              className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium transition-all duration-200 ${
+              className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium transition-all duration-theme ${
                 isActive
                   ? 'bg-[var(--accent-alpha)] text-[var(--text-primary)]'
                   : 'text-[var(--muted)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'

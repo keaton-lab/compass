@@ -122,7 +122,7 @@ export default function ClientLayout({
   const shouldShowSearch = settings.showSearch;
   const animationsEnabled = settings.animations;
   const footerLinkClass = animationsEnabled
-    ? 'transition-colors duration-200 hover:text-[var(--text-primary)]'
+    ? 'transition-colors duration-theme hover:text-[var(--text-primary)]'
     : '';
 
   return (
@@ -375,7 +375,7 @@ function SearchInput({
     return (
       <div className="relative hidden items-center md:flex" aria-label="搜索" role="search">
         <div
-          className="flex h-10 min-w-[280px] items-center rounded-lg border bg-[var(--panel-strong)] pl-3 pr-2 transition-colors duration-200 focus-within:border-[var(--accent)]"
+          className="flex h-10 min-w-[280px] items-center rounded-lg border bg-[var(--panel-strong)] pl-3 pr-2 transition-colors duration-theme focus-within:border-[var(--accent)]"
           style={{ borderColor: 'var(--panel-border)' }}
         >
           <Search size={16} className="shrink-0 text-[var(--muted)]" />
@@ -391,7 +391,7 @@ function SearchInput({
               type="button"
               onClick={() => onChange('')}
               aria-label="清除搜索"
-              className="ml-2 flex h-6 w-6 items-center justify-center rounded-md text-[var(--muted)] transition-colors duration-200 hover:text-[var(--text-primary)]"
+              className="ml-2 flex h-6 w-6 items-center justify-center rounded-md text-[var(--muted)] transition-colors duration-theme hover:text-[var(--text-primary)]"
             >
               <X size={14} />
             </button>
@@ -407,7 +407,7 @@ function SearchInput({
   return (
     <div className="relative w-full max-w-2xl">
       <div
-        className="relative rounded-lg border bg-[var(--panel-strong)] transition-colors duration-200 focus-within:border-[var(--accent)]"
+        className="relative rounded-lg border bg-[var(--panel-strong)] transition-colors duration-theme focus-within:border-[var(--accent)]"
         style={{ borderColor: 'var(--panel-border)' }}
       >
         <div className="absolute left-3 top-1/2 z-10 -translate-y-1/2" aria-hidden="true">
@@ -427,7 +427,7 @@ function SearchInput({
           <button
             type="button"
             onClick={() => onChange('')}
-            className="absolute inset-y-0 right-2 my-auto flex h-7 w-7 items-center justify-center rounded-md text-[var(--muted)] transition-colors duration-200 hover:text-[var(--text-primary)]"
+            className="absolute inset-y-0 right-2 my-auto flex h-7 w-7 items-center justify-center rounded-md text-[var(--muted)] transition-colors duration-theme hover:text-[var(--text-primary)]"
           >
             <X size={14} />
           </button>
@@ -498,14 +498,14 @@ function LinkCard({
   animations: boolean;
 }) {
   const cardClassName = animations
-    ? 'transition-all duration-200 hover:border-[color:var(--accent-border)] hover:bg-[var(--panel-strong)] active:scale-[0.99]'
+    ? 'transition-all duration-theme hover:border-[color:var(--accent-border)] hover:bg-[var(--panel-strong)] active:scale-[0.99]'
     : '';
-  const iconClassName = animations ? 'transition-transform duration-200 group-hover:scale-105' : '';
+  const iconClassName = animations ? 'transition-transform duration-theme group-hover:scale-105' : '';
   const titleClassName = animations
-    ? 'transition-colors duration-200 group-hover:text-[var(--accent)]'
+    ? 'transition-colors duration-theme group-hover:text-[var(--accent)]'
     : '';
   const arrowClassName = animations
-    ? 'opacity-0 transition-all duration-200 group-hover:opacity-100 md:opacity-60'
+    ? 'opacity-0 transition-all duration-theme group-hover:opacity-100 md:opacity-60'
     : 'opacity-60';
 
   return (

@@ -108,8 +108,8 @@ export default function EditHeader({
     : statusMessage
       ? {
           text: statusMessage,
-          className: 'text-emerald-500',
-          icon: <Check className="h-3.5 w-3.5 shrink-0" />,
+          className: 'text-red-400',
+          icon: <AlertCircle className="h-3.5 w-3.5 shrink-0" />,
         }
       : isSaving
         ? {
@@ -117,13 +117,7 @@ export default function EditHeader({
             className: 'text-[var(--muted)]',
             icon: <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin" />,
           }
-        : saved
-          ? {
-              text: '配置已保存',
-              className: 'text-emerald-500',
-              icon: <Check className="h-3.5 w-3.5 shrink-0" />,
-            }
-          : null;
+        : null;
 
   return (
     <section className="mb-2 rounded-[18px] border bg-[var(--panel-strong)] px-3 py-3 sm:mb-3 sm:px-4 sm:py-3.5" style={{ borderColor: 'var(--panel-border)' }}>
