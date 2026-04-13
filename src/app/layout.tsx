@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Script from 'next/script';
+
 import './globals.css';
 import {
   THEME_CSS_VARIABLES,
@@ -127,12 +127,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       style={getThemeStyleVariables(initialTheme)}
       className={initialThemePreset.isDark ? 'dark' : undefined}
     >
-      <head>
-        <Script id="theme-boot" strategy="beforeInteractive">
-          {themeBootScript}
-        </Script>
-      </head>
+      <head />
       <body>
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
         <div className="app-shell">{children}</div>
       </body>
     </html>
