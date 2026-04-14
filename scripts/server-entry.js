@@ -1,6 +1,10 @@
 const env = require('../src/server/env');
 
 const { assertServerStartupEnv } = env;
+const serverHost = process.env.COMPASS_SERVER_HOST || '0.0.0.0';
+
+// Next standalone reads HOSTNAME to determine the bind address.
+process.env.HOSTNAME = serverHost;
 
 try {
   const { generatedSessionSecret } = assertServerStartupEnv();
