@@ -56,12 +56,35 @@ function isValidAdminToken(token, expectedToken) {
   }
 }
 
-function createSessionCookieOptions(maxAge) {
+function isSecureRequest(request) {
+  if (!request) {
+    return process.env.NODE_ENV === 'production';
+  }
+
+  const forwardedProtoHeader = request.headers?.get?.('x-forwarded-proto');
+  const forwardedProto = typeof forwardedProtoHeader === 'string'
+    ? forwardedProtoHeader.split(',')[0].trim().toLowerCase()
+    : '';
+
+  if (forwardedProto) {
+    return forwardedProto === 'https';
+  }
+
+  const requestProtocol = request.nextUrl?.protocol;
+
+  if (typeof requestProtocol === 'string') {
+    return requestProtocol === 'https:';
+  }
+
+  return process.env.NODE_ENV === 'production';
+}
+
+function createSessionCookieOptions(maxAge, request) {
   return {
     path: '/',
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    secure: isSecureRequest(request),
     maxAge,
   };
 }
@@ -72,5 +95,6 @@ module.exports = {
   createSessionCookieOptions,
   createSessionCookieValue,
   isAuthenticatedCookie,
+  isSecureRequest,
   isValidAdminToken,
 };
