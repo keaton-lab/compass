@@ -11,6 +11,8 @@ import {
   themePresets,
   type ThemeId,
 } from '../themes';
+import { AppDialogContent } from './AppDialog';
+import Button from './Button';
 
 function ThemeIcon({ id, size = 18, className = '' }: { id: string; size?: number; className?: string }) {
   if (id === 'light') return <Sun size={size} className={className} />;
@@ -139,57 +141,64 @@ export default function ThemeToggle({ initialTheme, variant }: ThemeToggleProps)
     return (
       <Dialog.Root>
         <Dialog.Trigger asChild>
-          <button
-            type="button"
+          <Button
+            shape="icon"
+            leftIcon={<CurrentThemeIcon size={18} />}
+            size="md"
+            variant="secondary"
             aria-label="切换主题"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border bg-[var(--panel-strong)] text-[var(--muted)] transition-colors duration-theme hover:border-[var(--accent-border)] md:hidden"
-            style={{ borderColor: 'var(--panel-border)' }}
-          >
-            <CurrentThemeIcon size={18} />
-          </button>
+            title="切换主题"
+            className="md:hidden [&_svg]:text-[var(--muted)]"
+          />
         </Dialog.Trigger>
 
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-[120] bg-black/50 backdrop-blur-sm md:hidden" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 z-[121] w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-[var(--panel)] p-5 outline-none md:hidden" style={{ borderColor: 'var(--panel-border)' }}>
-            <div className="mb-4 flex items-center justify-between">
-              <Dialog.Title className="flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)]">
-                <Palette size={16} />
-                选择主题
-              </Dialog.Title>
-              <Dialog.Close asChild>
-                <button
-                  type="button"
-                  className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--muted)] transition-colors duration-theme hover:text-[var(--text-primary)]"
-                >
-                  <X size={16} />
-                </button>
-              </Dialog.Close>
-            </div>
+        <AppDialogContent
+          overlayClassName="z-[120] bg-black/50 md:hidden"
+          panelClassName="fixed left-1/2 top-1/2 z-[121] w-[280px] -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-[var(--panel-strong)] p-3 outline-none md:hidden"
+          panelStyle={{ borderColor: 'var(--panel-border)' }}
+        >
+          <div className="mb-2 flex items-center justify-between px-1">
+            <Dialog.Title className="flex items-center gap-1.5 text-xs font-medium text-[var(--muted)]">
+              <Palette size={14} />
+              选择主题
+            </Dialog.Title>
+            <Dialog.Close asChild>
+              <button
+                aria-label="关闭"
+                title="关闭"
+                className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--muted)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--text-secondary)]"
+              >
+                <X size={14} />
+              </button>
+            </Dialog.Close>
+          </div>
 
-            <div className="grid gap-2">
-              {themePresets.map((option) => {
-                const isActive = option.id === theme;
+          <div className="flex flex-col gap-0.5">
+            {themePresets.map((option) => {
+              const isActive = option.id === theme;
+              const iconStyles = getThemeIconStyles(option.id);
 
-                return (
-                  <Dialog.Close asChild key={option.id}>
-                    <button
-                      type="button"
-                      onClick={() => setTheme(option.id)}
-                      className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition-all duration-theme ${
-                        isActive
-                          ? 'border-[var(--accent-border)] bg-[var(--accent-alpha)] text-[var(--text-primary)]'
-                          : 'border-[var(--panel-border)] bg-[var(--bg-secondary)] text-[var(--muted)] hover:border-[var(--accent-border)] hover:text-[var(--text-primary)]'
-                      }`}
-                    >
-                      {renderThemeOption(option.id, option.label, 16)}
-                    </button>
-                  </Dialog.Close>
-                );
-              })}
-            </div>
-          </Dialog.Content>
-        </Dialog.Portal>
+              return (
+                <Dialog.Close asChild key={option.id}>
+                  <button
+                    onClick={() => setTheme(option.id)}
+                    className={`flex cursor-pointer items-center rounded-md px-2.5 py-2 text-sm outline-none transition-all duration-theme ${
+                      isActive
+                        ? 'bg-[var(--accent-alpha)] text-[var(--text-primary)]'
+                        : 'text-[var(--muted)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
+                    }`}
+                  >
+                    <span className={`mr-2.5 flex h-6 w-6 items-center justify-center rounded-md ${iconStyles.wrapper}`}>
+                      <ThemeIcon id={option.id} size={14} className={iconStyles.icon} />
+                    </span>
+                    <span className="flex-1 text-left">{option.label}</span>
+                    {isActive && <Check size={16} className="text-[var(--accent)]" />}
+                  </button>
+                </Dialog.Close>
+              );
+            })}
+          </div>
+        </AppDialogContent>
       </Dialog.Root>
     );
   }
@@ -198,14 +207,15 @@ export default function ThemeToggle({ initialTheme, variant }: ThemeToggleProps)
     return (
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
-          <button
-            type="button"
+          <Button
+            shape="icon"
+            leftIcon={<CurrentThemeIcon size={18} />}
+            size="md"
+            variant="secondary"
             aria-label="切换主题"
-            className="flex h-9 w-9 items-center justify-center rounded-lg border bg-[var(--panel-strong)] text-[var(--muted)] transition-colors duration-theme hover:border-[var(--accent-border)]"
-            style={{ borderColor: 'var(--panel-border)' }}
-          >
-            <CurrentThemeIcon size={18} />
-          </button>
+            title="切换主题"
+            className="[&_svg]:text-[var(--muted)]"
+          />
         </DropdownMenu.Trigger>
 
         <DropdownMenu.Portal>
@@ -254,21 +264,22 @@ export default function ThemeToggle({ initialTheme, variant }: ThemeToggleProps)
           const iconStyles = getThemeIconStyles(option.id);
 
           return (
-            <button
+            <Button
               key={option.id}
-              type="button"
+              variant="ghost"
+              size="sm"
               onClick={() => setTheme(option.id)}
-              className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium transition-all duration-theme ${
+              className={`!h-7 !px-2 !py-1 !text-xs ${
                 isActive
-                  ? 'bg-[var(--accent-alpha)] text-[var(--text-primary)]'
-                  : 'text-[var(--muted)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
+                  ? '!bg-[var(--accent-alpha)] !text-[var(--text-primary)]'
+                  : '!text-[var(--muted)] hover:!bg-[var(--bg-secondary)] hover:!text-[var(--text-primary)]'
               }`}
             >
               <span className={`flex h-5 w-5 items-center justify-center rounded ${iconStyles.wrapper}`}>
                 <ThemeIcon id={option.id} size={12} className={iconStyles.icon} />
               </span>
               <span>{option.label}</span>
-            </button>
+            </Button>
           );
         })}
       </div>

@@ -5,7 +5,9 @@ import { Search, X } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useDeferredValue, useEffect, useMemo, useRef, useState, startTransition } from 'react';
 import type { ReactNode, UIEvent } from 'react';
+import { AppDialogContent } from '../../components/AppDialog';
 import { normalizeBrandIconKey, toKebabCase } from '../../icon-utils';
+import { modalIconButtonClassName } from '../../components/modalStyles';
 
 interface BrandIcon {
   name: string;
@@ -248,12 +250,10 @@ export default function IconPicker({ value, onChange, onClose }: IconPickerProps
         }
       }}
     >
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-[var(--background)]/72 backdrop-blur-sm" />
-        <Dialog.Content
-          className="fixed inset-x-2 sm:inset-x-4 top-[4vh] sm:top-[6vh] bottom-[4vh] sm:bottom-[6vh] z-[51] mx-auto flex max-w-5xl flex-col overflow-hidden rounded-[20px] sm:rounded-[24px] border bg-[var(--panel-strong)] outline-none"
-          style={{ borderColor: 'var(--panel-border)' }}
-        >
+      <AppDialogContent
+        panelClassName="fixed inset-x-2 sm:inset-x-4 top-[4vh] sm:top-[6vh] bottom-[4vh] sm:bottom-[6vh] z-[51] mx-auto flex max-w-5xl flex-col overflow-hidden rounded-[20px] sm:rounded-[24px] border bg-[var(--panel-strong)] outline-none"
+        panelStyle={{ borderColor: 'var(--panel-border)' }}
+      >
           <div
             className="flex items-center justify-between border-b px-4 sm:px-6 py-3 sm:py-5"
             style={{ borderColor: 'var(--panel-border)' }}
@@ -267,7 +267,7 @@ export default function IconPicker({ value, onChange, onClose }: IconPickerProps
             <Dialog.Close asChild>
               <button
                 type="button"
-                className="flex h-10 w-10 items-center justify-center rounded-[14px] border bg-[var(--background)] text-[var(--muted)] transition-colors hover:bg-[var(--bg-secondary)]"
+                className={modalIconButtonClassName}
                 style={{ borderColor: 'var(--panel-border)' }}
               >
                 <X size={18} />
@@ -384,8 +384,7 @@ export default function IconPicker({ value, onChange, onClose }: IconPickerProps
             当前选中:{' '}
             <code className="rounded-[8px] sm:rounded-[10px] bg-[var(--background)] px-2 py-1 text-[var(--text-primary)]">{value}</code>
           </div>
-        </Dialog.Content>
-      </Dialog.Portal>
+      </AppDialogContent>
     </Dialog.Root>
   );
 }
