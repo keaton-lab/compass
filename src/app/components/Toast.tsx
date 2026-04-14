@@ -37,7 +37,7 @@ export function Toast({
 function ToastVisible({
   message,
   type,
-  duration,
+  duration = 2000,
   onClose,
 }: Omit<ToastProps, 'visible'>) {
   const [isExiting, setIsExiting] = useState(false);
