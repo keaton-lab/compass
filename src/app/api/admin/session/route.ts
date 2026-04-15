@@ -20,7 +20,7 @@ const {
 } = auth as {
   SESSION_COOKIE_NAME: string;
   SESSION_TTL_SECONDS: number;
-  createSessionCookieOptions: (maxAge: number) => {
+  createSessionCookieOptions: (maxAge: number, request?: NextRequest) => {
     path: string;
     httpOnly: boolean;
     sameSite: 'lax';
@@ -61,14 +61,14 @@ export async function POST(request: NextRequest) {
   response.cookies.set(
     SESSION_COOKIE_NAME,
     createSessionCookieValue(getSessionSecret()),
-    createSessionCookieOptions(SESSION_TTL_SECONDS),
+    createSessionCookieOptions(SESSION_TTL_SECONDS, request),
   );
 
   return response;
 }
 
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
   const response = NextResponse.json({ ok: true });
-  response.cookies.set(SESSION_COOKIE_NAME, '', createSessionCookieOptions(0));
+  response.cookies.set(SESSION_COOKIE_NAME, '', createSessionCookieOptions(0, request));
   return response;
 }

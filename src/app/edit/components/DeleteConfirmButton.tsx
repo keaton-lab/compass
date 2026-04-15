@@ -2,6 +2,8 @@
 
 import { AlertDialog } from 'radix-ui';
 import { Trash2 } from 'lucide-react';
+import { AppAlertDialogContent } from '../../components/AppDialog';
+import Button from '../../components/Button';
 
 interface DeleteConfirmButtonProps {
   title: string;
@@ -30,12 +32,11 @@ export default function DeleteConfirmButton({
         </button>
       </AlertDialog.Trigger>
 
-      <AlertDialog.Portal>
-        <AlertDialog.Overlay className="fixed inset-0 z-[130] bg-[var(--background)]/72 backdrop-blur-sm" />
-        <AlertDialog.Content
-          className="fixed inset-x-4 top-[18vh] z-[131] mx-auto w-full max-w-md rounded-[24px] border bg-[var(--panel-strong)] p-6 outline-none"
-          style={{ borderColor: 'var(--panel-border)' }}
-        >
+      <AppAlertDialogContent
+        overlayClassName="z-[130]"
+        panelClassName="fixed inset-x-4 top-[18vh] z-[131] mx-auto w-full max-w-md rounded-[24px] border bg-[var(--panel-strong)] p-6 outline-none"
+        panelStyle={{ borderColor: 'var(--panel-border)' }}
+      >
           <AlertDialog.Title className="text-lg font-semibold text-[var(--text-primary)]">
             {title}
           </AlertDialog.Title>
@@ -45,26 +46,17 @@ export default function DeleteConfirmButton({
 
           <div className="mt-6 flex justify-end gap-3">
             <AlertDialog.Cancel asChild>
-              <button
-                type="button"
-                className="rounded-[16px] border px-4 py-2.5 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--bg-secondary)]"
-                style={{ borderColor: 'var(--panel-border)' }}
-              >
+              <Button variant="secondary">
                 取消
-              </button>
+              </Button>
             </AlertDialog.Cancel>
             <AlertDialog.Action asChild>
-              <button
-                type="button"
-                onClick={onConfirm}
-                className="rounded-[16px] bg-red-500 px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
-              >
+              <Button variant="danger" onClick={onConfirm}>
                 {confirmLabel}
-              </button>
+              </Button>
             </AlertDialog.Action>
           </div>
-        </AlertDialog.Content>
-      </AlertDialog.Portal>
+      </AppAlertDialogContent>
     </AlertDialog.Root>
   );
 }

@@ -9,6 +9,7 @@ import { STATIC_BRAND_ICONS } from '../generated/static-brand-icons';
 import ThemeToggle from './ThemeToggle';
 import { stripAvatarIconPrefix } from '../avatar-utils';
 import type { ResolvedCategory, ResolvedProfile, Settings } from '../types';
+import Button from './Button';
 
 interface ClientLayoutProps {
   profile: ResolvedProfile;
@@ -387,14 +388,16 @@ function SearchInput({
             className="ml-2 flex-1 bg-transparent text-sm text-[var(--text-primary)] outline-none placeholder:text-[var(--muted)]"
           />
           {hasQuery && (
-            <button
-              type="button"
-              onClick={() => onChange('')}
+            <Button
+              shape="icon"
+              leftIcon={<X size={14} />}
+              size="sm"
+              variant="ghost"
               aria-label="清除搜索"
-              className="ml-2 flex h-6 w-6 items-center justify-center rounded-md text-[var(--muted)] transition-colors duration-theme hover:text-[var(--text-primary)]"
-            >
-              <X size={14} />
-            </button>
+              title="清除搜索"
+              onClick={() => onChange('')}
+              className="ml-2 !h-6 !w-6 !rounded-md [&_svg]:text-[var(--muted)]"
+            />
           )}
         </div>
         {showResultCount && hasQuery && (
@@ -424,13 +427,18 @@ function SearchInput({
         />
 
         {hasQuery && (
-          <button
-            type="button"
-            onClick={() => onChange('')}
-            className="absolute inset-y-0 right-2 my-auto flex h-7 w-7 items-center justify-center rounded-md text-[var(--muted)] transition-colors duration-theme hover:text-[var(--text-primary)]"
-          >
-            <X size={14} />
-          </button>
+          <div className="absolute inset-y-0 right-2 my-auto">
+            <Button
+              shape="icon"
+              leftIcon={<X size={14} />}
+              size="sm"
+              variant="ghost"
+              aria-label="清除搜索"
+              title="清除搜索"
+              onClick={() => onChange('')}
+              className="[&_svg]:text-[var(--muted)]"
+            />
+          </div>
         )}
       </div>
 

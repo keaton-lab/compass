@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, ChevronDown } from "lucide-react";
+import Button from "../../components/Button";
 import type { Link as LinkType } from "../../types";
 import LazyIconPicker from "./LazyIconPicker";
 import DynamicIcon from "../../components/DynamicIcon";
@@ -77,26 +78,31 @@ export default function SortableLinkItem({
       >
         <div className="flex items-center gap-2">
           {/* 拖拽手柄 */}
-          <button
-            type="button"
+          <Button
+            shape="icon"
+            leftIcon={<GripVertical />}
+            size="sm"
+            variant="ghost"
+            aria-label="拖拽排序"
+            title="拖拽排序"
             {...attributes}
             {...listeners}
             ref={setActivatorNodeRef}
-            className="flex h-9 w-7 cursor-grab touch-none select-none items-center justify-center text-[var(--muted)] transition-colors hover:text-[var(--foreground)] active:cursor-grabbing"
-            onClick={(e) => e.preventDefault()}
-          >
-            <GripVertical className="h-3.5 w-3.5" />
-          </button>
+            className="cursor-grab touch-none select-none active:cursor-grabbing [&_svg]:h-4 [&_svg]:w-4 [&_svg]:text-[var(--muted)]"
+            onClick={(e: React.MouseEvent) => e.preventDefault()}
+          />
 
           {/* 图标选择 */}
-          <button
-            type="button"
+          <Button
+            shape="icon"
+            leftIcon={<DynamicIcon name={link.icon} size={16} />}
+            size="sm"
+            variant="secondary"
+            title="更换图标"
+            aria-label="更换图标"
+            className="!bg-[var(--background)] [&_svg]:text-[var(--foreground)]"
             onClick={() => setShowIconPicker(true)}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] border bg-[var(--panel-strong)] text-[var(--foreground)] transition-colors hover:bg-[var(--bg-secondary)]"
-            style={{ borderColor: "var(--panel-border)" }}
-          >
-            <DynamicIcon name={link.icon} size={16} />
-          </button>
+          />
 
           {/* 名称输入 */}
           <div className="min-w-0 flex-1">
@@ -179,16 +185,17 @@ export default function SortableLinkItem({
         </div>
 
         {/* 移动端展开/收起按钮 */}
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className={`mt-2 flex w-full items-center justify-center gap-1 rounded-[10px] py-1.5 text-xs transition-colors sm:hidden ${
-            showAdvanced ? 'bg-[var(--accent-alpha)] text-[var(--accent)]' : 'text-[var(--muted)]'
+          rightIcon={<ChevronDown className={`w-4 h-4 transition-transform ${showAdvanced ? 'rotate-180' : ''}`} />}
+          className={`mt-2 w-full sm:hidden ${
+            showAdvanced ? '!bg-[var(--accent-alpha)] !text-[var(--accent)]' : '!text-[var(--muted)]'
           }`}
         >
-          <span>{showAdvanced ? '收起' : '展开'}</span>
-          <ChevronDown className={`w-4 h-4 transition-transform ${showAdvanced ? 'rotate-180' : ''}`} />
-        </button>
+          {showAdvanced ? '收起' : '展开'}
+        </Button>
       </div>
 
       {showIconPicker && (
