@@ -13,6 +13,7 @@ import {
 } from '../themes';
 import { AppDialogContent } from './AppDialog';
 import Button from './Button';
+import { useAnimatedDialogState } from './useAnimatedDialogState';
 
 function ThemeIcon({ id, size = 18, className = '' }: { id: string; size?: number; className?: string }) {
   if (id === 'light') return <Sun size={size} className={className} />;
@@ -103,6 +104,7 @@ export default function ThemeToggle({ initialTheme, variant }: ThemeToggleProps)
 
     return initialTheme;
   });
+  const mobileDialog = useAnimatedDialogState();
 
   useEffect(() => {
     applyTheme(theme);
@@ -139,7 +141,7 @@ export default function ThemeToggle({ initialTheme, variant }: ThemeToggleProps)
 
   if (variant === 'mobile') {
     return (
-      <Dialog.Root>
+      <Dialog.Root open={mobileDialog.open} onOpenChange={mobileDialog.handleOpenChange}>
         <Dialog.Trigger asChild>
           <Button
             shape="icon"
@@ -153,6 +155,7 @@ export default function ThemeToggle({ initialTheme, variant }: ThemeToggleProps)
         </Dialog.Trigger>
 
         <AppDialogContent
+          isClosing={mobileDialog.isClosing}
           overlayClassName="z-[120] bg-black/50 md:hidden"
           panelClassName="fixed left-1/2 top-1/2 z-[121] w-[280px] -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-[var(--panel-strong)] p-3 outline-none md:hidden"
           panelStyle={{ borderColor: 'var(--panel-border)' }}

@@ -152,10 +152,7 @@ export default function ClientLayout({
           ))}
 
           {normalizedQuery && filteredCategories.length === 0 && (
-            <div
-              className="rounded-lg border bg-[var(--panel)] py-12 text-center"
-              style={{ borderColor: 'var(--panel-border)' }}
-            >
+            <div className="rounded-lg border bg-[var(--panel)] py-12 text-center panel-border">
               <h2 className="text-base font-medium text-[var(--text-primary)]">未找到结果</h2>
               <p className="mt-1 text-sm text-[var(--muted)]">尝试其他关键词</p>
             </div>
@@ -225,10 +222,7 @@ function ProfileAvatar({
 
   if (isIconAvatar) {
     return (
-      <div
-        className={`flex items-center justify-center rounded-lg border bg-[var(--bg-secondary)] ${sizeClass}`}
-        style={{ borderColor: 'var(--panel-border)' }}
-      >
+      <div className={`flex items-center justify-center rounded-lg border bg-[var(--bg-secondary)] ${sizeClass} panel-border`}>
         <ResolvedIcon
           icon={profile.resolvedAvatarIcon}
           name={iconAvatarName}
@@ -241,20 +235,14 @@ function ProfileAvatar({
 
   if (isImageAvatar) {
     return (
-      <div
-        className={`relative overflow-hidden rounded-lg border bg-[var(--bg-secondary)] ${sizeClass}`}
-        style={{ borderColor: 'var(--panel-border)' }}
-      >
+      <div className={`relative overflow-hidden rounded-lg border bg-[var(--bg-secondary)] ${sizeClass} panel-border`}>
         <Image src={avatarValue} alt={name} fill className="object-cover" sizes="(max-width: 768px) 40px, 48px" />
       </div>
     );
   }
 
   return (
-    <div
-      className={`flex items-center justify-center rounded-lg border bg-[var(--bg-secondary)] ${sizeClass}`}
-      style={{ borderColor: 'var(--panel-border)' }}
-    >
+    <div className={`flex items-center justify-center rounded-lg border bg-[var(--bg-secondary)] ${sizeClass} panel-border`}>
       <span className={`${textSizeClass} font-semibold text-[var(--text-primary)]`}>{initials}</span>
     </div>
   );
@@ -272,10 +260,7 @@ function HomeHeader({
 
   return (
     <>
-      <div
-        className="rounded-2xl border bg-[var(--panel)] p-4 shadow-[0_10px_30px_rgba(15,23,42,0.05)] md:hidden"
-        style={{ borderColor: 'var(--panel-border)' }}
-      >
+      <div className="rounded-2xl border bg-[var(--panel)] p-4 shadow-[0_10px_30px_rgba(15,23,42,0.05)] md:hidden panel-border">
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 flex-1 items-center gap-3.5">
             <ProfileAvatar
@@ -308,7 +293,7 @@ function HomeHeader({
       </div>
 
       <div className="hidden w-full items-center justify-between md:flex">
-        <div className="rounded-xl border bg-[var(--panel)] px-6 py-4 shadow-sm" style={{ borderColor: 'var(--panel-border)' }}>
+        <div className="rounded-xl border bg-[var(--panel)] px-6 py-4 shadow-sm panel-border">
           <DesktopProfileSummary profile={profile} />
         </div>
         <div className="flex items-center gap-3">
@@ -375,10 +360,7 @@ function SearchInput({
   if (compact) {
     return (
       <div className="relative hidden items-center md:flex" aria-label="搜索" role="search">
-        <div
-          className="flex h-10 min-w-[280px] items-center rounded-lg border bg-[var(--panel-strong)] pl-3 pr-2 transition-colors duration-theme focus-within:border-[var(--accent)]"
-          style={{ borderColor: 'var(--panel-border)' }}
-        >
+        <div className="flex h-10 min-w-[280px] items-center rounded-lg border bg-[var(--panel-strong)] pl-3 pr-2 transition-colors duration-theme focus-within:border-[var(--accent-border)] panel-border">
           <Search size={16} className="shrink-0 text-[var(--muted)]" />
           <input
             value={value}
@@ -409,10 +391,7 @@ function SearchInput({
 
   return (
     <div className="relative w-full max-w-2xl">
-      <div
-        className="relative rounded-lg border bg-[var(--panel-strong)] transition-colors duration-theme focus-within:border-[var(--accent)]"
-        style={{ borderColor: 'var(--panel-border)' }}
-      >
+      <div className="relative rounded-lg border bg-[var(--panel-strong)] transition-colors duration-theme focus-within:border-[var(--accent-border)] panel-border">
         <div className="absolute left-3 top-1/2 z-10 -translate-y-1/2" aria-hidden="true">
           <Search size={16} className="text-[var(--muted)]" />
         </div>
@@ -521,8 +500,7 @@ function LinkCard({
       href={link.url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group relative flex min-h-[64px] cursor-pointer flex-col overflow-hidden rounded-lg border bg-[var(--panel)] p-2.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-border)] xsm:min-h-[72px] xsm:p-3 md:min-h-[68px] md:flex-row md:items-center md:gap-3 ${cardClassName}`}
-      style={{ borderColor: 'var(--panel-border)' }}
+      className={`group relative flex min-h-[64px] cursor-pointer flex-col overflow-hidden rounded-lg border bg-[var(--panel)] p-2.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-border)] xsm:min-h-[72px] xsm:p-3 md:min-h-[68px] md:flex-row md:items-center md:gap-3 panel-border ${cardClassName}`}
     >
       <div
         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border xsm:h-9 xsm:w-9"

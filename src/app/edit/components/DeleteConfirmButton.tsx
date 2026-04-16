@@ -4,6 +4,7 @@ import { AlertDialog } from 'radix-ui';
 import { Trash2 } from 'lucide-react';
 import { AppAlertDialogContent } from '../../components/AppDialog';
 import Button from '../../components/Button';
+import { useAnimatedDialogState } from '../../components/useAnimatedDialogState';
 
 interface DeleteConfirmButtonProps {
   title: string;
@@ -20,8 +21,10 @@ export default function DeleteConfirmButton({
   triggerTitle,
   onConfirm,
 }: DeleteConfirmButtonProps) {
+  const dialog = useAnimatedDialogState();
+
   return (
-    <AlertDialog.Root>
+    <AlertDialog.Root open={dialog.open} onOpenChange={dialog.handleOpenChange}>
       <AlertDialog.Trigger asChild>
         <button
           type="button"
@@ -33,6 +36,7 @@ export default function DeleteConfirmButton({
       </AlertDialog.Trigger>
 
       <AppAlertDialogContent
+        isClosing={dialog.isClosing}
         overlayClassName="z-[130]"
         panelClassName="fixed inset-x-4 top-[18vh] z-[131] mx-auto w-full max-w-md rounded-[24px] border bg-[var(--panel-strong)] p-6 outline-none"
         panelStyle={{ borderColor: 'var(--panel-border)' }}
@@ -50,11 +54,9 @@ export default function DeleteConfirmButton({
                 取消
               </Button>
             </AlertDialog.Cancel>
-            <AlertDialog.Action asChild>
-              <Button variant="danger" onClick={onConfirm}>
-                {confirmLabel}
-              </Button>
-            </AlertDialog.Action>
+            <Button variant="danger" onClick={() => dialog.requestClose(onConfirm)}>
+              {confirmLabel}
+            </Button>
           </div>
       </AppAlertDialogContent>
     </AlertDialog.Root>

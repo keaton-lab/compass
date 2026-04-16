@@ -10,6 +10,8 @@ import type { Config } from '../types';
 import { useEditState } from './hooks/use-edit-state';
 import EditHeader from './components/EditHeader';
 import Button from '../components/Button';
+import { AppInput } from '../components/AppInput';
+import { classNames } from '../components/classNames';
 
 const GeneralSettings = dynamic(() => import('./components/GeneralSettings'), {
   loading: () => <SectionLoading />,
@@ -433,8 +435,7 @@ export default function EditClient({ initialConfig, canSaveToServer }: EditClien
         >
           <div className="mb-2 shrink-0 sm:mb-3">
             <Tabs.List
-              className="inline-flex min-w-max gap-1 rounded-full border bg-[var(--panel-strong)] p-1"
-              style={{ borderColor: 'var(--panel-border)' }}
+              className="inline-flex min-w-max gap-1 rounded-full border bg-[var(--panel-strong)] p-1 panel-border"
             >
               {sections.map(({ key, label, icon, count }) => (
                 <Tabs.Trigger
@@ -509,7 +510,7 @@ function EditLoginScreen({
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <div className="mx-auto flex min-h-screen max-w-xl items-center px-4 py-10 sm:px-6">
-        <section className="w-full rounded-[28px] border bg-[var(--panel-strong)] p-6 shadow-sm" style={{ borderColor: 'var(--panel-border)' }}>
+        <section className="w-full rounded-[28px] border bg-[var(--panel-strong)] p-6 shadow-sm panel-border">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--accent-alpha)] text-[var(--accent)]">
               <Lock className="h-5 w-5" />
@@ -525,7 +526,7 @@ function EditLoginScreen({
           <div className="mt-6 space-y-3">
             <label className="block">
               <span className="mb-2 block text-sm text-[var(--text-primary)]">管理口令</span>
-              <input
+              <AppInput
                 type="password"
                 value={loginToken}
                 onChange={(event) => onLoginTokenChange(event.target.value)}
@@ -535,9 +536,8 @@ function EditLoginScreen({
                     void onLogin();
                   }
                 }}
-                className="w-full rounded-[18px] border bg-[var(--background)] px-4 py-3 text-sm text-[var(--foreground)] outline-none transition-colors"
-                style={{ borderColor: 'var(--panel-border)' }}
                 placeholder="输入 COMPASS_ADMIN_TOKEN"
+                size="lg"
               />
             </label>
 
@@ -602,17 +602,23 @@ function YamlEditorSection({
             )}
           </div>
         </div>
-        <div className="edit-panel-body flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
-          <textarea
-            value={yamlInput}
-            onChange={(event) => onChange(event.target.value)}
-            className={`min-h-0 flex-1 overflow-y-auto rounded-[20px] border bg-[var(--background)] p-4 font-mono text-[length:var(--edit-input-size)] leading-[var(--edit-input-line-height)] text-[var(--foreground)] outline-none transition-colors [scrollbar-gutter:stable] ${
-              yamlError ? 'border-red-500/50' : ''
-            }`}
-            style={{ borderColor: yamlError ? undefined : 'var(--panel-border)' }}
-            placeholder="在此编辑 YAML 配置..."
-            spellCheck={false}
-          />
+        <div className="edit-panel-body flex min-h-0 flex-1 flex-col gap-2">
+          <div className="min-h-0 flex-1 overflow-hidden rounded-[20px] border panel-border bg-[var(--background)]">
+            <textarea
+              value={yamlInput}
+              onChange={(event) => onChange(event.target.value)}
+              placeholder="在此编辑 YAML 配置..."
+              spellCheck={false}
+              className={classNames(
+                'yaml-editor-scrollbar h-full w-full overflow-y-auto p-4 font-mono resize-none',
+                'text-[length:var(--edit-input-size)] leading-[var(--edit-input-line-height)]',
+                '[scrollbar-gutter:stable] bg-transparent',
+                'text-[var(--foreground)] outline-none transition-colors placeholder:text-[var(--muted)]',
+                'focus:ring-2 focus:ring-[var(--accent-border)]',
+                yamlError && 'ring-2 ring-red-500/50',
+              )}
+            />
+          </div>
           {yamlError && (
             <p className="mt-2 flex items-start gap-2 text-[length:var(--edit-input-size)] leading-[var(--edit-input-line-height)] text-red-400">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
@@ -630,7 +636,7 @@ function YamlEditorSection({
 
 function SectionLoading() {
   return (
-    <div className="rounded-[24px] border bg-[var(--panel-strong)] px-5 py-10 text-center text-sm text-[var(--muted)]" style={{ borderColor: 'var(--panel-border)' }}>
+    <div className="rounded-[24px] border bg-[var(--panel-strong)] px-5 py-10 text-center text-sm text-[var(--muted)] panel-border">
       正在加载编辑器...
     </div>
   );
@@ -648,7 +654,7 @@ function CenteredStateCard({
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <div className="mx-auto flex min-h-screen max-w-xl items-center px-4 py-10 sm:px-6">
-        <section className="w-full rounded-[28px] border bg-[var(--panel-strong)] p-6 text-center shadow-sm" style={{ borderColor: 'var(--panel-border)' }}>
+        <section className="w-full rounded-[28px] border bg-[var(--panel-strong)] p-6 text-center shadow-sm panel-border">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--accent-alpha)]">
             {icon}
           </div>

@@ -62,13 +62,7 @@ mkdir -p docker
 cp public/config.yaml docker/config.yaml
 ```
 
-2. 构建镜像：
-
-```bash
-docker build -t compass .
-```
-
-3. 运行容器：
+2. 运行容器：
 
 ```bash
 docker run -d \
@@ -77,16 +71,20 @@ docker run -d \
   -e COMPASS_ADMIN_TOKEN=replace-with-a-strong-token \
   -e COMPASS_SESSION_SECRET=replace-with-a-long-random-secret \
   -v "$(pwd)/docker/config.yaml:/app/public/config.yaml" \
-  compass
+  zhoukq/compass:latest
 ```
 
 说明：
 
+- 公共镜像地址是 `zhoukq/compass:latest`
+- 首次执行 `docker run` 时，如果本地还没有该镜像，Docker 会自动拉取
 - 容器内默认配置路径是 `/app/public/config.yaml`
 - `COMPASS_ADMIN_TOKEN` 未设置时，容器会直接退出
 - 挂载进去的 YAML 文件必须可写，否则 `/edit` 保存会失败
 - 如需改用其他挂载路径，请同时设置 `COMPASS_CONFIG_PATH`
 - `server` 模式按请求读取配置；修改挂载文件或在 `/edit` 保存后，刷新页面即可看到最新内容
+
+如果你要验证本地源码改动，仍然可以在仓库根目录执行 `docker build -t compass .` 自行构建镜像；但对于普通部署，优先推荐直接拉取公共镜像。
 
 ### Docker Compose
 
@@ -102,10 +100,10 @@ cp public/config.yaml docker/config.yaml
 3. 启动：
 
 ```bash
-docker compose up --build -d
+docker compose up -d
 ```
 
-默认 `docker-compose.yml` 会把宿主机的 `./docker/config.yaml` 挂载到容器内的 `/app/public/config.yaml`。
+默认 `docker-compose.yml` 会直接使用 `zhoukq/compass:latest`，并把宿主机的 `./docker/config.yaml` 挂载到容器内的 `/app/public/config.yaml`。
 
 ## Vercel 部署
 

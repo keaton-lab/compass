@@ -29,6 +29,7 @@ import DeleteConfirmButton from './DeleteConfirmButton';
 import { validateCategoryName } from '../utils/validators';
 import SortableLinkItem from './SortableLinkItem';
 import Button from '../../components/Button';
+import { AppInput } from '../../components/AppInput';
 
 const restrictToVerticalAxis: Modifier = ({ transform }) => ({
   ...transform,
@@ -51,10 +52,9 @@ interface CategoriesEditorSectionProps {
   onDeleteLink: (catIdx: number, linkIdx: number) => void;
 }
 
-// 空状态组件
 function EmptyState({ onAdd }: { onAdd: () => void }) {
   return (
-    <div className="rounded-[20px] border border-dashed py-16 text-center" style={{ borderColor: 'var(--panel-border)' }}>
+    <div className="rounded-[20px] border border-dashed py-16 text-center panel-border">
       <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--bg-secondary)]">
         <Folder className="h-8 w-8 text-[var(--muted)] opacity-60" />
       </div>
@@ -103,12 +103,12 @@ function SortableCategoryTab({
   return (
     <div
       ref={setNodeRef}
-      className={`group relative flex items-center gap-2 rounded-[14px] border px-3 py-2.5 cursor-pointer transition-colors will-change-transform ${
+      className={`group relative flex items-center gap-2 rounded-[14px] border px-3 py-2.5 cursor-pointer transition-colors will-change-transform panel-border ${
         isSelected
-          ? 'bg-[var(--accent-alpha)] border-[var(--accent)]'
+          ? 'bg-[var(--accent-alpha)] accent-border'
           : 'bg-[var(--background)] border-transparent hover:bg-[var(--bg-secondary)]'
       } ${isDragging ? 'shadow-lg' : ''}`}
-      style={{ borderColor: isSelected ? 'var(--accent-border)' : 'transparent', ...dndStyle }}
+      style={dndStyle}
       onClick={onClick}
     >
       {/* 拖拽手柄 */}
@@ -228,7 +228,7 @@ function CategoryEditor({
       )}
 
       {/* 分类基本信息 */}
-      <div className="rounded-[18px] border bg-[var(--background)] p-3 sm:shrink-0 sm:p-4" style={{ borderColor: 'var(--panel-border)' }}>
+      <div className="rounded-[18px] border bg-[var(--background)] p-3 sm:shrink-0 sm:p-4 panel-border">
         {/* PC端：水平布局 */}
         {!isMobile && (
           <div className="flex items-end gap-3">
@@ -254,15 +254,14 @@ function CategoryEditor({
               <label className="mb-2 block text-xs font-medium text-[var(--muted)]">
                 分类名称
               </label>
-              <input
+              <AppInput
                 type="text"
                 value={category.name}
                 onChange={(e) => onUpdate('name', e.target.value)}
-                className={`w-full rounded-[14px] border bg-[var(--panel-strong)] px-4 py-2.5 text-sm font-medium text-[var(--foreground)] outline-none transition-colors ${
-                  nameError ? 'border-red-500/50' : ''
-                }`}
-                style={{ borderColor: nameError ? undefined : 'var(--panel-border)' }}
+                error={!!nameError}
                 placeholder="分类名称"
+                inputClassName="font-medium bg-[var(--panel-strong)]"
+                size="sm"
               />
               {nameError && <p className="mt-1 text-xs text-red-400">{nameError}</p>}
             </div>
@@ -303,15 +302,14 @@ function CategoryEditor({
                 <label className="mb-1.5 block text-[11px] font-medium text-[var(--muted)]">
                   分类名称
                 </label>
-                <input
+                <AppInput
                   type="text"
                   value={category.name}
                   onChange={(e) => onUpdate('name', e.target.value)}
-                  className={`w-full rounded-[12px] border bg-[var(--panel-strong)] px-3 py-2 text-sm font-medium text-[var(--foreground)] outline-none transition-colors ${
-                    nameError ? 'border-red-500/50' : ''
-                  }`}
-                  style={{ borderColor: nameError ? undefined : 'var(--panel-border)' }}
+                  error={!!nameError}
                   placeholder="分类名称"
+                  inputClassName="font-medium bg-[var(--panel-strong)]"
+                  size="sm"
                 />
                 {nameError && <p className="mt-1 text-xs text-red-400">{nameError}</p>}
               </div>
@@ -345,10 +343,7 @@ function CategoryEditor({
         </div>
 
         {category.links.length === 0 ? (
-          <div
-            className="rounded-[14px] border border-dashed py-8 text-center"
-            style={{ borderColor: 'var(--panel-border)' }}
-          >
+          <div className="rounded-[14px] border border-dashed py-8 text-center panel-border">
             <p className="text-sm text-[var(--muted)]">还没有链接</p>
             <Button
               variant="ghost"
@@ -537,7 +532,7 @@ export default function CategoriesEditorSection({
       {/* PC端布局：左右分栏 */}
       <div className="hidden lg:flex min-h-0 flex-1">
         {/* 左侧分类列表 */}
-        <div className="shrink-0 border-r w-64 xl:w-72" style={{ borderColor: 'var(--panel-border)' }}>
+        <div className="shrink-0 border-r w-64 xl:w-72 panel-border">
           <div className="h-full p-3 overflow-hidden">
             <DndContext
               sensors={categorySensors}

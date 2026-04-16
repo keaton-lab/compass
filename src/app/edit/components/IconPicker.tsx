@@ -3,11 +3,13 @@
 import { Dialog, Tabs } from 'radix-ui';
 import { Search, X } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { useDeferredValue, useEffect, useMemo, useRef, useState, startTransition } from 'react';
+import { useDeferredValue, useEffect, useMemo, useState, startTransition } from 'react';
 import type { ReactNode, UIEvent } from 'react';
 import { AppDialogContent } from '../../components/AppDialog';
 import { normalizeBrandIconKey, toKebabCase } from '../../icon-utils';
 import { modalIconButtonClassName } from '../../components/modalStyles';
+import { AppInput } from '../../components/AppInput';
+import { useAnimatedDialogState } from '../../components/useAnimatedDialogState';
 
 interface BrandIcon {
   name: string;
@@ -125,6 +127,7 @@ async function loadBrandIcons(): Promise<BrandIcon[]> {
 }
 
 export default function IconPicker({ value, onChange, onClose }: IconPickerProps) {
+  const dialog = useAnimatedDialogState({ initialOpen: true, onAfterClose: onClose });
   const [search, setSearch] = useState('');
   const deferredSearch = useDeferredValue(search);
   const [tab, setTab] = useState<'lucide' | 'brand'>('lucide');
@@ -238,25 +241,20 @@ export default function IconPicker({ value, onChange, onClose }: IconPickerProps
 
   function handleSelect(icon: string) {
     onChange(icon);
-    onClose();
+    dialog.requestClose();
   }
 
   return (
     <Dialog.Root
-      open
-      onOpenChange={(open) => {
-        if (!open) {
-          onClose();
-        }
-      }}
+      open={dialog.open}
+      onOpenChange={dialog.handleOpenChange}
     >
       <AppDialogContent
-        panelClassName="fixed inset-x-2 sm:inset-x-4 top-[4vh] sm:top-[6vh] bottom-[4vh] sm:bottom-[6vh] z-[51] mx-auto flex max-w-5xl flex-col overflow-hidden rounded-[20px] sm:rounded-[24px] border bg-[var(--panel-strong)] outline-none"
-        panelStyle={{ borderColor: 'var(--panel-border)' }}
+        isClosing={dialog.isClosing}
+        panelClassName="fixed inset-x-2 sm:inset-x-4 top-[4vh] sm:top-[6vh] bottom-[4vh] sm:bottom-[6vh] z-[51] mx-auto flex max-w-5xl flex-col overflow-hidden rounded-[20px] sm:rounded-[24px] border bg-[var(--panel-strong)] outline-none panel-border"
       >
           <div
-            className="flex items-center justify-between border-b px-4 sm:px-6 py-3 sm:py-5"
-            style={{ borderColor: 'var(--panel-border)' }}
+            className="flex items-center justify-between border-b px-4 sm:px-6 py-3 sm:py-5 panel-border"
           >
             <div>
               <Dialog.Title className="text-lg sm:text-xl font-semibold text-[var(--text-primary)]">选择图标</Dialog.Title>
@@ -267,8 +265,7 @@ export default function IconPicker({ value, onChange, onClose }: IconPickerProps
             <Dialog.Close asChild>
               <button
                 type="button"
-                className={modalIconButtonClassName}
-                style={{ borderColor: 'var(--panel-border)' }}
+                className={`${modalIconButtonClassName} panel-border`}
               >
                 <X size={18} />
               </button>
@@ -285,10 +282,9 @@ export default function IconPicker({ value, onChange, onClose }: IconPickerProps
             }}
             className="flex min-h-0 flex-1 flex-col"
           >
-            <div className="border-b px-4 sm:px-6 py-3 sm:py-4" style={{ borderColor: 'var(--panel-border)' }}>
+            <div className="border-b px-4 sm:px-6 py-3 sm:py-4 panel-border">
               <div className="relative">
-                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
-                <input
+                <AppInput
                   type="text"
                   value={search}
                   onChange={(event) => {
@@ -297,14 +293,14 @@ export default function IconPicker({ value, onChange, onClose }: IconPickerProps
                   }}
                   placeholder="搜索图标..."
                   autoFocus
-                  className="w-full rounded-[14px] sm:rounded-[18px] border bg-[var(--background)] px-10 sm:px-11 py-2.5 sm:py-3 text-sm text-[var(--foreground)] outline-none transition-colors placeholder:text-[var(--muted)] focus:border-[var(--accent-border)]"
-                  style={{ borderColor: 'var(--panel-border)' }}
+                  leftIcon={<Search className="h-4 w-4" />}
+                  size="lg"
+                  inputClassName="sm:rounded-[18px] sm:py-3 sm:px-11"
                 />
               </div>
 
               <Tabs.List
-                className="mt-3 sm:mt-4 inline-flex rounded-[14px] sm:rounded-[18px] border bg-[var(--background)] p-1"
-                style={{ borderColor: 'var(--panel-border)' }}
+                className="mt-3 sm:mt-4 inline-flex rounded-[14px] sm:rounded-[18px] border bg-[var(--background)] p-1 panel-border"
               >
                 <Tabs.Trigger
                   value="lucide"
@@ -380,7 +376,7 @@ export default function IconPicker({ value, onChange, onClose }: IconPickerProps
             </Tabs.Content>
           </Tabs.Root>
 
-          <div className="border-t px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-[var(--muted)]" style={{ borderColor: 'var(--panel-border)' }}>
+          <div className="border-t px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-[var(--muted)] panel-border">
             当前选中:{' '}
             <code className="rounded-[8px] sm:rounded-[10px] bg-[var(--background)] px-2 py-1 text-[var(--text-primary)]">{value}</code>
           </div>
@@ -473,11 +469,57 @@ function FooterAction({
       <button
         type="button"
         onClick={onClick}
-        className="rounded-[14px] border px-4 py-2 text-sm text-[var(--foreground)] transition-colors hover:bg-[var(--bg-secondary)]"
-        style={{ borderColor: 'var(--panel-border)' }}
+        className="rounded-[14px] border px-4 py-2 text-sm text-[var(--foreground)] transition-colors hover:bg-[var(--bg-secondary)] panel-border"
       >
         {buttonLabel}
       </button>
+    </div>
+  );
+}
+
+function IconGrid<T>({
+  icons,
+  selectedValue,
+  onSelect,
+  renderIcon,
+  getKey,
+  getName,
+  isSelected,
+}: {
+  icons: T[];
+  selectedValue: string;
+  onSelect: (item: T) => void;
+  renderIcon: (item: T) => ReactNode;
+  getKey: (item: T) => string;
+  getName: (item: T) => string;
+  isSelected: (item: T, selectedValue: string) => boolean;
+}) {
+  return (
+    <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 sm:gap-3">
+      {icons.map((icon) => {
+        const selected = isSelected(icon, selectedValue);
+
+        return (
+          <button
+            key={getKey(icon)}
+            type="button"
+            onClick={() => onSelect(icon)}
+            className={`rounded-[12px] sm:rounded-[16px] border px-1.5 sm:px-2 py-3 sm:py-4 text-xs transition-colors active:scale-95 ${
+              selected
+                ? 'bg-[var(--accent-alpha)] text-[var(--foreground)] accent-border'
+                : 'bg-[var(--background)] text-[var(--muted)] hover:bg-[var(--bg-secondary)] panel-border'
+            }`}
+            title={getName(icon)}
+          >
+            <div className="mb-2 flex justify-center">
+              {renderIcon(icon)}
+            </div>
+            <div className="truncate text-center">
+              {getName(icon).length > 10 ? `${getName(icon).slice(0, 9)}…` : getName(icon)}
+            </div>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -492,33 +534,15 @@ function LucideIconGrid({
   onSelect: (name: string) => void;
 }) {
   return (
-    <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 sm:gap-3">
-      {icons.map((icon) => {
-        const isSelected = selectedValue === icon.normalizedKey;
-
-        return (
-          <button
-            key={icon.key}
-            type="button"
-            onClick={() => onSelect(icon.name)}
-            className={`rounded-[12px] sm:rounded-[16px] border px-1.5 sm:px-2 py-3 sm:py-4 text-xs transition-colors active:scale-95 ${
-              isSelected
-                ? 'bg-[var(--accent-alpha)] text-[var(--foreground)]'
-                : 'bg-[var(--background)] text-[var(--muted)] hover:bg-[var(--bg-secondary)]'
-            }`}
-            style={{ borderColor: isSelected ? 'var(--accent-border)' : 'var(--panel-border)' }}
-            title={icon.name}
-          >
-            <div className="mb-2 flex justify-center">
-              <icon.component size={20} />
-            </div>
-            <div className="truncate text-center">
-              {icon.name.length > 10 ? `${icon.name.slice(0, 9)}…` : icon.name}
-            </div>
-          </button>
-        );
-      })}
-    </div>
+    <IconGrid
+      icons={icons}
+      selectedValue={selectedValue}
+      onSelect={(icon) => onSelect(icon.name)}
+      renderIcon={(icon) => <icon.component size={20} />}
+      getKey={(icon) => icon.key}
+      getName={(icon) => icon.name}
+      isSelected={(icon, value) => value === icon.normalizedKey}
+    />
   );
 }
 
@@ -532,34 +556,18 @@ function BrandIconGrid({
   onSelect: (name: string) => void;
 }) {
   return (
-    <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 sm:gap-3">
-      {icons.map((icon) => {
-        const isSelected = selectedValue === normalizeBrandIconKey(icon.slug);
-
-        return (
-          <button
-            key={icon.slug}
-            type="button"
-            onClick={() => onSelect(icon.slug)}
-            className={`rounded-[12px] sm:rounded-[16px] border px-1.5 sm:px-2 py-3 sm:py-4 text-xs transition-colors active:scale-95 ${
-              isSelected
-                ? 'bg-[var(--accent-alpha)] text-[var(--foreground)]'
-                : 'bg-[var(--background)] text-[var(--muted)] hover:bg-[var(--bg-secondary)]'
-            }`}
-            style={{ borderColor: isSelected ? 'var(--accent-border)' : 'var(--panel-border)' }}
-            title={icon.name}
-          >
-            <div className="mb-2 flex justify-center">
-              <svg viewBox="0 0 24 24" width="20" height="20" style={{ fill: 'currentColor' }}>
-                <path d={icon.path} />
-              </svg>
-            </div>
-            <div className="truncate text-center">
-              {icon.name.length > 10 ? `${icon.name.slice(0, 9)}…` : icon.name}
-            </div>
-          </button>
-        );
-      })}
-    </div>
+    <IconGrid
+      icons={icons}
+      selectedValue={selectedValue}
+      onSelect={(icon) => onSelect(icon.slug)}
+      renderIcon={(icon) => (
+        <svg viewBox="0 0 24 24" width="20" height="20" style={{ fill: 'currentColor' }}>
+          <path d={icon.path} />
+        </svg>
+      )}
+      getKey={(icon) => icon.slug}
+      getName={(icon) => icon.name}
+      isSelected={(icon, value) => value === normalizeBrandIconKey(icon.slug)}
+    />
   );
 }
