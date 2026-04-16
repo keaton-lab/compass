@@ -124,7 +124,7 @@ export default function EditHeader({
 
   return (
     <>
-      <section className="mb-2 rounded-[18px] border bg-[var(--panel-strong)] px-3 py-3 sm:mb-3 sm:px-4 sm:py-3.5" style={{ borderColor: 'var(--panel-border)' }}>
+      <section className="mb-2 rounded-[18px] border bg-[var(--panel-strong)] px-3 py-3 sm:mb-3 sm:px-4 sm:py-3.5 panel-border">
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">

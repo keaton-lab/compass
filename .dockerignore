@@ -1,5 +1,7 @@
 .git
 .gitignore
+.env*
+!.env.example
 .next
 out
 node_modules

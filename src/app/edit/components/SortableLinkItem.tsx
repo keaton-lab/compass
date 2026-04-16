@@ -10,6 +10,7 @@ import LazyIconPicker from "./LazyIconPicker";
 import DynamicIcon from "../../components/DynamicIcon";
 import DeleteConfirmButton from "./DeleteConfirmButton";
 import { validateLinkName, validateLinkUrl } from "../utils/validators";
+import { AppInput } from "../../components/AppInput";
 
 interface SortableLinkItemProps {
   link: LinkType;
@@ -71,10 +72,10 @@ export default function SortableLinkItem({
           setNodeRef(node);
           itemRef.current = node;
         }}
-        className={`rounded-[14px] border bg-[var(--background)] px-3 py-2 transition-colors ${
+        className={`rounded-[14px] border bg-[var(--background)] px-3 py-2 transition-colors panel-border ${
           isDragging ? "shadow-lg ring-2 ring-[var(--accent)]" : ""
         }`}
-        style={{ borderColor: "var(--panel-border)", ...dndStyle }}
+        style={dndStyle}
       >
         <div className="flex items-center gap-2">
           {/* 拖拽手柄 */}
@@ -106,17 +107,13 @@ export default function SortableLinkItem({
 
           {/* 名称输入 */}
           <div className="min-w-0 flex-1">
-            <input
+            <AppInput
               type="text"
               value={link.name}
               onChange={(e) => onUpdate("name", e.target.value)}
-              className={`w-full rounded-[10px] border bg-[var(--panel-strong)] px-3 py-1.5 text-sm text-[var(--foreground)] outline-none transition-colors ${
-                nameError ? "border-red-500/50" : ""
-              }`}
-              style={{
-                borderColor: nameError ? undefined : "var(--panel-border)",
-              }}
+              error={!!nameError}
               placeholder="链接名称"
+              size="sm"
             />
             {nameError && (
               <p className="mt-0.5 text-[10px] text-red-400">{nameError}</p>
@@ -125,17 +122,13 @@ export default function SortableLinkItem({
 
           {/* URL 输入 - PC端 */}
           <div className="min-w-0 flex-1 hidden sm:block">
-            <input
+            <AppInput
               type="text"
               value={link.url}
               onChange={(e) => onUpdate("url", e.target.value)}
-              className={`w-full rounded-[10px] border bg-[var(--panel-strong)] px-3 py-1.5 text-sm text-[var(--foreground)] outline-none transition-colors ${
-                urlError ? "border-red-500/50" : ""
-              }`}
-              style={{
-                borderColor: urlError ? undefined : "var(--panel-border)",
-              }}
+              error={!!urlError}
               placeholder="https://..."
+              size="sm"
             />
             {urlError && (
               <p className="mt-0.5 text-[10px] text-red-400">{urlError}</p>
@@ -156,17 +149,13 @@ export default function SortableLinkItem({
         <div className={`${showAdvanced ? 'mt-2 space-y-1.5 pl-6' : 'hidden'} sm:mt-2 sm:block sm:space-y-1.5 sm:pl-6`}>
           {/* 移动端 URL 输入 */}
           <div className="sm:hidden">
-            <input
+            <AppInput
               type="text"
               value={link.url}
               onChange={(e) => onUpdate("url", e.target.value)}
-              className={`w-full rounded-[10px] border bg-[var(--panel-strong)] px-3 py-1.5 text-sm text-[var(--foreground)] outline-none transition-colors ${
-                urlError ? "border-red-500/50" : ""
-              }`}
-              style={{
-                borderColor: urlError ? undefined : "var(--panel-border)",
-              }}
+              error={!!urlError}
               placeholder="https://..."
+              size="sm"
             />
             {urlError && (
               <p className="mt-0.5 text-[10px] text-red-400">{urlError}</p>
@@ -174,13 +163,12 @@ export default function SortableLinkItem({
           </div>
 
           {/* 描述输入 */}
-          <input
+          <AppInput
             type="text"
             value={link.description}
             onChange={(e) => onUpdate("description", e.target.value)}
-            className="w-full rounded-[10px] border bg-[var(--panel-strong)] px-3 py-1.5 text-sm text-[var(--foreground)] outline-none transition-colors placeholder:text-[var(--muted)]"
-            style={{ borderColor: "var(--panel-border)" }}
             placeholder="描述（可选）"
+            size="sm"
           />
         </div>
 

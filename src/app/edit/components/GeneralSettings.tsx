@@ -9,6 +9,7 @@ import DynamicIcon from '../../components/DynamicIcon';
 import LazyIconPicker from './LazyIconPicker';
 import AppSelect from '../../components/AppSelect';
 import AppSwitchRow from '../../components/AppSwitchRow';
+import { AppInput } from '../../components/AppInput';
 
 interface GeneralSettingsProps {
   profile: Config['profile'];
@@ -50,8 +51,7 @@ export default function GeneralSettings({
               <button
                 type="button"
                 onClick={() => setShowIconPicker(true)}
-                className="flex h-10 w-10 items-center justify-center rounded-[14px] border bg-[var(--background)] text-[var(--foreground)] transition-colors hover:bg-[var(--bg-secondary)]"
-                style={{ borderColor: 'var(--panel-border)' }}
+                className="flex h-10 w-10 items-center justify-center rounded-[14px] border bg-[var(--background)] text-[var(--foreground)] transition-colors hover:bg-[var(--bg-secondary)] panel-border"
                 title="更换 Logo"
               >
                 <DynamicIcon name={avatarIcon} size={22} />
@@ -61,14 +61,11 @@ export default function GeneralSettings({
               <label className="edit-field-label">
                 名称 <span className="text-red-400">*</span>
               </label>
-              <input
+              <AppInput
                 type="text"
                 value={profile.name}
                 onChange={(e) => onProfileChange('name', e.target.value)}
-                className={`edit-field-input ${
-                  nameError ? 'border-red-500/50' : ''
-                }`}
-                style={{ borderColor: nameError ? undefined : 'var(--panel-border)' }}
+                error={!!nameError}
                 placeholder="站点名称"
               />
               {nameError && (
@@ -82,14 +79,11 @@ export default function GeneralSettings({
             <label className="edit-field-label">
               描述 <span className="text-red-400">*</span>
             </label>
-            <input
+            <AppInput
               type="text"
               value={profile.description}
               onChange={(e) => onProfileChange('description', e.target.value)}
-              className={`edit-field-input ${
-                descError ? 'border-red-500/50' : ''
-              }`}
-              style={{ borderColor: descError ? undefined : 'var(--panel-border)' }}
+              error={!!descError}
               placeholder="站点描述"
             />
             {descError && (
@@ -102,13 +96,12 @@ export default function GeneralSettings({
             <label className="edit-field-label">
               简介 <span className="text-[var(--muted)]">（可选）</span>
             </label>
-            <input
+            <AppInput
               type="text"
               value={profile.bio || ''}
               onChange={(e) => onProfileChange('bio', e.target.value)}
-              className="edit-field-input"
-              style={{ borderColor: 'var(--panel-border)' }}
               placeholder="一句简短的自我介绍"
+              inputClassName="edit-field-input"
             />
           </div>
         </div>
