@@ -29,7 +29,7 @@ COMPASS_ADMIN_TOKEN=change-me npm run dev
 说明：
 
 - `npm run dev` 默认就是 `server` 模式
-- 未设置 `COMPASS_ADMIN_TOKEN` 时，页面仍可打开，但 `/edit` 不会启用服务器保存
+- 未设置 `COMPASS_ADMIN_TOKEN` 时，`npm run dev` 会直接启动失败；如果只想预览静态效果，请改用 `npm run dev:static`
 - `COMPASS_SESSION_SECRET` 可选；未设置时会自动生成临时值，重启后登录态会失效
 
 ### 2. Static 模式预览
