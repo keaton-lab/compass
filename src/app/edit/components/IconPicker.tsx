@@ -3,7 +3,7 @@
 import { Dialog, Tabs } from 'radix-ui';
 import { Search, X } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { useDeferredValue, useEffect, useMemo, useState, startTransition } from 'react';
+import { useDeferredValue, useEffect, useMemo, useState, startTransition, useRef } from 'react';
 import type { ReactNode, UIEvent } from 'react';
 import { AppDialogContent } from '../../components/AppDialog';
 import { normalizeBrandIconKey, toKebabCase } from '../../icon-utils';

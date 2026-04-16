@@ -14,7 +14,7 @@ export function useAnimatedDialogState({
 }: UseAnimatedDialogStateOptions = {}) {
   const [isOpen, setIsOpen] = useState(initialOpen);
   const [isClosing, setIsClosing] = useState(false);
-  const closeTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
+  const closeTimerRef = useRef<number | null>(null);
 
   const clearCloseTimer = useCallback(() => {
     if (closeTimerRef.current) {
