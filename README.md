@@ -8,7 +8,7 @@
   <a href="https://react.dev"><img src="https://img.shields.io/badge/React-19-61dafb?logo=react" alt="React"></a>
   <a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript" alt="TypeScript"></a>
   <a href="https://tailwindcss.com"><img src="https://img.shields.io/badge/Tailwind_CSS-3-06b6d4?logo=tailwindcss" alt="Tailwind CSS"></a>
-  <a href="https://github.com/imzhoukunqiang/compass/blob/dev/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-green.svg" alt="License"></a>
+  <a href="https://github.com/keaton-lab/compass/blob/dev/LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-green.svg" alt="License"></a>
 </p>
 
 <p align="center">
@@ -56,9 +56,9 @@ Compass 是一个由 YAML 配置驱动的个人导航页，适合个人主页、
 ### 一键部署
 
 <p>
-  <a href="https://vercel.com/new/clone?repository-url=https://github.com/imzhoukunqiang/compass"><img src="https://vercel.com/button" alt="Deploy with Vercel"></a>
-  <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/imzhoukunqiang/compass"><img src="https://deploy.workers.cloudflare.com/button.svg" alt="Deploy to Cloudflare"></a>
-  <a href="https://app.netlify.com/start/deploy?repository=https://github.com/imzhoukunqiang/compass"><img src="https://www.netlify.com/img/deploy/button.svg" alt="Deploy to Netlify"></a>
+  <a href="https://vercel.com/new/clone?repository-url=https://github.com/keaton-lab/compass"><img src="https://vercel.com/button" alt="Deploy with Vercel"></a>
+  <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/keaton-lab/compass"><img src="https://deploy.workers.cloudflare.com/button.svg" alt="Deploy to Cloudflare"></a>
+  <a href="https://app.netlify.com/start/deploy?repository=https://github.com/keaton-lab/compass"><img src="https://www.netlify.com/img/deploy/button.svg" alt="Deploy to Netlify"></a>
 </p>
 
 点击按钮会进入对应平台的项目创建或仓库导入流程。
