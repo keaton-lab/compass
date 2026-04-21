@@ -164,7 +164,7 @@ export default function ClientLayout({
         <div className="mx-auto h-px w-full max-w-[180px] bg-gradient-to-r from-transparent via-[var(--panel-border)] to-transparent opacity-40 md:max-w-sm" />
         <div className="mx-auto mt-5 flex max-w-[1400px] flex-col items-center gap-2 px-4 text-center md:px-6 lg:px-8">
           <a
-            href="https://github.com/imzhoukunqiang/compass"
+            href="https://github.com/keaton-lab/compass"
             target="_blank"
             rel="noopener noreferrer"
             className={`flex items-center justify-center gap-1.5 text-sm text-[var(--muted)] ${footerLinkClass}`}
